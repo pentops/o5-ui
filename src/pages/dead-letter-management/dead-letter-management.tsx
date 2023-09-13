@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/data-table/data-table.tsx';
 import { O5DempeV1CapturedMessage } from '@/data/types';
 import { useListMessages } from '@/data/api';
+import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 
 const columns: ColumnDef<O5DempeV1CapturedMessage>[] = [
   {
@@ -30,6 +30,16 @@ const columns: ColumnDef<O5DempeV1CapturedMessage>[] = [
     header: 'Sent At',
     accessorKey: 'initialSentTimestamp',
   },
+  {
+    header: () => {
+      return <div className="block w-[65px]" />;
+    },
+    id: 'actions',
+    accessorKey: 'messageId',
+    cell: ({ getValue }) => {
+      return <ActionActivator messageId={getValue<string>()} />;
+    },
+  },
 ];
 
 function DeadLetterManagement() {
@@ -49,14 +59,10 @@ function DeadLetterManagement() {
   }, [data?.pages]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Dead Letter Management</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <DataTable columns={columns} data={flatData} pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }} showSkeleton={isLoading} />
-      </CardContent>
-    </Card>
+    <div>
+      <h1 className="text-2xl pb-4">Dead Letter Management</h1>
+      <DataTable columns={columns} data={flatData} pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }} showSkeleton={isLoading} />
+    </div>
   );
 }
 

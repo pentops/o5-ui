@@ -18,7 +18,7 @@ export async function messageAction(request: O5DempeV1MessageActionRequest) {
   });
 }
 
-export function useCreateTeamMemberInvitation() {
+export function useMessageAction() {
   const queryClient = useQueryClient();
 
   return useMutation({

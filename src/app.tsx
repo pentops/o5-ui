@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="flex flex-col h-full w-full">
       <Header />
-      <main className="w-full h-full p-4 flex-grow">
+      <main className="w-full h-full p-4 lg:px-8 flex-grow">
         <Outlet />
       </main>
       <Toaster />
