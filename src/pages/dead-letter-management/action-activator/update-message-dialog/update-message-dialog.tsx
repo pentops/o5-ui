@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs/components/prism-core';
 import { DialogClose } from '@radix-ui/react-dialog';
@@ -13,9 +13,10 @@ import { Button } from '@/components/ui/button.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { useMessageAction } from '@/data/api/mutation';
-import { useErrorHandler } from '@/lib/utils.ts';
+import { useErrorHandler } from '@/lib/error.ts';
 import 'prismjs/components/prism-json';
 import 'prismjs/themes/prism-tomorrow.css';
+import { useMessage } from '@/data/api';
 
 const schema = z.object({
   note: z.string().optional(),
@@ -23,12 +24,6 @@ const schema = z.object({
 });
 
 type Values = z.infer<typeof schema>;
-
-const defaultValues: Values = {
-  json: `{
-  
-}`,
-};
 
 interface UpdateMessageDialogProps {
   messageId: string;
@@ -39,6 +34,19 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
   const { toast } = useToast();
   const { mutateAsync, isLoading, error } = useMessageAction();
   useErrorHandler(error, 'Error editing message');
+
+  const { data, error: messageError } = useMessage({ messageId });
+  useErrorHandler(messageError, 'Failed to load dead letter message');
+  const defaultValues = useMemo(
+    () => ({
+      json:
+        JSON.stringify(data?.message?.cause?.payload?.json, null, 2) ||
+        `{
+  
+}`,
+    }),
+    [data?.message?.cause?.payload?.json],
+  );
 
   const form = useForm({ defaultValues: defaultValues, resolver: zodResolver(schema) });
 

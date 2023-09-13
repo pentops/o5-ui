@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CopyIcon } from '@radix-ui/react-icons';
-import { useCopyToClipboard } from '@/lib/utils.ts';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { clsx } from 'clsx';
+import { useCopyToClipboard } from '@/lib/copy.ts';
 
 interface UUIDProps extends React.HTMLAttributes<HTMLSpanElement> {
   canCopy?: boolean;
   short?: boolean;
   to?: string;
-  uuid: string;
+  uuid: string | undefined;
 }
 
 export function UUID({ canCopy, className, short, to, uuid, ...rest }: UUIDProps) {
   const [isShowingCopiedNotice, setIsShowingCopiedNotice] = useState(false);
   const [copied, copy] = useCopyToClipboard();
-  const uuidToRender = short ? uuid.slice(0, 8) : uuid;
+  const uuidToRender = short ? uuid?.slice(0, 8) : uuid;
 
   useEffect(() => {
     let timeout: number;

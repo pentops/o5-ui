@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, Row, useReactTable } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
-import { useIntersectionObserverAction } from '@/lib/utils.ts';
+import { useIntersectionObserverAction } from '@/lib/intersection-observer.ts';
 
 const LOADING_ROWS = 20;
 

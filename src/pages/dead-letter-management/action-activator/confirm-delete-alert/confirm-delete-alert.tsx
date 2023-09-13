@@ -15,11 +15,11 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMessageAction } from '@/data/api/mutation';
 import { useToast } from '@/components/ui/use-toast.ts';
-import { useErrorHandler } from '@/lib/utils.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { Button } from '@/components/ui/button.tsx';
+import { useErrorHandler } from '@/lib/error.ts';
 
 const schema = z.object({
   note: z.string().optional(),

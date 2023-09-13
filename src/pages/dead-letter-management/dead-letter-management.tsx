@@ -4,15 +4,25 @@ import { DataTable } from '@/components/data-table/data-table.tsx';
 import { O5DempeV1CapturedMessage } from '@/data/types';
 import { useListMessages } from '@/data/api';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
+import { DateFormat } from '@/components/format/date/date-format.tsx';
+import { UUID } from '@/components/uuid/uuid.tsx';
+import { deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui/dempe.ts';
+import { useErrorHandler } from '@/lib/error.ts';
 
 const columns: ColumnDef<O5DempeV1CapturedMessage>[] = [
   {
-    header: 'Infra ID',
-    accessorKey: 'infraId',
-  },
-  {
     header: 'Message ID',
     accessorKey: 'messageId',
+    cell: ({ getValue }) => {
+      return <UUID canCopy short to={getValue<string>()} uuid={getValue<string>()} />;
+    },
+  },
+  {
+    header: 'Infra ID',
+    accessorKey: 'infraId',
+    cell: ({ getValue }) => {
+      return <UUID canCopy short uuid={getValue<string>()} />;
+    },
   },
   {
     header: 'Queue',
@@ -23,12 +33,22 @@ const columns: ColumnDef<O5DempeV1CapturedMessage>[] = [
     accessorKey: 'grpcName',
   },
   {
+    header: 'Problem',
+    accessorFn: (row) => deadMessageProblemLabels[getDeadMessageProblem(row.cause)],
+  },
+  {
     header: 'Rejected At',
     accessorKey: 'rejectedTimestamp',
+    cell: ({ getValue }) => {
+      return <DateFormat value={getValue<string>()} />;
+    },
   },
   {
     header: 'Sent At',
     accessorKey: 'initialSentTimestamp',
+    cell: ({ getValue }) => {
+      return <DateFormat value={getValue<string>()} />;
+    },
   },
   {
     header: () => {
@@ -43,7 +63,8 @@ const columns: ColumnDef<O5DempeV1CapturedMessage>[] = [
 ];
 
 function DeadLetterManagement() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListMessages();
+  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListMessages();
+  useErrorHandler(error, 'Failed to load dead letter messages');
   const flatData = useMemo(() => {
     if (!data?.pages) {
       return [];
@@ -61,7 +82,12 @@ function DeadLetterManagement() {
   return (
     <div>
       <h1 className="text-2xl pb-4">Dead Letter Management</h1>
-      <DataTable columns={columns} data={flatData} pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }} showSkeleton={isLoading} />
+      <DataTable
+        columns={columns}
+        data={flatData}
+        pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
+        showSkeleton={Boolean(isLoading || error)}
+      />
     </div>
   );
 }

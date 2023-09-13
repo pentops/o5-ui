@@ -8,13 +8,13 @@ export function Header() {
         <div className="p-4 border-b border-slate-900/10 lg:px-8 lg:border-1 dark:border-slate-300/10">
           <div className="relative flex items-center">
             <span className="flex gap-1 mr-3 flex-none font-medium text-accent-foreground">
-              <Link to="/">Undertaker</Link>
+              <Link to="/dead-letter">Undertaker</Link>
             </span>
             <div className="relative flex items-center ml-auto">
               <nav className="text-sm leading-6 font-semibold text-slate-700 dark:text-slate-200">
                 <ul className="flex space-x-8">
                   <li>
-                    <Link to="/">Dead Letters</Link>
+                    <Link to="/dead-letter">Dead Letters</Link>
                   </li>
                 </ul>
               </nav>
