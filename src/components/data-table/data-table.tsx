@@ -8,7 +8,11 @@ import { useIntersectionObserverAction } from '@/lib/intersection-observer.ts';
 
 const LOADING_ROWS = 20;
 
-type TableRow<T> = { row: Row<T> };
+export type TableRow<T> = { row: Row<T> };
+
+function allRowsCanExpand() {
+  return true;
+}
 
 function getTableData<TData>(data: TData[] | undefined, showSkeleton?: boolean): TData[] {
   if (showSkeleton) {
@@ -63,6 +67,7 @@ export function DataTable<TData, TValue>({
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     enableExpanding: Boolean(getRowCanExpand && renderSubComponent),
+    getRowCanExpand: getRowCanExpand === true ? allRowsCanExpand : getRowCanExpand,
   });
 
   return (
@@ -84,11 +89,20 @@ export function DataTable<TData, TValue>({
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                ))}
-              </TableRow>
+              <>
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                  ))}
+                </TableRow>
+                {renderSubComponent && row.getIsExpanded() && (
+                  <TableRow key={`${row.id}-sub`} data-state="expanded">
+                    <TableCell className="px-3" colSpan={columns.length}>
+                      {renderSubComponent({ row })}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </>
             ))
           ) : (
             <TableRow>

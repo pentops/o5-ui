@@ -1,4 +1,5 @@
 import React from 'react';
+import clsx from 'clsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 
 interface NutritionFactProps {
@@ -6,13 +7,14 @@ interface NutritionFactProps {
   label: React.ReactNode;
   renderWhenEmpty?: React.ReactNode;
   value: React.ReactNode;
+  vertical?: boolean;
 }
 
-export function NutritionFact({ isLoading, label, renderWhenEmpty, value }: NutritionFactProps) {
+export function NutritionFact({ isLoading, label, renderWhenEmpty, value, vertical }: NutritionFactProps) {
   return (
-    <div className="flex items-center place-content-between gap-4 text-sm">
-      <span className="font-semibold">{label}</span>
-      <span>{isLoading ? <Skeleton className="h-4 w-full min-w-[125px]" /> : value || renderWhenEmpty}</span>
+    <div className={clsx('flex place-content-between text-sm', vertical ? 'flex-col items-start gap-2' : 'items-center gap-4')}>
+      <span className={clsx('font-semibold', vertical && 'w-full')}>{label}</span>
+      <span className={clsx(vertical && 'w-full')}>{isLoading ? <Skeleton className="h-4 w-full min-w-[125px]" /> : value || renderWhenEmpty}</span>
     </div>
   );
 }

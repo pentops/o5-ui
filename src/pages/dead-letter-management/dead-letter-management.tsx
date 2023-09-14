@@ -40,14 +40,36 @@ const columns: ColumnDef<O5DempeV1CapturedMessage>[] = [
     header: 'Rejected At',
     accessorKey: 'rejectedTimestamp',
     cell: ({ getValue }) => {
-      return <DateFormat value={getValue<string>()} />;
+      return (
+        <DateFormat
+          day="2-digit"
+          hour="numeric"
+          minute="2-digit"
+          second="numeric"
+          month="2-digit"
+          timeZoneName="short"
+          year="numeric"
+          value={getValue<string>()}
+        />
+      );
     },
   },
   {
     header: 'Sent At',
     accessorKey: 'initialSentTimestamp',
     cell: ({ getValue }) => {
-      return <DateFormat value={getValue<string>()} />;
+      return (
+        <DateFormat
+          day="2-digit"
+          hour="numeric"
+          minute="2-digit"
+          second="numeric"
+          month="2-digit"
+          timeZoneName="short"
+          year="numeric"
+          value={getValue<string>()}
+        />
+      );
     },
   },
   {

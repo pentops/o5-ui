@@ -1,6 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import Editor from 'react-simple-code-editor';
-import { highlight, languages } from 'prismjs/components/prism-core';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Pencil1Icon } from '@radix-ui/react-icons';
 import { useForm } from 'react-hook-form';
@@ -14,9 +12,8 @@ import { Textarea } from '@/components/ui/textarea.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { useMessageAction } from '@/data/api/mutation';
 import { useErrorHandler } from '@/lib/error.ts';
-import 'prismjs/components/prism-json';
-import 'prismjs/themes/prism-tomorrow.css';
 import { useMessage } from '@/data/api';
+import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
 
 const schema = z.object({
   note: z.string().optional(),
@@ -48,7 +45,7 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
     [data?.message?.cause?.payload?.json],
   );
 
-  const form = useForm({ defaultValues: defaultValues, resolver: zodResolver(schema) });
+  const form = useForm<Values>({ defaultValues: defaultValues, resolver: zodResolver(schema) });
 
   async function handleEdit(values: Values) {
     try {
@@ -58,7 +55,7 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
           note: values.note || undefined,
           timestamp: new Date().toISOString(),
           edit: {
-            newMessageJson: JSON.parse(values.json || '{}'),
+            newMessageJson: values.json || '{}',
           },
         },
       });
@@ -100,20 +97,7 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
                 <FormItem className="py-2">
                   <FormLabel>Message JSON</FormLabel>
                   <FormControl>
-                    <div className="scrollbars max-h-96 overflow-auto rounded-md border border-input bg-transparent shadow-sm focus-visible:outline-none focus-within:ring-1 focus-within:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
-                      <Editor
-                        {...field}
-                        className="font-mono text-xs bg-transparent"
-                        value={field.value || '{}'}
-                        onValueChange={(value) => {
-                          try {
-                            field.onChange(value);
-                          } catch {}
-                        }}
-                        highlight={(code) => highlight(code, languages.json)}
-                        padding={10}
-                      />
-                    </div>
+                    <JSONEditor {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

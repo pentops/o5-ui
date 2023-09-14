@@ -6,7 +6,7 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
-import { DataTable } from '@/components/data-table/data-table.tsx';
+import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import { ColumnDef } from '@tanstack/react-table';
 import { O5DempeV1MessageAction, O5DempeV1Urgency } from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
@@ -19,14 +19,28 @@ import {
   urgencyLabels,
 } from '@/data/types/ui/dempe.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
+import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
+import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
+import { InvariantViolationPayloadDialog } from '@/pages/dead-letter/invariant-violation-payload-dialog/invariant-violation-payload-dialog.tsx';
 
-// TODO: make expandable to show actor & edited JSON where applicable
 const activityColumns: ColumnDef<O5DempeV1MessageAction>[] = [
+  getRowExpander(),
   {
     header: 'Timestamp',
     accessorKey: 'timestamp',
     cell: ({ getValue }) => {
-      return <DateFormat value={getValue<string>()} />;
+      return (
+        <DateFormat
+          day="2-digit"
+          hour="numeric"
+          minute="2-digit"
+          second="numeric"
+          month="2-digit"
+          timeZoneName="short"
+          year="numeric"
+          value={getValue<string>()}
+        />
+      );
     },
   },
   {
@@ -38,6 +52,18 @@ const activityColumns: ColumnDef<O5DempeV1MessageAction>[] = [
     accessorKey: 'note',
   },
 ];
+
+function renderSubRow({ row }: TableRow<O5DempeV1MessageAction>) {
+  return (
+    <div className="flex flex-col gap-4">
+      <NutritionFact vertical label="Actor" value="-" />
+
+      {row.original.edit && (
+        <NutritionFact vertical label="New JSON" value={<JSONEditor disabled value={row.original.edit.newMessageJson || ''} />} />
+      )}
+    </div>
+  );
+}
 
 export function DeadLetter() {
   const { messageId } = useParams();
@@ -52,7 +78,7 @@ export function DeadLetter() {
         {messageId && <ActionActivator messageId={messageId} />}
       </div>
       <div className="w-full inline-flex gap-4">
-        <Card className="flex-grow-0 w-[325px]">
+        <Card className="flex-grow-0 w-[325px] h-fit">
           <CardHeader className="text-lg font-semibold">Details</CardHeader>
           <CardContent className="w-full flex flex-col gap-4">
             <NutritionFact
@@ -67,13 +93,39 @@ export function DeadLetter() {
               isLoading={isLoading}
               label="Rejected At"
               renderWhenEmpty="-"
-              value={data?.message?.cause?.rejectedTimestamp ? <DateFormat value={data.message.cause.rejectedTimestamp} /> : null}
+              value={
+                data?.message?.cause?.rejectedTimestamp ? (
+                  <DateFormat
+                    day="2-digit"
+                    hour="numeric"
+                    minute="2-digit"
+                    second="numeric"
+                    month="2-digit"
+                    timeZoneName="short"
+                    year="numeric"
+                    value={data.message.cause.rejectedTimestamp}
+                  />
+                ) : null
+              }
             />
             <NutritionFact
               isLoading={isLoading}
               label="Sent At"
               renderWhenEmpty="-"
-              value={data?.message?.cause?.initialSentTimestamp ? <DateFormat value={data.message.cause.initialSentTimestamp} /> : null}
+              value={
+                data?.message?.cause?.initialSentTimestamp ? (
+                  <DateFormat
+                    day="2-digit"
+                    hour="numeric"
+                    minute="2-digit"
+                    second="numeric"
+                    month="2-digit"
+                    timeZoneName="short"
+                    year="numeric"
+                    value={data.message.cause.initialSentTimestamp}
+                  />
+                ) : null
+              }
             />
 
             <NutritionFact
@@ -97,7 +149,12 @@ export function DeadLetter() {
                   renderWhenEmpty="-"
                   value={urgencyLabels[data?.message?.cause?.invariantViolation?.urgency || O5DempeV1Urgency.Unspecified]}
                 />
-                {/* TODO: render activator for dialog showing payload JSON */}
+                <NutritionFact
+                  isLoading={isLoading}
+                  label="Error"
+                  renderWhenEmpty="-"
+                  value={<InvariantViolationPayloadDialog payload={data?.message?.cause?.invariantViolation?.error?.json || ''} />}
+                />
               </>
             )}
 
@@ -106,10 +163,16 @@ export function DeadLetter() {
             )}
           </CardContent>
         </Card>
-        <Card className="flex-grow">
+        <Card className="flex-grow h-fit">
           <CardHeader className="text-lg font-semibold">Actions</CardHeader>
           <CardContent>
-            <DataTable columns={activityColumns} data={data?.actions || []} showSkeleton={Boolean(isLoading || error)} />
+            <DataTable
+              getRowCanExpand
+              columns={activityColumns}
+              data={data?.actions || []}
+              renderSubComponent={renderSubRow}
+              showSkeleton={Boolean(isLoading || error)}
+            />
           </CardContent>
         </Card>
       </div>

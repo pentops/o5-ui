@@ -37,7 +37,7 @@ export function UUID({ canCopy, className, short, to, uuid, ...rest }: UUIDProps
         <TooltipProvider>
           <Tooltip open={isShowingCopiedNotice}>
             <TooltipTrigger asChild>
-              <button onClick={() => copy(uuid)} type="button">
+              <button onClick={() => copy(uuid || '')} type="button">
                 <CopyIcon />
               </button>
             </TooltipTrigger>
