@@ -14,7 +14,9 @@ export function NutritionFact({ isLoading, label, renderWhenEmpty, value, vertic
   return (
     <div className={clsx('flex place-content-between text-sm', vertical ? 'flex-col items-start gap-2' : 'items-center gap-4')}>
       <span className={clsx('font-semibold', vertical && 'w-full')}>{label}</span>
-      <span className={clsx(vertical && 'w-full')}>{isLoading ? <Skeleton className="h-4 w-full min-w-[125px]" /> : value || renderWhenEmpty}</span>
+      <span className={clsx('text-right', vertical && 'w-full')}>
+        {isLoading ? <Skeleton className="h-4 w-full min-w-[125px]" /> : value || renderWhenEmpty}
+      </span>
     </div>
   );
 }

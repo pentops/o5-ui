@@ -7,7 +7,7 @@ const GET_MESSAGE_KEY: KeyBase = { scope: 'messages', entity: 'detail', service:
 const GET_MESSAGE_PATH_PARAMETERS: readonly (keyof O5DempeV1GetMessageRequest)[] = ['messageId'] as const;
 
 export async function getMessage(baseUrl: string, request: O5DempeV1GetMessageRequest | undefined) {
-  const { path } = buildBoundPath('GET', `${baseUrl}/dempe/v1/messages/:messageId`, request, GET_MESSAGE_PATH_PARAMETERS);
+  const { path } = buildBoundPath('GET', `${baseUrl}/dempe/v1/message/:messageId`, request, GET_MESSAGE_PATH_PARAMETERS);
 
   return makeRequest<O5DempeV1GetMessageResponse>('GET', path);
 }

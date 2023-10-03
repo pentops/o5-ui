@@ -44,10 +44,9 @@ export function RequeueMessageAlert({ messageId }: RequeueMessageAlertProps) {
   async function handleRequeue(values: Values) {
     try {
       await mutateAsync({
-        messageId,
+        messageIds: [messageId],
         action: {
           note: values.note || undefined,
-          timestamp: new Date().toISOString(),
           requeue: {},
         },
       });

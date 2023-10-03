@@ -8,7 +8,7 @@ import { ActionActivator } from '@/pages/dead-letter-management/action-activator
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import { ColumnDef } from '@tanstack/react-table';
-import { O5DempeV1MessageAction, O5DempeV1Urgency } from '@/data/types';
+import { O5DempeV1GetMessageResponse, O5DempeV1Urgency } from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import {
   DeadMessageProblem,
@@ -23,8 +23,17 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
 import { InvariantViolationPayloadDialog } from '@/pages/dead-letter/invariant-violation-payload-dialog/invariant-violation-payload-dialog.tsx';
 
-const activityColumns: ColumnDef<O5DempeV1MessageAction>[] = [
+type Action = Required<O5DempeV1GetMessageResponse>['actions'][number];
+
+const activityColumns: ColumnDef<Action>[] = [
   getRowExpander(),
+  {
+    header: 'Action ID',
+    accessorFn: (row) => row.action?.id,
+    cell: ({ getValue }) => {
+      return <UUID short uuid={getValue<string>()} />;
+    },
+  },
   {
     header: 'Timestamp',
     accessorKey: 'timestamp',
@@ -45,21 +54,21 @@ const activityColumns: ColumnDef<O5DempeV1MessageAction>[] = [
   },
   {
     header: 'Action',
-    accessorFn: (row) => messageActionTypeLabels[getMessageActionType(row)],
+    accessorFn: (row) => messageActionTypeLabels[getMessageActionType(row.action)],
   },
   {
     header: 'Note',
-    accessorKey: 'note',
+    accessorFn: (row) => row.action?.note,
   },
 ];
 
-function renderSubRow({ row }: TableRow<O5DempeV1MessageAction>) {
+function renderSubRow({ row }: TableRow<Action>) {
   return (
     <div className="flex flex-col gap-4">
       <NutritionFact vertical label="Actor" value="-" />
 
-      {row.original.edit && (
-        <NutritionFact vertical label="New JSON" value={<JSONEditor disabled value={row.original.edit.newMessageJson || ''} />} />
+      {row.original.action?.edit && (
+        <NutritionFact vertical label="New JSON" value={<JSONEditor disabled value={row.original.action.edit.newMessageJson || ''} />} />
       )}
     </div>
   );

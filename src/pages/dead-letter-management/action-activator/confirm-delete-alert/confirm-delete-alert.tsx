@@ -44,10 +44,9 @@ export function ConfirmDeleteAlert({ messageId }: ConfirmDeleteAlertProps) {
   async function handleDelete(values: Values) {
     try {
       await mutateAsync({
-        messageId,
+        messageIds: [messageId],
         action: {
           note: values.note || undefined,
-          timestamp: new Date().toISOString(),
           delete: {},
         },
       });

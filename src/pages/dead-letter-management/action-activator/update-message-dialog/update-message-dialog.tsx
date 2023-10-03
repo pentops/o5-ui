@@ -50,10 +50,9 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
   async function handleEdit(values: Values) {
     try {
       await mutateAsync({
-        messageId,
+        messageIds: [messageId],
         action: {
           note: values.note || undefined,
-          timestamp: new Date().toISOString(),
           edit: {
             newMessageJson: values.json || '{}',
           },

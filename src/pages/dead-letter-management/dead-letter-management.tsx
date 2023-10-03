@@ -104,6 +104,7 @@ function DeadLetterManagement() {
   return (
     <div>
       <h1 className="text-2xl pb-4">Dead Letter Management</h1>
+
       <DataTable
         columns={columns}
         data={flatData}

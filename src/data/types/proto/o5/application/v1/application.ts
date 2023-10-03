@@ -1,6 +1,6 @@
 /**
  * DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.
- * Built from: proto/o5/application/v1/application.proto at 2023-09-12T20:14:34.109Z */
+ * Built from: proto/o5/application/v1/application.proto at 2023-10-03T17:32:35.931Z */
 
 export interface O5ApplicationV1Application {
     name?: string;
@@ -56,6 +56,8 @@ export interface O5ApplicationV1Database {
     postgres?: {
         dbName?: string;
         serverGroup?: string;
+        dbExtensions?: string[];
+        migrateContainer?: O5ApplicationV1Container;
     }; // end oneof "engine"
 }
 
@@ -79,6 +81,7 @@ export interface O5ApplicationV1Container {
         name?: string;
         tag?: string;
     }; // end oneof "source"
+    command?: string[];
     demand?: O5ApplicationV1Demand;
     envVars?: O5ApplicationV1EnvironmentVariable[];
 }
@@ -93,6 +96,7 @@ export interface O5ApplicationV1EnvironmentVariable {
 }
 
 export interface O5ApplicationV1DatabaseEnvVar {
+    databaseName?: string;
 }
 
 export interface O5ApplicationV1BlobstoreEnvVar {
