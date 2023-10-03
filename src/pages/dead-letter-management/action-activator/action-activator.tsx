@@ -9,7 +9,7 @@ interface ActionActivatorProps {
 
 export function ActionActivator({ messageId }: ActionActivatorProps) {
   return (
-    <div className="flex content-center items-center gap-2">
+    <div className="flex items-center justify-end gap-2">
       <RequeueMessageAlert messageId={messageId} />
       <UpdateMessageDialog messageId={messageId} />
       <ConfirmDeleteAlert messageId={messageId} />

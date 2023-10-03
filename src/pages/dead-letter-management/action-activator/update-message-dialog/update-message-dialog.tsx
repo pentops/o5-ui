@@ -32,7 +32,7 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
   const { mutateAsync, isLoading, error } = useMessageAction();
   useErrorHandler(error, 'Error editing message');
 
-  const { data, error: messageError } = useMessage({ messageId });
+  const { data, error: messageError } = useMessage(isOpen ? { messageId } : undefined);
   useErrorHandler(messageError, 'Failed to load dead letter message');
   const defaultValues = useMemo(
     () => ({

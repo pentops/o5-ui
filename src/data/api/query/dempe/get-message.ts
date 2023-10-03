@@ -16,5 +16,6 @@ export function useMessage(request?: O5DempeV1GetMessageRequest) {
   return useQuery({
     queryKey: [GET_MESSAGE_KEY, request],
     queryFn: async () => getMessage('', request),
+    enabled: Boolean(request?.messageId),
   });
 }

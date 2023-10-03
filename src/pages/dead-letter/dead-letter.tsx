@@ -86,8 +86,8 @@ export function DeadLetter() {
         <h1 className="text-2xl">Dead Letter: {messageId ? <UUID uuid={messageId} /> : <Skeleton />}</h1>
         {messageId && <ActionActivator messageId={messageId} />}
       </div>
-      <div className="w-full inline-flex gap-4">
-        <Card className="flex-grow-0 w-[325px] h-fit">
+      <div className="w-full inline-flex gap-4 flex-wrap lg:flex-nowrap">
+        <Card className="flex-grow lg:flex-grow-0 w-[325px] h-fit">
           <CardHeader className="text-lg font-semibold">Details</CardHeader>
           <CardContent className="w-full flex flex-col gap-4">
             <NutritionFact
