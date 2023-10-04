@@ -1,6 +1,10 @@
 import React from 'react';
 import Editor from 'react-simple-code-editor';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { highlight, languages } from 'prismjs/components/prism-core';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import 'prismjs/components/prism-json';
 import 'prismjs/themes/prism-tomorrow.css';
 

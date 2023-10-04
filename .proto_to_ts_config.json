@@ -1,6 +1,6 @@
 {
-  "protoGitRepository": "git@github.com:pentops/o5-pb.git",
-  "namespacesToIgnore": ["google"],
+  "protoGitRepository": ["git@github.com:pentops/o5-pb.git", "git@github.com:pentops/protoc-gen-listify.git"],
+  "namespacesToIgnore": ["google", "sample"],
   "generateEnumType": "enum",
   "generatedTypeComments": {
     "google.protobuf.Timestamp": "format: date-time",
