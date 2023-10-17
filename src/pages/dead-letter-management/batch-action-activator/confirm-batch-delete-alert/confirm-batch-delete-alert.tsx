@@ -34,7 +34,7 @@ interface ConfirmBatchDeleteAlertProps {
 export function ConfirmBatchDeleteAlert({ messageIds }: ConfirmBatchDeleteAlertProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync, isLoading, error } = useMessageAction();
+  const { mutateAsync, isPending, error } = useMessageAction();
   useErrorHandler(error, 'Error deleting message(s)');
 
   const form = useForm<Values>({
@@ -93,8 +93,8 @@ export function ConfirmBatchDeleteAlert({ messageIds }: ConfirmBatchDeleteAlertP
               />
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-              <Button disabled={isLoading} variant="destructive" type="submit">
+              <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+              <Button disabled={isPending} variant="destructive" type="submit">
                 Delete
               </Button>
             </AlertDialogFooter>

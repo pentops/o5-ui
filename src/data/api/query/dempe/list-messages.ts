@@ -2,6 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { KeyBase, makeRequest } from '@/data/api/client.ts';
 import { buildBoundPath } from '@/data/api/search-params.ts';
 import { O5DempeV1ListMessagesRequest, O5DempeV1ListMessagesResponse } from '@/data/types';
+import { getNextPageParam } from '@/data/api/pagination.ts';
 
 export const LIST_MESSAGES_KEY: KeyBase = { scope: 'messages', entity: 'list', service: 'DempeService.ListMessages' } as const;
 
@@ -15,5 +16,7 @@ export function useListMessages(request?: O5DempeV1ListMessagesRequest) {
   return useInfiniteQuery({
     queryKey: [LIST_MESSAGES_KEY],
     queryFn: async () => listMessages('', request),
+    getNextPageParam,
+    initialPageParam: undefined,
   });
 }

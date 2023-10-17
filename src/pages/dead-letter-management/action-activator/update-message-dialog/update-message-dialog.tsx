@@ -29,7 +29,7 @@ interface UpdateMessageDialogProps {
 export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync, isLoading, error } = useMessageAction();
+  const { mutateAsync, isPending, error } = useMessageAction();
   useErrorHandler(error, 'Error editing message');
 
   const { data, error: messageError } = useMessage(isOpen ? { messageId } : undefined);
@@ -120,12 +120,12 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
 
             <DialogFooter>
               <DialogClose asChild>
-                <Button disabled={isLoading} variant="outline">
+                <Button disabled={isPending} variant="outline">
                   Cancel
                 </Button>
               </DialogClose>
 
-              <Button disabled={isLoading} type="submit">
+              <Button disabled={isPending} type="submit">
                 Edit
               </Button>
             </DialogFooter>

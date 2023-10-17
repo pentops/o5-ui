@@ -34,7 +34,7 @@ interface BatchRequeueAlertProps {
 export function BatchRequeueAlert({ messageIds }: BatchRequeueAlertProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync, isLoading, error } = useMessageAction();
+  const { mutateAsync, isPending, error } = useMessageAction();
   useErrorHandler(error, 'Error requeuing message(s)');
 
   const form = useForm<Values>({
@@ -93,8 +93,8 @@ export function BatchRequeueAlert({ messageIds }: BatchRequeueAlertProps) {
               />
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-              <Button disabled={isLoading} type="submit">
+              <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+              <Button disabled={isPending} type="submit">
                 Requeue
               </Button>
             </AlertDialogFooter>

@@ -4,6 +4,6 @@ interface PagedResponse {
   nextPage?: string;
 }
 
-export const getNextPageParam: GetNextPageParamFunction = function getNextPageParam<T extends PagedResponse>(lastPage: T | unknown) {
+export const getNextPageParam: GetNextPageParamFunction<any> = function getNextPageParam<T extends PagedResponse>(lastPage: T | unknown) {
   return (lastPage as PagedResponse)?.nextPage;
 };

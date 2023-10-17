@@ -34,7 +34,7 @@ interface ConfirmDeleteAlertProps {
 export function ConfirmDeleteAlert({ messageId }: ConfirmDeleteAlertProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync, isLoading, error } = useMessageAction();
+  const { mutateAsync, isPending, error } = useMessageAction();
   useErrorHandler(error, 'Error deleting message');
 
   const form = useForm<Values>({
@@ -96,8 +96,8 @@ export function ConfirmDeleteAlert({ messageId }: ConfirmDeleteAlertProps) {
               />
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-              <Button disabled={isLoading} variant="destructive" type="submit">
+              <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+              <Button disabled={isPending} variant="destructive" type="submit">
                 Delete
               </Button>
             </AlertDialogFooter>

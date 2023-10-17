@@ -25,8 +25,8 @@ export function useMessageAction() {
     async mutationFn(request: O5DempeV1MessagesActionRequest) {
       return messageAction(request);
     },
-    onSuccess() {
-      queryClient.invalidateQueries([LIST_MESSAGES_KEY]);
+    onSettled() {
+      queryClient.invalidateQueries({ queryKey: [LIST_MESSAGES_KEY] });
     },
   });
 }
