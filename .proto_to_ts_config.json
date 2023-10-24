@@ -11,7 +11,7 @@
     "sfixed64": "format: sfixed64",
     "bytes": "format: bytes"
   },
-  "outputPath": "src/data/types",
+  "outputPath": "src/data/types/generated",
   "indexFileHeaderCommentTemplate": "DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.\nBuilt at {{generationTimestamp}}",
   "fileHeaderCommentTemplate": "DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.\nBuilt from: {{sourceFile}} at {{generationTimestamp}}"
 }

@@ -1,6 +1,6 @@
 /**
  * DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.
- * Built from: protoc-gen-listify/proto/listify/v1/annotations.proto at 2023-10-04T23:21:20.588Z */
+ * Built from: protoc-gen-listify/proto/listify/v1/annotations.proto at 2023-10-24T23:07:49.767Z */
 
 export interface ListifyV1MethodOptions {
     enable?: boolean;
