@@ -110,8 +110,8 @@ devDependencies:
     specifier: ^10.4.16
     version: 10.4.16(postcss@8.4.31)
   convert-proto-to-ts:
-    specifier: ^1.2.2
-    version: 1.2.2
+    specifier: ^1.3.0
+    version: 1.3.0
   eslint:
     specifier: ^8.52.0
     version: 8.52.0
@@ -2047,8 +2047,8 @@ packages:
   /concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
-  /convert-proto-to-ts@1.2.2:
-    resolution: {integrity: sha512-Lk1ljeRxWidBE1rxJA6i6rq28Ms4DG59sDVGufje+USHpv+9JpBvt8HCntSwNwyniKrJwNP5jZfeLekKFq/+mQ==}
+  /convert-proto-to-ts@1.3.0:
+    resolution: {integrity: sha512-EYGm5Iq3CVc1Koq4GyvsGJpLgKNEJBp7rWkuNuZRr3hSCi2mNnoqJI5uVGkovXi/pcOzB2QoNALAC2QMRwjmJw==}
     hasBin: true
     dependencies:
       change-case: 5.1.2

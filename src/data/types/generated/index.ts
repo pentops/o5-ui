@@ -1,8 +1,9 @@
 /**
  * DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.
- * Built at 2023-10-24T23:07:49.767Z */
+ * Built at 2023-11-01T17:25:13.638Z */
 export * from './o5-pb/proto/o5/application/v1/application';
 export * from './o5-pb/proto/o5/auth/v1/actor';
+export * from './o5-pb/proto/o5/auth/v1/annotations';
 export * from './o5-pb/proto/o5/dempe/v1/dead_message';
 export * from './o5-pb/proto/o5/dempe/v1/service';
 export * from './o5-pb/proto/o5/environment/v1/environment';

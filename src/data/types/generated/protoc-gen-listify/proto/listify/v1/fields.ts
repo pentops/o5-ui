@@ -1,15 +1,15 @@
 /**
  * DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.
- * Built from: protoc-gen-listify/proto/listify/v1/fields.proto at 2023-10-24T23:07:49.767Z */
+ * Built from: protoc-gen-listify/proto/listify/v1/fields.proto at 2023-11-01T17:25:13.638Z */
 
 export interface ListifyV1PageRequest {
-    offset?: string;
+    token?: string;
     // format: int64
     limit?: string;
 }
 
 export interface ListifyV1PageResponse {
-    nextOffset?: string;
+    nextToken?: string;
     finalPage?: boolean;
     // format: int64
     totalPageRecords?: string;
