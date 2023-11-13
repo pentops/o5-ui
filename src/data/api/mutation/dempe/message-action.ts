@@ -11,7 +11,7 @@ const MESSAGE_ACTION_KEY: KeyBase = {
 } as const;
 
 export async function messageAction(request: O5DempeV1MessagesActionRequest) {
-  const { path, body } = buildBoundPath('POST', 'dempe/v1/messages/action', request);
+  const { path, body } = buildBoundPath('POST', 'dante/v1/messages/action', request);
   return makeRequest<O5DempeV1MessagesActionResponse, O5DempeV1MessagesActionRequest>('POST', path, {
     body,
   });

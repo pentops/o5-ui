@@ -6,7 +6,7 @@ import { useListMessages } from '@/data/api';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
-import { deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui/dempe.ts';
+import { deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui/dante.ts';
 import { useErrorHandler } from '@/lib/error.ts';
 import { getRowSelect } from '@/components/data-table/row-select/row-select.tsx';
 import { BatchActionActivator } from '@/pages/dead-letter-management/batch-action-activator/batch-action-activator.tsx';

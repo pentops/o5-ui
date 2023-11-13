@@ -30,6 +30,7 @@ export interface O5EnvironmentV1Aws {
     ecsRepo?: string;
     ecsTaskExecutionRole?: string;
     vpcId?: string;
+    scratchBucket?: string;
     o5DeployerAssumeRole?: string;
     o5DeployerGrantRoles?: string[];
     hostHeader?: string;

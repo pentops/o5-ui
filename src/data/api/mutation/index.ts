@@ -1,1 +1,1 @@
-export * from './dempe';
+export * from './dante';

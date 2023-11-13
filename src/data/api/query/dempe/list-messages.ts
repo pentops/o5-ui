@@ -7,7 +7,7 @@ import { getNextPageParam } from '@/data/api/pagination.ts';
 export const LIST_MESSAGES_KEY: KeyBase = { scope: 'messages', entity: 'list', service: 'DempeService.ListMessages' } as const;
 
 export async function listMessages(baseUrl: string, request: O5DempeV1ListMessagesRequest | undefined) {
-  const { path } = buildBoundPath('GET', `${baseUrl}/dempe/v1/messages`, request);
+  const { path } = buildBoundPath('GET', `${baseUrl}/dante/v1/messages`, request);
 
   return makeRequest<O5DempeV1ListMessagesResponse>('GET', path);
 }

@@ -17,7 +17,7 @@ import {
   getMessageActionType,
   messageActionTypeLabels,
   urgencyLabels,
-} from '@/data/types/ui/dempe.ts';
+} from '@/data/types/ui/dante.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { JSONEditor } from '@/components/json-editor/json-editor.tsx';

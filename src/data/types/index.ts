@@ -1,2 +1,2 @@
 export * from './generated';
-export * from './ui/dempe.ts';
+export * from './ui/dante.ts';
