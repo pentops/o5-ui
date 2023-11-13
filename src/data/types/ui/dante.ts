@@ -1,6 +1,6 @@
 // ui-only enum to help with dead message problem oneOf
-import type { O5DempeV1DeadMessage, O5DempeV1MessageAction } from '@/data/types';
-import { O5DempeV1Urgency } from '@/data/types';
+import type { O5DanteV1DeadMessage, O5DanteV1MessageAction } from '@/data/types';
+import { O5DanteV1Urgency } from '@/data/types';
 
 export enum DeadMessageProblem {
   Unspecified = 'DEAD_MESSAGE_PROBLEM_UNSPECIFIED',
@@ -8,7 +8,7 @@ export enum DeadMessageProblem {
   UnhandledError = 'DEAD_MESSAGE_PROBLEM_UNHANDLED_ERROR',
 }
 
-export function getDeadMessageProblem(capturedMessage: O5DempeV1DeadMessage | undefined): DeadMessageProblem {
+export function getDeadMessageProblem(capturedMessage: O5DanteV1DeadMessage | undefined): DeadMessageProblem {
   if (capturedMessage?.problem?.invariantViolation) {
     return DeadMessageProblem.InvariantViolation;
   }
@@ -34,7 +34,7 @@ export enum MessageActionType {
   Edit = 'MESSAGE_ACTION_TYPE_EDIT',
 }
 
-export function getMessageActionType(messageAction: O5DempeV1MessageAction | undefined): MessageActionType {
+export function getMessageActionType(messageAction: O5DanteV1MessageAction | undefined): MessageActionType {
   if (messageAction?.action?.delete) {
     return MessageActionType.Delete;
   }
@@ -57,9 +57,9 @@ export const messageActionTypeLabels: Record<MessageActionType, string> = {
   [MessageActionType.Edit]: 'Edit',
 };
 
-export const urgencyLabels: Record<O5DempeV1Urgency, string> = {
-  [O5DempeV1Urgency.Unspecified]: 'Unspecified',
-  [O5DempeV1Urgency.Low]: 'Low',
-  [O5DempeV1Urgency.Medium]: 'Medium',
-  [O5DempeV1Urgency.High]: 'High',
+export const urgencyLabels: Record<O5DanteV1Urgency, string> = {
+  [O5DanteV1Urgency.Unspecified]: 'Unspecified',
+  [O5DanteV1Urgency.Low]: 'Low',
+  [O5DanteV1Urgency.Medium]: 'Medium',
+  [O5DanteV1Urgency.High]: 'High',
 };
