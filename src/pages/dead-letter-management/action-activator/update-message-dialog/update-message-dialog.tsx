@@ -53,8 +53,8 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
         messageIds: [messageId],
         action: {
           note: values.note || undefined,
-          edit: {
-            newMessageJson: values.json || '{}',
+          action: {
+            edit: { newMessageJson: values.json || '{}' },
           },
         },
       });

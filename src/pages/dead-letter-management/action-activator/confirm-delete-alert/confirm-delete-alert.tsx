@@ -47,7 +47,7 @@ export function ConfirmDeleteAlert({ messageId }: ConfirmDeleteAlertProps) {
         messageIds: [messageId],
         action: {
           note: values.note || undefined,
-          delete: {},
+          action: { delete: {} },
         },
       });
 

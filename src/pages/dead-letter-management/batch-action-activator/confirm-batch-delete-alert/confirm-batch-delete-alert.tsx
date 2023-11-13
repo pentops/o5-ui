@@ -47,7 +47,7 @@ export function ConfirmBatchDeleteAlert({ messageIds }: ConfirmBatchDeleteAlertP
         messageIds,
         action: {
           note: values.note || undefined,
-          delete: {},
+          action: { delete: {} },
         },
       });
 

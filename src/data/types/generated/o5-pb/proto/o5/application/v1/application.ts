@@ -1,6 +1,6 @@
 /**
  * DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.
- * Built from: o5-pb/proto/o5/application/v1/application.proto at 2023-11-01T17:25:13.638Z */
+ * Built from: o5-pb/proto/o5/application/v1/application.proto */
 
 export interface O5ApplicationV1Application {
     name?: string;
@@ -21,11 +21,13 @@ export interface O5ApplicationV1Blobstore {
 export interface O5ApplicationV1Database {
     name?: string;
     // start oneof "engine"
-    postgres?: {
-        dbName?: string;
-        serverGroup?: string;
-        dbExtensions?: string[];
-        migrateContainer?: O5ApplicationV1Container;
+    engine?: {
+        postgres?: {
+            dbName?: string;
+            serverGroup?: string;
+            dbExtensions?: string[];
+            migrateContainer?: O5ApplicationV1Container;
+        };
     }; // end oneof "engine"
 }
 
@@ -79,11 +81,13 @@ export enum O5ApplicationV1Demand {
 export interface O5ApplicationV1Container {
     name?: string;
     // start oneof "source"
-    imageUrl?: string;
-    image?: {
-        name?: string;
-        tag?: string;
-        registry?: string;
+    source?: {
+        imageUrl?: string;
+        image?: {
+            name?: string;
+            tag?: string;
+            registry?: string;
+        };
     }; // end oneof "source"
     command?: string[];
     demand?: O5ApplicationV1Demand;
@@ -93,12 +97,14 @@ export interface O5ApplicationV1Container {
 export interface O5ApplicationV1EnvironmentVariable {
     name?: string;
     // start oneof "spec"
-    value?: string;
-    database?: O5ApplicationV1DatabaseEnvVar;
-    blobstore?: O5ApplicationV1BlobstoreEnvVar;
-    envMap?: O5ApplicationV1MapEnvVar;
-    fromEnv?: O5ApplicationV1FromEnvVar;
-    secret?: O5ApplicationV1SecretEnvVar; // end oneof "spec"
+    spec?: {
+        value?: string;
+        database?: O5ApplicationV1DatabaseEnvVar;
+        blobstore?: O5ApplicationV1BlobstoreEnvVar;
+        envMap?: O5ApplicationV1MapEnvVar;
+        fromEnv?: O5ApplicationV1FromEnvVar;
+        secret?: O5ApplicationV1SecretEnvVar;
+    }; // end oneof "spec"
 }
 
 export interface O5ApplicationV1DatabaseEnvVar {
@@ -109,7 +115,9 @@ export interface O5ApplicationV1BlobstoreEnvVar {
     name?: string;
     subPath?: string;
     // start oneof "format"
-    s3Direct?: boolean; // end oneof "format"
+    format?: {
+        s3Direct?: boolean;
+    }; // end oneof "format"
 }
 
 export interface O5ApplicationV1MapEnvVar {

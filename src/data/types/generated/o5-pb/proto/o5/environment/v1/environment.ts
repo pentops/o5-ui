@@ -1,21 +1,26 @@
 /**
  * DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.
- * Built from: o5-pb/proto/o5/environment/v1/environment.proto at 2023-11-01T17:25:13.638Z */
+ * Built from: o5-pb/proto/o5/environment/v1/environment.proto */
 
 export interface O5EnvironmentV1Environment {
     fullName?: string;
     // start oneof "provider"
-    aws?: O5EnvironmentV1Aws; // end oneof "provider"
+    provider?: {
+        aws?: O5EnvironmentV1Aws;
+    }; // end oneof "provider"
+    trustJwks?: string[];
     vars?: O5EnvironmentV1CustomVariable[];
 }
 
 export interface O5EnvironmentV1CustomVariable {
     name?: string;
     // start oneof "src"
-    value?: string;
-    join?: {
-        delimiter?: string;
-        values?: string[];
+    src?: {
+        value?: string;
+        join?: {
+            delimiter?: string;
+            values?: string[];
+        };
     }; // end oneof "src"
 }
 

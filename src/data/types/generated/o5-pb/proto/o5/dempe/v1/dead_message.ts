@@ -1,6 +1,6 @@
 /**
  * DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.
- * Built from: o5-pb/proto/o5/dempe/v1/dead_message.proto at 2023-11-01T17:25:13.638Z */
+ * Built from: o5-pb/proto/o5/dempe/v1/dead_message.proto */
 
 export interface O5DempeV1DeadMessage {
     infraMessageId?: string;
@@ -13,8 +13,10 @@ export interface O5DempeV1DeadMessage {
     initialSentTimestamp?: string;
     payload?: O5DempeV1Any;
     // start oneof "problem"
-    invariantViolation?: O5DempeV1InvariantViolation;
-    unhandledError?: O5DempeV1UnhandledError; // end oneof "problem"
+    problem?: {
+        invariantViolation?: O5DempeV1InvariantViolation;
+        unhandledError?: O5DempeV1UnhandledError;
+    }; // end oneof "problem"
 }
 
 export enum O5DempeV1Urgency {

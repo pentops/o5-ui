@@ -1,6 +1,6 @@
 /**
  * DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.
- * Built from: o5-pb/proto/o5/dempe/v1/service.proto at 2023-11-01T17:25:13.638Z */
+ * Built from: o5-pb/proto/o5/dempe/v1/service.proto */
 
 import type { O5AuthV1Actor } from '../../auth/v1/actor';
 import type { O5DempeV1DeadMessage } from './dead_message';
@@ -33,9 +33,11 @@ export interface O5DempeV1MessageAction {
     id?: string;
     note?: string;
     // start oneof "action"
-    delete?: O5DempeV1ActionDelete;
-    requeue?: O5DempeV1ActionRequeue;
-    edit?: O5DempeV1ActionEdit; // end oneof "action"
+    action?: {
+        delete?: O5DempeV1ActionDelete;
+        requeue?: O5DempeV1ActionRequeue;
+        edit?: O5DempeV1ActionEdit;
+    }; // end oneof "action"
 }
 
 export interface O5DempeV1MessagesActionRequest {

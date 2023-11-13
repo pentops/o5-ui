@@ -47,7 +47,7 @@ export function RequeueMessageAlert({ messageId }: RequeueMessageAlertProps) {
         messageIds: [messageId],
         action: {
           note: values.note || undefined,
-          requeue: {},
+          action: { requeue: {} },
         },
       });
 

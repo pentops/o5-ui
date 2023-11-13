@@ -47,7 +47,7 @@ export function BatchRequeueAlert({ messageIds }: BatchRequeueAlertProps) {
         messageIds,
         action: {
           note: values.note || undefined,
-          requeue: {},
+          action: { requeue: {} },
         },
       });
 

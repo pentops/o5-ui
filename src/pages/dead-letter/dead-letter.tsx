@@ -67,8 +67,8 @@ function renderSubRow({ row }: TableRow<Action>) {
     <div className="flex flex-col gap-4">
       <NutritionFact vertical label="Actor" value="-" />
 
-      {row.original.action?.edit && (
-        <NutritionFact vertical label="New JSON" value={<JSONEditor disabled value={row.original.action.edit.newMessageJson || ''} />} />
+      {row.original.action?.action?.edit && (
+        <NutritionFact vertical label="New JSON" value={<JSONEditor disabled value={row.original.action.action.edit.newMessageJson || ''} />} />
       )}
     </div>
   );
@@ -150,25 +150,25 @@ export function DeadLetter() {
                   isLoading={isLoading}
                   label="Description"
                   renderWhenEmpty="-"
-                  value={data?.message?.cause?.invariantViolation?.description}
+                  value={data?.message?.cause?.problem?.invariantViolation?.description}
                 />
                 <NutritionFact
                   isLoading={isLoading}
                   label="Description"
                   renderWhenEmpty="-"
-                  value={urgencyLabels[data?.message?.cause?.invariantViolation?.urgency || O5DempeV1Urgency.Unspecified]}
+                  value={urgencyLabels[data?.message?.cause?.problem?.invariantViolation?.urgency || O5DempeV1Urgency.Unspecified]}
                 />
                 <NutritionFact
                   isLoading={isLoading}
                   label="Error"
                   renderWhenEmpty="-"
-                  value={<InvariantViolationPayloadDialog payload={data?.message?.cause?.invariantViolation?.error?.json || ''} />}
+                  value={<InvariantViolationPayloadDialog payload={data?.message?.cause?.problem?.invariantViolation?.error?.json || ''} />}
                 />
               </>
             )}
 
             {problemType === DeadMessageProblem.UnhandledError && (
-              <NutritionFact isLoading={isLoading} label="Error" renderWhenEmpty="-" value={data?.message?.cause?.unhandledError?.error} />
+              <NutritionFact isLoading={isLoading} label="Error" renderWhenEmpty="-" value={data?.message?.cause?.problem?.unhandledError?.error} />
             )}
           </CardContent>
         </Card>

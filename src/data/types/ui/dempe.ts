@@ -9,11 +9,11 @@ export enum DeadMessageProblem {
 }
 
 export function getDeadMessageProblem(capturedMessage: O5DempeV1DeadMessage | undefined): DeadMessageProblem {
-  if (capturedMessage?.invariantViolation) {
+  if (capturedMessage?.problem?.invariantViolation) {
     return DeadMessageProblem.InvariantViolation;
   }
 
-  if (capturedMessage?.unhandledError) {
+  if (capturedMessage?.problem?.unhandledError) {
     return DeadMessageProblem.UnhandledError;
   }
 
@@ -35,15 +35,15 @@ export enum MessageActionType {
 }
 
 export function getMessageActionType(messageAction: O5DempeV1MessageAction | undefined): MessageActionType {
-  if (messageAction?.delete) {
+  if (messageAction?.action?.delete) {
     return MessageActionType.Delete;
   }
 
-  if (messageAction?.requeue) {
+  if (messageAction?.action?.requeue) {
     return MessageActionType.Requeue;
   }
 
-  if (messageAction?.edit) {
+  if (messageAction?.action?.edit) {
     return MessageActionType.Edit;
   }
 
