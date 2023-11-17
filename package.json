@@ -24,7 +24,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@tanstack/react-query": "^5.8.4",
     "@tanstack/react-table": "^8.10.7",
-    "change-case": "^5.1.2",
+    "change-case": "^5.2.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "prismjs": "^1.29.0",
@@ -40,7 +40,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/node": "^20.9.0",
+    "@types/node": "^20.9.1",
     "@types/prismjs": "^1.26.3",
     "@types/qs": "^6.9.10",
     "@types/react": "^18.2.37",
