@@ -8,7 +8,7 @@ import { ActionActivator } from '@/pages/dead-letter-management/action-activator
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import { ColumnDef } from '@tanstack/react-table';
-import { O5DanteV1GetMessageResponse, O5DanteV1Urgency } from '@/data/types';
+import { O5DanteV1ServiceGetMessageResponse, O5DanteV1Urgency } from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import {
   DeadMessageProblem,
@@ -23,7 +23,7 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
 import { InvariantViolationPayloadDialog } from '@/pages/dead-letter/invariant-violation-payload-dialog/invariant-violation-payload-dialog.tsx';
 
-type Action = Required<O5DanteV1GetMessageResponse>['actions'][number];
+type Action = Required<O5DanteV1ServiceGetMessageResponse>['actions'][number];
 
 const activityColumns: ColumnDef<Action>[] = [
   getRowExpander(),
@@ -156,7 +156,7 @@ export function DeadLetter() {
                   isLoading={isLoading}
                   label="Description"
                   renderWhenEmpty="-"
-                  value={urgencyLabels[data?.message?.cause?.problem?.invariantViolation?.urgency || O5DanteV1Urgency.Unspecified]}
+                  value={urgencyLabels[(data?.message?.cause?.problem?.invariantViolation?.urgency as O5DanteV1Urgency | undefined) || O5DanteV1Urgency.Unspecified]}
                 />
                 <NutritionFact
                   isLoading={isLoading}

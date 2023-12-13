@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/data-table/data-table.tsx';
-import { O5DanteV1CapturedMessage } from '@/data/types';
+import { O5DanteV1ServiceCapturedMessage } from '@/data/types';
 import { useListMessages } from '@/data/api';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
@@ -11,7 +11,7 @@ import { useErrorHandler } from '@/lib/error.ts';
 import { getRowSelect } from '@/components/data-table/row-select/row-select.tsx';
 import { BatchActionActivator } from '@/pages/dead-letter-management/batch-action-activator/batch-action-activator.tsx';
 
-const columns: ColumnDef<O5DanteV1CapturedMessage>[] = [
+const columns: ColumnDef<O5DanteV1ServiceCapturedMessage>[] = [
   getRowSelect(true),
   {
     header: 'Message ID',
@@ -102,7 +102,7 @@ function DeadLetterManagement() {
       }
 
       return acc;
-    }, [] as O5DanteV1CapturedMessage[]);
+    }, [] as O5DanteV1ServiceCapturedMessage[]);
   }, [data?.pages]);
   const selectedRows = useMemo(
     () => flatData.filter((row, i) => selectedRowIndices[i] && row.cause?.messageId).map((row) => row.cause!.messageId!),

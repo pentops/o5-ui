@@ -30,12 +30,22 @@ export interface O5EnvironmentV1Aws {
     ecsRepo?: string;
     ecsTaskExecutionRole?: string;
     vpcId?: string;
-    scratchBucket?: string;
     o5DeployerAssumeRole?: string;
     o5DeployerGrantRoles?: string[];
     hostHeader?: string;
     rdsHosts?: O5EnvironmentV1RdsHost[];
     environmentLinks?: O5EnvironmentV1AwsLink[];
+    snsPrefix?: string;
+    s3BucketNamespace?: string;
+    grantPrincipals?: O5EnvironmentV1AwsGrantPrincipal[];
+    region?: string;
+    sidecarImageVersion?: string;
+    sidecarImageRepo?: string;
+}
+
+export interface O5EnvironmentV1AwsGrantPrincipal {
+    name?: string;
+    roleArn?: string;
 }
 
 export interface O5EnvironmentV1AwsLink {

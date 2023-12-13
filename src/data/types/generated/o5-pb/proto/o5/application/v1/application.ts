@@ -4,10 +4,17 @@
 
 export interface O5ApplicationV1Application {
     name?: string;
+    targets?: O5ApplicationV1Target[];
     blobstores?: O5ApplicationV1Blobstore[];
     databases?: O5ApplicationV1Database[];
     runtimes?: O5ApplicationV1Runtime[];
     secrets?: O5ApplicationV1Secret[];
+    deploymentConfig?: O5ApplicationV1DeploymentConfig;
+    awsConfig?: O5ApplicationV1AwsConfig;
+}
+
+export interface O5ApplicationV1DeploymentConfig {
+    quickMode?: boolean;
 }
 
 export interface O5ApplicationV1Target {
@@ -16,6 +23,11 @@ export interface O5ApplicationV1Target {
 
 export interface O5ApplicationV1Blobstore {
     name?: string;
+    grants?: O5ApplicationV1Grant[];
+}
+
+export interface O5ApplicationV1Grant {
+    principal?: string;
 }
 
 export interface O5ApplicationV1Database {
@@ -27,6 +39,7 @@ export interface O5ApplicationV1Database {
             serverGroup?: string;
             dbExtensions?: string[];
             migrateContainer?: O5ApplicationV1Container;
+            runOutbox?: boolean;
         };
     }; // end oneof "engine"
 }
@@ -59,23 +72,23 @@ export interface O5ApplicationV1Route {
 }
 
 export enum O5ApplicationV1RouteProtocol {
-    Unspecified = 'ROUTE_PROTOCOL_UNSPECIFIED',
-    Http = 'ROUTE_PROTOCOL_HTTP',
-    Grpc = 'ROUTE_PROTOCOL_GRPC'
+    Unspecified = 'UNSPECIFIED',
+    Http = 'HTTP',
+    Grpc = 'GRPC'
 }
 
 export enum O5ApplicationV1RouteGroup {
-    Unspecified = 'ROUTE_GROUP_UNSPECIFIED',
-    First = 'ROUTE_GROUP_FIRST',
-    Normal = 'ROUTE_GROUP_NORMAL',
-    Fallback = 'ROUTE_GROUP_FALLBACK'
+    Unspecified = 'UNSPECIFIED',
+    First = 'FIRST',
+    Normal = 'NORMAL',
+    Fallback = 'FALLBACK'
 }
 
 export enum O5ApplicationV1Demand {
-    Unspecified = 'DEMAND_UNSPECIFIED',
-    Light = 'DEMAND_LIGHT',
-    Medium = 'DEMAND_MEDIUM',
-    Heavy = 'DEMAND_HEAVY'
+    Unspecified = 'UNSPECIFIED',
+    Light = 'LIGHT',
+    Medium = 'MEDIUM',
+    Heavy = 'HEAVY'
 }
 
 export interface O5ApplicationV1Container {
@@ -134,5 +147,11 @@ export interface O5ApplicationV1SecretEnvVar {
 
 export interface O5ApplicationV1Secret {
     name?: string;
+}
+
+export interface O5ApplicationV1AwsConfig {
+    ses?: {
+        sendEmail?: boolean;
+    };
 }
 

@@ -1,5 +1,5 @@
 // ui-only enum to help with dead message problem oneOf
-import type { O5DanteV1DeadMessage, O5DanteV1MessageAction } from '@/data/types';
+import type { O5DanteV1DeadMessage, O5DanteV1ServiceMessageAction } from '@/data/types';
 import { O5DanteV1Urgency } from '@/data/types';
 
 export enum DeadMessageProblem {
@@ -34,7 +34,7 @@ export enum MessageActionType {
   Edit = 'MESSAGE_ACTION_TYPE_EDIT',
 }
 
-export function getMessageActionType(messageAction: O5DanteV1MessageAction | undefined): MessageActionType {
+export function getMessageActionType(messageAction: O5DanteV1ServiceMessageAction | undefined): MessageActionType {
   if (messageAction?.action?.delete) {
     return MessageActionType.Delete;
   }

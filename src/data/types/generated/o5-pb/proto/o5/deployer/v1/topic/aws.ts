@@ -2,41 +2,50 @@
  * DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.
  * Built from: o5-pb/proto/o5/deployer/v1/topic/aws.proto */
 
-import type { O5DeployerV1KeyValue, O5DeployerV1PostgresDatabase } from '../application';
+import type { O5DeployerV1CloudFormationStackParameter, O5DeployerV1PostgresDatabase } from '../application';
+
+export interface O5DeployerV1TopicStackId {
+    deploymentId?: string;
+    deploymentPhase?: string;
+    stackName?: string;
+}
 
 export interface O5DeployerV1TopicStabalizeStackMessage {
-    stackName?: string;
+    stackId?: O5DeployerV1TopicStackId;
     cancelUpdate?: boolean;
 }
 
 export interface O5DeployerV1TopicCreateNewStackMessage {
-    stackName?: string;
+    stackId?: O5DeployerV1TopicStackId;
     templateUrl?: string;
-    parameters?: O5DeployerV1KeyValue[];
+    parameters?: O5DeployerV1CloudFormationStackParameter[];
+    desiredCount?: number;
+    extraResources?: O5DeployerV1TopicExtraResources;
 }
 
 export interface O5DeployerV1TopicUpdateStackMessage {
-    stackName?: string;
+    stackId?: O5DeployerV1TopicStackId;
     templateUrl?: string;
-    parameters?: O5DeployerV1KeyValue[];
+    parameters?: O5DeployerV1CloudFormationStackParameter[];
+    desiredCount?: number;
+    extraResources?: O5DeployerV1TopicExtraResources;
+}
+
+export interface O5DeployerV1TopicExtraResources {
+    snsTopics?: string[];
 }
 
 export interface O5DeployerV1TopicDeleteStackMessage {
-    stackName?: string;
+    stackId?: O5DeployerV1TopicStackId;
 }
 
 export interface O5DeployerV1TopicScaleStackMessage {
-    stackName?: string;
+    stackId?: O5DeployerV1TopicStackId;
     desiredCount?: number;
 }
 
 export interface O5DeployerV1TopicCancelStackUpdateMessage {
-    stackName?: string;
-}
-
-export interface O5DeployerV1TopicUpsertSnsTopicsMessage {
-    environmentName?: string;
-    topicNames?: string[];
+    stackId?: O5DeployerV1TopicStackId;
 }
 
 export interface O5DeployerV1TopicRunDatabaseMigrationMessage {

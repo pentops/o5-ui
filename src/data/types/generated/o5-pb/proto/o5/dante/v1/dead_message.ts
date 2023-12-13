@@ -20,10 +20,10 @@ export interface O5DanteV1DeadMessage {
 }
 
 export enum O5DanteV1Urgency {
-    Unspecified = 'URGENCY_UNSPECIFIED',
-    Low = 'URGENCY_LOW',
-    Medium = 'URGENCY_MEDIUM',
-    High = 'URGENCY_HIGH'
+    Unspecified = 'UNSPECIFIED',
+    Low = 'LOW',
+    Medium = 'MEDIUM',
+    High = 'HIGH'
 }
 
 export interface O5DanteV1InvariantViolation {
