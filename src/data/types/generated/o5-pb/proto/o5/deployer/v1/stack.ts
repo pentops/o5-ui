@@ -35,20 +35,18 @@ export interface O5DeployerV1StackEvent {
 
 export interface O5DeployerV1StackEventType {
     // start oneof "type"
-    type?: {
-        triggered?: {
-            deployment?: O5DeployerV1StackDeployment;
-            applicationName?: string;
-            environmentName?: string;
-        };
-        deploymentCompleted?: {
-            deployment?: O5DeployerV1StackDeployment;
-        };
-        deploymentFailed?: {
-            deployment?: O5DeployerV1StackDeployment;
-            error?: string;
-        };
-        available?: {};
-    }; // end oneof "type"
+    triggered?: {
+        deployment?: O5DeployerV1StackDeployment;
+        applicationName?: string;
+        environmentName?: string;
+    };
+    deploymentCompleted?: {
+        deployment?: O5DeployerV1StackDeployment;
+    };
+    deploymentFailed?: {
+        deployment?: O5DeployerV1StackDeployment;
+        error?: string;
+    };
+    available?: {}; // end oneof "type"
 }
 

@@ -5,22 +5,19 @@
 export interface O5EnvironmentV1Environment {
     fullName?: string;
     // start oneof "provider"
-    provider?: {
-        aws?: O5EnvironmentV1Aws;
-    }; // end oneof "provider"
+    aws?: O5EnvironmentV1Aws; // end oneof "provider"
     trustJwks?: string[];
     vars?: O5EnvironmentV1CustomVariable[];
+    corsOrigins?: string[];
 }
 
 export interface O5EnvironmentV1CustomVariable {
     name?: string;
     // start oneof "src"
-    src?: {
-        value?: string;
-        join?: {
-            delimiter?: string;
-            values?: string[];
-        };
+    value?: string;
+    join?: {
+        delimiter?: string;
+        values?: string[];
     }; // end oneof "src"
 }
 
@@ -41,6 +38,12 @@ export interface O5EnvironmentV1Aws {
     region?: string;
     sidecarImageVersion?: string;
     sidecarImageRepo?: string;
+    sesIdentity?: O5EnvironmentV1SesIdentity;
+}
+
+export interface O5EnvironmentV1SesIdentity {
+    senders?: string[];
+    recipients?: string[];
 }
 
 export interface O5EnvironmentV1AwsGrantPrincipal {

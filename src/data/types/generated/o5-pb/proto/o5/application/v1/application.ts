@@ -33,14 +33,12 @@ export interface O5ApplicationV1Grant {
 export interface O5ApplicationV1Database {
     name?: string;
     // start oneof "engine"
-    engine?: {
-        postgres?: {
-            dbName?: string;
-            serverGroup?: string;
-            dbExtensions?: string[];
-            migrateContainer?: O5ApplicationV1Container;
-            runOutbox?: boolean;
-        };
+    postgres?: {
+        dbName?: string;
+        serverGroup?: string;
+        dbExtensions?: string[];
+        migrateContainer?: O5ApplicationV1Container;
+        runOutbox?: boolean;
     }; // end oneof "engine"
 }
 
@@ -94,30 +92,28 @@ export enum O5ApplicationV1Demand {
 export interface O5ApplicationV1Container {
     name?: string;
     // start oneof "source"
-    source?: {
-        imageUrl?: string;
-        image?: {
-            name?: string;
-            tag?: string;
-            registry?: string;
-        };
+    imageUrl?: string;
+    image?: {
+        name?: string;
+        tag?: string;
+        registry?: string;
     }; // end oneof "source"
     command?: string[];
     demand?: O5ApplicationV1Demand;
     envVars?: O5ApplicationV1EnvironmentVariable[];
+    mountDockerSocket?: boolean;
 }
 
 export interface O5ApplicationV1EnvironmentVariable {
     name?: string;
     // start oneof "spec"
-    spec?: {
-        value?: string;
-        database?: O5ApplicationV1DatabaseEnvVar;
-        blobstore?: O5ApplicationV1BlobstoreEnvVar;
-        envMap?: O5ApplicationV1MapEnvVar;
-        fromEnv?: O5ApplicationV1FromEnvVar;
-        secret?: O5ApplicationV1SecretEnvVar;
-    }; // end oneof "spec"
+    value?: string;
+    database?: O5ApplicationV1DatabaseEnvVar;
+    blobstore?: O5ApplicationV1BlobstoreEnvVar;
+    envMap?: O5ApplicationV1MapEnvVar;
+    fromEnv?: O5ApplicationV1FromEnvVar;
+    secret?: O5ApplicationV1SecretEnvVar;
+    o5?: O5ApplicationV1O5Var; // end oneof "spec"
 }
 
 export interface O5ApplicationV1DatabaseEnvVar {
@@ -128,9 +124,7 @@ export interface O5ApplicationV1BlobstoreEnvVar {
     name?: string;
     subPath?: string;
     // start oneof "format"
-    format?: {
-        s3Direct?: boolean;
-    }; // end oneof "format"
+    s3Direct?: boolean; // end oneof "format"
 }
 
 export interface O5ApplicationV1MapEnvVar {
@@ -153,5 +147,10 @@ export interface O5ApplicationV1AwsConfig {
     ses?: {
         sendEmail?: boolean;
     };
+}
+
+export enum O5ApplicationV1O5Var {
+    Unspecified = 'UNSPECIFIED',
+    AdapterEndpoint = 'ADAPTER_ENDPOINT'
 }
 

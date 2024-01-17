@@ -116,8 +116,8 @@ devDependencies:
     specifier: ^10.4.17
     version: 10.4.17(postcss@8.4.33)
   convert-proto-to-ts:
-    specifier: ^1.7.0
-    version: 1.7.0
+    specifier: ^1.7.1
+    version: 1.7.1
   eslint:
     specifier: ^8.56.0
     version: 8.56.0
@@ -2157,15 +2157,15 @@ packages:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
     dev: true
 
-  /convert-proto-to-ts@1.7.0:
-    resolution: {integrity: sha512-6roCYkSskRXOXSgO1Ki0CFDVE+aE1uyAH854iZE/owvSZu56XnKh+GHqizC4Na+wEXir7PtPJmU2tbLa5c96EQ==}
+  /convert-proto-to-ts@1.7.1:
+    resolution: {integrity: sha512-txQpuac320DaBvB3uHnU3lLJ3Ktzn2b2+j3WD0Zt6Ft5SiWmcR3xJUIrrxXuALuxOAbVrWzodkcHZWtnk/+6sw==}
     hasBin: true
     dependencies:
       change-case: 5.4.2
       find-up: 7.0.0
       import-meta-resolve: 4.0.0
       inquirer: 9.2.12
-      protobufjs: 7.2.6
+      protobufjs: 7.2.5
       typescript: 5.3.3
     dev: true
 
@@ -3208,6 +3208,25 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
+  /protobufjs@7.2.5:
+    resolution: {integrity: sha512-gGXRSXvxQ7UiPgfw8gevrfRWcTlSbOFg+p/N+JVJEK5VhueL2miT6qTymqAmjr1Q5WbOCyJbyrk6JfWKwlFn6A==}
+    engines: {node: '>=12.0.0'}
+    requiresBuild: true
+    dependencies:
+      '@protobufjs/aspromise': 1.1.2
+      '@protobufjs/base64': 1.1.2
+      '@protobufjs/codegen': 2.0.4
+      '@protobufjs/eventemitter': 1.1.0
+      '@protobufjs/fetch': 1.1.0
+      '@protobufjs/float': 1.0.2
+      '@protobufjs/inquire': 1.1.0
+      '@protobufjs/path': 1.1.2
+      '@protobufjs/pool': 1.1.0
+      '@protobufjs/utf8': 1.1.0
+      '@types/node': 20.11.5
+      long: 5.2.3
+    dev: true
+
   /protobufjs@7.2.6:
     resolution: {integrity: sha512-dgJaEDDL6x8ASUZ1YqWciTRrdOuYNzoOf27oHNfdyvKqHr5i0FV7FSLU+aIeFjyFgVxrpTOtQUi0BLLBymZaBw==}
     engines: {node: '>=12.0.0'}
@@ -3225,6 +3244,7 @@ packages:
       '@protobufjs/utf8': 1.1.0
       '@types/node': 20.11.5
       long: 5.2.3
+    dev: false
 
   /punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}

@@ -49,7 +49,7 @@
     "@typescript-eslint/parser": "^6.19.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
-    "convert-proto-to-ts": "^1.7.0",
+    "convert-proto-to-ts": "^1.7.1",
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
