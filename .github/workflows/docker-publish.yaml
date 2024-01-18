@@ -44,7 +44,7 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build Portal SPA
+      - name: Build SPA
         run: pnpm build
 
       - name: Build and push Docker images
