@@ -71,41 +71,39 @@ export enum O5DeployerV1StackLifecycle {
 
 export interface O5DeployerV1DeploymentEventType {
     // start oneof "type"
-    type?: {
-        created?: {
-            spec?: O5DeployerV1DeploymentSpec;
-        };
-        triggered?: {};
-        stackCreate?: {};
-        stackWait?: {};
-        stackScale?: {
-            desiredCount?: number;
-        };
-        stackTrigger?: {
-            phase?: string;
-        };
-        stackUpsert?: {};
-        stackStatus?: {
-            lifecycle?: O5DeployerV1StackLifecycle;
-            fullStatus?: string;
-            stackOutput?: O5DeployerV1KeyValue[];
-            deploymentPhase?: string;
-        };
-        migrateData?: {
-            databases?: O5DeployerV1DatabaseMigration[];
-        };
-        dbMigrateStatus?: {
-            dbName?: string;
-            migrationId?: string;
-            status?: O5DeployerV1DatabaseMigrationStatus;
-            error?: string;
-        };
-        dataMigrated?: {};
-        error?: {
-            error?: string;
-        };
-        done?: {};
-    }; // end oneof "type"
+    created?: {
+        spec?: O5DeployerV1DeploymentSpec;
+    };
+    triggered?: {};
+    stackCreate?: {};
+    stackWait?: {};
+    stackScale?: {
+        desiredCount?: number;
+    };
+    stackTrigger?: {
+        phase?: string;
+    };
+    stackUpsert?: {};
+    stackStatus?: {
+        lifecycle?: O5DeployerV1StackLifecycle;
+        fullStatus?: string;
+        stackOutput?: O5DeployerV1KeyValue[];
+        deploymentPhase?: string;
+    };
+    migrateData?: {
+        databases?: O5DeployerV1DatabaseMigration[];
+    };
+    dbMigrateStatus?: {
+        dbName?: string;
+        migrationId?: string;
+        status?: O5DeployerV1DatabaseMigrationStatus;
+        error?: string;
+    };
+    dataMigrated?: {};
+    error?: {
+        error?: string;
+    };
+    done?: {}; // end oneof "type"
 }
 
 export interface O5DeployerV1DatabaseMigration {

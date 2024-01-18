@@ -21,13 +21,13 @@ function getEnumKeyName(value) {
 }
 
 export default {
-  protoGitRepository: ['git@github.com:pentops/o5-pb.git',
+  protoGitRepository: [
+    'git@github.com:pentops/o5-pb.git',
     'git@github.com:pentops/iso-pb.git',
-    'git@github.com:pentops/listify-pb.git',
     'git@github.com:pentops/protostate.git',
     'git@github.com:pentops/moretypes.git',
   ],
-  namespacesToIgnore: ['google', 'sample'],
+  namespacesToIgnore: ['google', 'sample', 'testproto', 'test'],
   generateEnumType: 'enum',
   generatedTypeComments: {
     'google.protobuf.Timestamp': 'format: date-time',
@@ -49,15 +49,15 @@ export default {
     // If generatedName is not provided, a union type will be returned
     if (generatedName) {
       return ts.factory.createEnumDeclaration(
-          [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-          ts.factory.createIdentifier(generatedName),
-          Object.keys(node.values || {}).map((value) => {
-            const cleanedValue = value.replace(nameInConstant, '');
-            const pascalValue = pascalCase(cleanedValue);
-            const name = pascalValue.replace(pascalCase(node.name), '') || pascalValue;
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        ts.factory.createIdentifier(generatedName),
+        Object.keys(node.values || {}).map((value) => {
+          const cleanedValue = value.replace(nameInConstant, '');
+          const pascalValue = pascalCase(cleanedValue);
+          const name = pascalValue.replace(pascalCase(node.name), '') || pascalValue;
 
-            return ts.factory.createEnumMember(getEnumKeyName(name), ts.factory.createStringLiteral(cleanedValue, true));
-          }),
+          return ts.factory.createEnumMember(getEnumKeyName(name), ts.factory.createStringLiteral(cleanedValue, true));
+        }),
       );
     }
 
@@ -73,29 +73,29 @@ export default {
       // Handle oneof fields
       if (field.id === field.partOf.fieldsArray[0].id) {
         const oneofMembers = field.partOf.fieldsArray.map((f) =>
-            ts.factory.createPropertySignature(
-                undefined,
-                camelCase(f.name),
-                f.optional || !f.required ? optionalFieldMarker : undefined,
-                getBaseFieldType(f),
-            ),
+          ts.factory.createPropertySignature(
+            undefined,
+            camelCase(f.name),
+            f.optional || !f.required ? optionalFieldMarker : undefined,
+            getBaseFieldType(f),
+          ),
         );
 
         return ts.addSyntheticTrailingComment(
-            ts.addSyntheticLeadingComment(
-                ts.factory.createPropertySignature(
-                    undefined,
-                    camelCase(field.partOf.name),
-                    field.optional || !field.required ? optionalFieldMarker : undefined,
-                    ts.factory.createTypeLiteralNode(oneofMembers),
-                ),
-                ts.SyntaxKind.SingleLineCommentTrivia,
-                ` start oneof "${field.partOf.name}"`,
-                false,
+          ts.addSyntheticLeadingComment(
+            ts.factory.createPropertySignature(
+              undefined,
+              camelCase(field.partOf.name),
+              field.optional || !field.required ? optionalFieldMarker : undefined,
+              ts.factory.createTypeLiteralNode(oneofMembers),
             ),
             ts.SyntaxKind.SingleLineCommentTrivia,
-            ` end oneof "${field.partOf.name}"`,
+            ` start oneof "${field.partOf.name}"`,
             false,
+          ),
+          ts.SyntaxKind.SingleLineCommentTrivia,
+          ` end oneof "${field.partOf.name}"`,
+          false,
         );
       }
 

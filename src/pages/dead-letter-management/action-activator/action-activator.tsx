@@ -1,7 +1,7 @@
 import React from 'react';
-import { ConfirmDeleteAlert } from '@/pages/dead-letter-management/action-activator/confirm-delete-alert/confirm-delete-alert.tsx';
-import { RequeueMessageAlert } from '@/pages/dead-letter-management/action-activator/requeue-message-alert/requeue-message-alert.tsx';
+import { ReplayMessageAlert } from '@/pages/dead-letter-management/action-activator/replay-message-alert/replay-message-alert.tsx';
 import { UpdateMessageDialog } from '@/pages/dead-letter-management/action-activator/update-message-dialog/update-message-dialog.tsx';
+import { ConfirmRejectAlert } from '@/pages/dead-letter-management/action-activator/confirm-reject-alert/confirm-reject-alert.tsx';
 
 interface ActionActivatorProps {
   messageId: string;
@@ -10,9 +10,9 @@ interface ActionActivatorProps {
 export function ActionActivator({ messageId }: ActionActivatorProps) {
   return (
     <div className="flex items-center justify-end gap-2">
-      <RequeueMessageAlert messageId={messageId} />
+      <ReplayMessageAlert messageId={messageId} />
       <UpdateMessageDialog messageId={messageId} />
-      <ConfirmDeleteAlert messageId={messageId} />
+      <ConfirmRejectAlert messageId={messageId} />
     </div>
   );
 }

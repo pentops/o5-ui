@@ -4,11 +4,9 @@
 
 export interface O5MessagingV1Config {
     // start oneof "type"
-    type?: {
-        broadcast?: O5MessagingV1BroadcastConfig;
-        unicast?: O5MessagingV1UnicastConfig;
-        reply?: O5MessagingV1ReplyConfig;
-    }; // end oneof "type"
+    broadcast?: O5MessagingV1BroadcastConfig;
+    unicast?: O5MessagingV1UnicastConfig;
+    reply?: O5MessagingV1ReplyConfig; // end oneof "type"
 }
 
 export interface O5MessagingV1BroadcastConfig {

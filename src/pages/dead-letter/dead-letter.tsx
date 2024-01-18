@@ -1,4 +1,5 @@
 import React from 'react';
+import { match, P } from 'ts-pattern';
 import { useParams } from 'react-router-dom';
 import { useMessage } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
@@ -8,35 +9,51 @@ import { ActionActivator } from '@/pages/dead-letter-management/action-activator
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import { ColumnDef } from '@tanstack/react-table';
-import { O5DanteV1ServiceGetMessageResponse, O5DanteV1Urgency } from '@/data/types';
+import { deadMessageEventTypeLabels, getDeadMessageEventType, O5DanteV1DeadMessageEvent, O5DanteV1Problem, O5DanteV1Urgency } from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
-import {
-  DeadMessageProblem,
-  deadMessageProblemLabels,
-  getDeadMessageProblem,
-  getMessageActionType,
-  messageActionTypeLabels,
-  urgencyLabels,
-} from '@/data/types/ui/dante.ts';
+import { DeadMessageProblem, deadMessageProblemLabels, getDeadMessageProblem, urgencyLabels } from '@/data/types/ui/dante.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
 import { InvariantViolationPayloadDialog } from '@/pages/dead-letter/invariant-violation-payload-dialog/invariant-violation-payload-dialog.tsx';
 
-type Action = Required<O5DanteV1ServiceGetMessageResponse>['actions'][number];
+function renderProblem(problem: O5DanteV1Problem | undefined) {
+  return match(problem)
+    .with({ invariantViolation: P.not(P.nullish) }, (p) => {
+      return (
+        <>
+          <NutritionFact label="Description" renderWhenEmpty="-" value={p.invariantViolation?.description} />
+          <NutritionFact
+            label="Description"
+            renderWhenEmpty="-"
+            value={urgencyLabels[(p.invariantViolation?.urgency as O5DanteV1Urgency | undefined) || O5DanteV1Urgency.Unspecified]}
+          />
+          <NutritionFact
+            label="Error"
+            renderWhenEmpty="-"
+            value={<InvariantViolationPayloadDialog payload={p.invariantViolation?.error?.json || ''} />}
+          />
+        </>
+      );
+    })
+    .with({ unhandledError: P.not(P.nullish) }, (p) => {
+      return <NutritionFact vertical label="Error" value={p.unhandledError.error} />;
+    })
+    .otherwise(() => null);
+}
 
-const activityColumns: ColumnDef<Action>[] = [
-  getRowExpander(),
+const eventColumns: ColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
+  getRowExpander<O5DanteV1DeadMessageEvent>(),
   {
-    header: 'Action ID',
-    accessorFn: (row) => row.action?.id,
+    header: 'Event ID',
+    accessorFn: (row) => row.metadata?.eventId,
     cell: ({ getValue }) => {
       return <UUID short uuid={getValue<string>()} />;
     },
   },
   {
     header: 'Timestamp',
-    accessorKey: 'timestamp',
+    accessorFn: (row) => row.metadata?.timestamp,
     cell: ({ getValue }) => {
       return (
         <DateFormat
@@ -53,23 +70,95 @@ const activityColumns: ColumnDef<Action>[] = [
     },
   },
   {
-    header: 'Action',
-    accessorFn: (row) => messageActionTypeLabels[getMessageActionType(row.action)],
-  },
-  {
-    header: 'Note',
-    accessorFn: (row) => row.action?.note,
+    header: 'Type',
+    accessorFn: (row) => deadMessageEventTypeLabels[getDeadMessageEventType(row.event)],
   },
 ];
 
-function renderSubRow({ row }: TableRow<Action>) {
+function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageEvent>) {
+  const problemType = getDeadMessageProblem(row.original.event?.created?.spec);
+
   return (
     <div className="flex flex-col gap-4">
       <NutritionFact vertical label="Actor" value="-" />
 
-      {row.original.action?.action?.edit && (
-        <NutritionFact vertical label="New JSON" value={<JSONEditor disabled value={row.original.action.action.edit.newMessageJson || ''} />} />
-      )}
+      {match(row.original.event)
+        .with({ updated: P.not(P.nullish) }, (e) => {
+          return (
+            <>
+              <NutritionFact vertical label="Version ID" value={<UUID uuid={e.updated.spec?.versionId} />} />
+              <NutritionFact vertical label="Queue Name" value={e.updated.spec?.queueName} />
+              <NutritionFact vertical label="gRPC Name" value={e.updated.spec?.grpcName} />
+              <NutritionFact vertical label="Infa Message ID" value={<UUID uuid={e.updated.spec?.infraMessageId} />} />
+              <NutritionFact
+                vertical
+                label="Created At"
+                value={
+                  <DateFormat
+                    day="2-digit"
+                    hour="numeric"
+                    minute="2-digit"
+                    second="numeric"
+                    month="2-digit"
+                    timeZoneName="short"
+                    year="numeric"
+                    value={e.updated.spec?.createdAt}
+                  />
+                }
+              />
+
+              <NutritionFact
+                label="Problem"
+                renderWhenEmpty="-"
+                value={problemType !== DeadMessageProblem.Unspecified ? deadMessageProblemLabels[problemType] : null}
+              />
+
+              {renderProblem(e.updated.spec?.problem)}
+
+              <NutritionFact vertical label="JSON" value={<JSONEditor disabled value={e.updated.spec?.payload?.json || ''} />} />
+            </>
+          );
+        })
+        .with({ created: P.not(P.nullish) }, (e) => {
+          return (
+            <>
+              <NutritionFact vertical label="Version ID" value={<UUID uuid={e.created.spec?.versionId} />} />
+              <NutritionFact vertical label="Queue Name" value={e.created.spec?.queueName} />
+              <NutritionFact vertical label="gRPC Name" value={e.created.spec?.grpcName} />
+              <NutritionFact vertical label="Infa Message ID" value={<UUID uuid={e.created.spec?.infraMessageId} />} />
+              <NutritionFact
+                vertical
+                label="Created At"
+                value={
+                  <DateFormat
+                    day="2-digit"
+                    hour="numeric"
+                    minute="2-digit"
+                    second="numeric"
+                    month="2-digit"
+                    timeZoneName="short"
+                    year="numeric"
+                    value={e.created.spec?.createdAt}
+                  />
+                }
+              />
+
+              <NutritionFact
+                label="Problem"
+                renderWhenEmpty="-"
+                value={problemType !== DeadMessageProblem.Unspecified ? deadMessageProblemLabels[problemType] : null}
+              />
+
+              {renderProblem(e.created.spec?.problem)}
+
+              <NutritionFact vertical label="JSON" value={<JSONEditor disabled value={e.created.spec?.payload?.json || ''} />} />
+            </>
+          );
+        })
+        .with({ rejected: P.not(P.nullish) }, (e) => {
+          return <NutritionFact vertical label="Reason" value={e.rejected.reason} />;
+        })
+        .otherwise(() => null)}
     </div>
   );
 }
@@ -78,7 +167,7 @@ export function DeadLetter() {
   const { messageId } = useParams();
   const { data, error, isLoading } = useMessage({ messageId });
   useErrorHandler(error, 'Failed to load dead letter message');
-  const problemType = getDeadMessageProblem(data?.message?.cause);
+  const problemType = getDeadMessageProblem(data?.message?.currentSpec);
 
   return (
     <div className="w-full">
@@ -94,16 +183,16 @@ export function DeadLetter() {
               isLoading={isLoading}
               label="Infra Message ID"
               renderWhenEmpty="-"
-              value={data?.message?.cause?.infraMessageId ? <UUID canCopy short uuid={data.message.cause.infraMessageId} /> : null}
+              value={data?.message?.currentSpec?.infraMessageId ? <UUID canCopy short uuid={data.message.currentSpec.infraMessageId} /> : null}
             />
-            <NutritionFact isLoading={isLoading} label="Queue Name" renderWhenEmpty="-" value={data?.message?.cause?.queueName} />
-            <NutritionFact isLoading={isLoading} label="gRPC Name" renderWhenEmpty="-" value={data?.message?.cause?.grpcName} />
+            <NutritionFact isLoading={isLoading} label="Queue Name" renderWhenEmpty="-" value={data?.message?.currentSpec?.queueName} />
+            <NutritionFact isLoading={isLoading} label="gRPC Name" renderWhenEmpty="-" value={data?.message?.currentSpec?.grpcName} />
             <NutritionFact
               isLoading={isLoading}
-              label="Rejected At"
+              label="Created At"
               renderWhenEmpty="-"
               value={
-                data?.message?.cause?.rejectedTimestamp ? (
+                data?.message?.currentSpec?.createdAt ? (
                   <DateFormat
                     day="2-digit"
                     hour="numeric"
@@ -112,26 +201,7 @@ export function DeadLetter() {
                     month="2-digit"
                     timeZoneName="short"
                     year="numeric"
-                    value={data.message.cause.rejectedTimestamp}
-                  />
-                ) : null
-              }
-            />
-            <NutritionFact
-              isLoading={isLoading}
-              label="Sent At"
-              renderWhenEmpty="-"
-              value={
-                data?.message?.cause?.initialSentTimestamp ? (
-                  <DateFormat
-                    day="2-digit"
-                    hour="numeric"
-                    minute="2-digit"
-                    second="numeric"
-                    month="2-digit"
-                    timeZoneName="short"
-                    year="numeric"
-                    value={data.message.cause.initialSentTimestamp}
+                    value={data.message.currentSpec.createdAt}
                   />
                 ) : null
               }
@@ -144,41 +214,16 @@ export function DeadLetter() {
               value={problemType !== DeadMessageProblem.Unspecified ? deadMessageProblemLabels[problemType] : null}
             />
 
-            {problemType === DeadMessageProblem.InvariantViolation && (
-              <>
-                <NutritionFact
-                  isLoading={isLoading}
-                  label="Description"
-                  renderWhenEmpty="-"
-                  value={data?.message?.cause?.problem?.invariantViolation?.description}
-                />
-                <NutritionFact
-                  isLoading={isLoading}
-                  label="Description"
-                  renderWhenEmpty="-"
-                  value={urgencyLabels[(data?.message?.cause?.problem?.invariantViolation?.urgency as O5DanteV1Urgency | undefined) || O5DanteV1Urgency.Unspecified]}
-                />
-                <NutritionFact
-                  isLoading={isLoading}
-                  label="Error"
-                  renderWhenEmpty="-"
-                  value={<InvariantViolationPayloadDialog payload={data?.message?.cause?.problem?.invariantViolation?.error?.json || ''} />}
-                />
-              </>
-            )}
-
-            {problemType === DeadMessageProblem.UnhandledError && (
-              <NutritionFact isLoading={isLoading} label="Error" renderWhenEmpty="-" value={data?.message?.cause?.problem?.unhandledError?.error} />
-            )}
+            {renderProblem(data?.message?.currentSpec?.problem)}
           </CardContent>
         </Card>
         <Card className="flex-grow h-fit">
-          <CardHeader className="text-lg font-semibold">Actions</CardHeader>
+          <CardHeader className="text-lg font-semibold">Events</CardHeader>
           <CardContent>
             <DataTable
               getRowCanExpand
-              columns={activityColumns}
-              data={data?.actions || []}
+              columns={eventColumns}
+              data={data?.events || []}
               renderSubComponent={renderSubRow}
               showSkeleton={Boolean(isLoading || error)}
             />

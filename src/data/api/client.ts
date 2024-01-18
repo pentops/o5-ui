@@ -1,6 +1,6 @@
 import { APIError } from '@/data/api/error.ts';
 
-export type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 async function processResponse<TRes>(rawResponse: Response): Promise<TRes> {
   switch (rawResponse.headers.get('Content-Type')) {

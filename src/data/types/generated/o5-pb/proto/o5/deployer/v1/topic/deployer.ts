@@ -2,13 +2,16 @@
  * DO NOT EDIT -- GENERATED AUTOMATICALLY via convert-proto-to-ts. Run `pnpm generate:types` from the project root to regenerate.
  * Built from: o5-pb/proto/o5/deployer/v1/topic/deployer.proto */
 
+import type { O5DeployerV1StackLifecycle, O5DeployerV1DatabaseMigrationStatus } from '../deployment';
 import type { O5DeployerV1KeyValue } from '../application';
 import type { O5DeployerV1TopicStackId } from './aws';
-import type { O5DeployerV1DeploymentSpec, O5DeployerV1StackLifecycle, O5DeployerV1DatabaseMigrationStatus } from '../deployment';
+import type { O5ApplicationV1Application } from '../../../application/v1/application';
 
 export interface O5DeployerV1TopicRequestDeploymentMessage {
     deploymentId?: string;
-    spec?: O5DeployerV1DeploymentSpec;
+    application?: O5ApplicationV1Application;
+    version?: string;
+    environmentName?: string;
 }
 
 export interface O5DeployerV1TopicDeploymentCompleteMessage {
