@@ -1,0 +1,18 @@
+name: "dante-ui"
+
+deploymentConfig:
+  quickMode: true
+
+runtimes:
+  - name: main
+    routes:
+      - prefix: "/"
+        protocol: ROUTE_PROTOCOL_HTTP
+        bypass_ingress: true
+        port: 80
+        route_group: ROUTE_GROUP_FALLBACK
+    containers:
+      - name: main
+        demand: DEMAND_LIGHT
+        image:
+          name: dante-ui
