@@ -28,8 +28,6 @@ jobs:
           tags: |
             type=sha,format=long,prefix=
             type=raw,value=latest,enable={{is_default_branch}}
-            
-            - uses: actions/checkout@v3
 
       - uses: pnpm/action-setup@v2
         with:
