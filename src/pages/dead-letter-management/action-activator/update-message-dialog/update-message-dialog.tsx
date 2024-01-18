@@ -6,18 +6,26 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { UUID } from '@/components/uuid/uuid.tsx';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
 import { Button } from '@/components/ui/button.tsx';
-import { Textarea } from '@/components/ui/textarea.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
-import { useMessageAction } from '@/data/api/mutation';
 import { useErrorHandler } from '@/lib/error.ts';
 import { useMessage } from '@/data/api';
 import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
+import { useUpdateMessage } from '@/data/api/mutation';
+import { O5DanteV1DeadMessageSpec } from '@/data/types';
+import { Input } from '@/components/ui/input.tsx';
 
 const schema = z.object({
-  note: z.string().optional(),
-  json: z.string(),
+  message: z.object({
+    payload: z.object({
+      json: z.string(),
+      proto: z.object({
+        '@type': z.string(),
+        'value': z.any(),
+      }),
+    }),
+  }),
 });
 
 type Values = z.infer<typeof schema>;
@@ -27,44 +35,57 @@ interface UpdateMessageDialogProps {
 }
 
 export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync, isPending, error } = useMessageAction();
-  useErrorHandler(error, 'Error editing message');
+  const [isOpen, setIsOpen] = useState(false);
+  const { mutateAsync, isPending, error } = useUpdateMessage();
+  useErrorHandler(error, 'Error updating message');
 
   const { data, error: messageError } = useMessage(isOpen ? { messageId } : undefined);
   useErrorHandler(messageError, 'Failed to load dead letter message');
   const defaultValues = useMemo(
     () => ({
-      json:
-        JSON.stringify(data?.message?.cause?.payload?.json, null, 2) ||
-        `{
+      message: {
+        payload: {
+          proto: {
+            '@type': data?.message?.currentSpec?.payload?.proto?.['@type'] || '',
+            'value':
+              JSON.stringify(data?.message?.currentSpec?.payload?.proto?.value, null, 2) ||
+              `{
   
 }`,
+          },
+          json:
+            JSON.stringify(data?.message?.currentSpec?.payload?.json, null, 2) ||
+            `{
+  
+}`,
+        },
+      },
     }),
-    [data?.message?.cause?.payload?.json],
+    [data?.message?.currentSpec?.payload?.json, data?.message?.currentSpec?.payload?.proto],
   );
 
-  const form = useForm<Values>({ defaultValues: defaultValues, resolver: zodResolver(schema) });
+  const form = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
 
   async function handleEdit(values: Values) {
     try {
-      await mutateAsync({
-        messageIds: [messageId],
-        action: {
-          note: values.note || undefined,
-          action: {
-            edit: { newMessageJson: values.json || '{}' },
-          },
-        },
-      });
+      if (data?.message) {
+        await mutateAsync({
+          messageId,
+          replacesVersionId: data?.message?.currentSpec?.versionId,
+          message: {
+            ...data?.message?.currentSpec,
+            ...values.message,
+          } as O5DanteV1DeadMessageSpec,
+        });
 
-      toast({
-        title: 'Message edited',
-        description: `Message ${messageId} has been edited.`,
-      });
+        toast({
+          title: 'Message edited',
+          description: `Message ${messageId} has been edited.`,
+        });
 
-      setIsOpen(false);
+        setIsOpen(false);
+      }
     } catch {}
   }
 
@@ -91,7 +112,7 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
 
             <FormField
               control={form.control}
-              name="json"
+              name="message.payload.json"
               render={({ field }) => (
                 <FormItem className="py-2">
                   <FormLabel>Message JSON</FormLabel>
@@ -105,14 +126,27 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
 
             <FormField
               control={form.control}
-              name="note"
+              name="message.payload.proto.@type"
               render={({ field }) => (
                 <FormItem className="py-2">
-                  <FormLabel>Note</FormLabel>
+                  <FormLabel>Proto Type</FormLabel>
                   <FormControl>
-                    <Textarea {...field} />
+                    <Input {...field} />
                   </FormControl>
-                  <FormDescription>Optionally include a note to provide context for why you're requeuing this message.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="message.payload.proto.value"
+              render={({ field }) => (
+                <FormItem className="py-2">
+                  <FormLabel>Proto Value</FormLabel>
+                  <FormControl>
+                    <JSONEditor {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

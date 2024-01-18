@@ -1,5 +1,5 @@
 import { stringify } from 'qs';
-import { HTTPMethod } from '@/data/api/client.ts';
+import { HTTPMethod, TypedRequestInit } from '@/data/api/client.ts';
 
 function prepareParameters(params: any | undefined): any {
   if (!params || params === '' || params === undefined || params === null) {
@@ -37,29 +37,40 @@ function prepareParameters(params: any | undefined): any {
   return params;
 }
 
-function buildSearchString(params: any | undefined): string {
+export function buildSearchString(params: any | undefined): string {
   return stringify(prepareParameters(params), { addQueryPrefix: true, arrayFormat: 'comma', allowDots: true, skipNulls: true });
 }
 
-interface BoundPathResult {
-  path: string;
-  body?: any;
-}
-
-export function buildBoundPath(method: HTTPMethod, unboundPath: string, params?: any, pathParameters?: readonly string[]): BoundPathResult {
+export function buildRequestInit<TReq = undefined>(
+  method: HTTPMethod,
+  basePath: string,
+  unboundPath: string,
+  params?: TReq,
+  requestInit?: RequestInit,
+): [HTTPMethod, string, TypedRequestInit<TReq> | undefined] {
   const paramCopy = JSON.parse(JSON.stringify(params || {}));
-  let boundPath = unboundPath;
+  let pathname = unboundPath;
 
-  if (params) {
-    pathParameters?.forEach((unboundPathParameter) => {
-      boundPath = boundPath.replace(`:${unboundPathParameter}`, paramCopy[unboundPathParameter] || '');
-      delete paramCopy[unboundPathParameter];
-    });
+  if (basePath) {
+    pathname = new URL(unboundPath, basePath).pathname;
   }
+
+  const urlSegments = pathname.split('/');
+
+  for (let i = 0; i < urlSegments.length; i += 1) {
+    const segment = urlSegments[i];
+    if (segment.startsWith(':')) {
+      const key = segment.slice(1);
+      urlSegments[i] = paramCopy[key];
+      delete paramCopy[key];
+    }
+  }
+
+  const fullPath = `${basePath}${urlSegments.join('/')}`;
 
   if (method === 'GET') {
-    return { path: `${boundPath}${buildSearchString(paramCopy)}` };
+    return [method, `${fullPath}${buildSearchString(paramCopy)}`, requestInit as TypedRequestInit<TReq>];
   }
 
-  return { path: boundPath, body: paramCopy };
+  return [method, fullPath, { ...(requestInit || {}), body: paramCopy }];
 }
