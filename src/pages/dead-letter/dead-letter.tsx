@@ -43,9 +43,9 @@ function renderProblem(problem: O5DanteV1Problem | undefined) {
 }
 
 const eventColumns: ColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
-  getRowExpander<O5DanteV1DeadMessageEvent>(),
+  getRowExpander(),
   {
-    header: 'Event ID',
+    header: 'ID',
     accessorFn: (row) => row.metadata?.eventId,
     cell: ({ getValue }) => {
       return <UUID short uuid={getValue<string>()} />;

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { KeyBase, makeRequest } from '@/data/api/client.ts';
 import { O5DanteV1ServiceRejectDeadMessageRequest, O5DanteV1ServiceRejectDeadMessageResponse } from '@/data/types';
-import { LIST_MESSAGES_KEY } from '@/data/api';
+import { GET_MESSAGE_KEY, LIST_MESSAGES_KEY } from '@/data/api';
 import { buildRequestInit } from '../../search-params';
 
 const REJECT_MESSAGE_KEY: KeyBase = {
@@ -24,8 +24,12 @@ export function useRejectMessage() {
     async mutationFn(request: O5DanteV1ServiceRejectDeadMessageRequest) {
       return rejectMessage('', request);
     },
-    onSettled() {
+    onSettled(res) {
       queryClient.invalidateQueries({ queryKey: [LIST_MESSAGES_KEY] });
+
+      if (res?.message?.messageId) {
+        queryClient.invalidateQueries({ queryKey: [GET_MESSAGE_KEY, res.message.messageId] });
+      }
     },
   });
 }

@@ -1,4 +1,4 @@
-name: "dante-ui"
+name: "o5-ui"
 
 deploymentConfig:
   quickMode: true
@@ -15,4 +15,4 @@ runtimes:
       - name: main
         demand: DEMAND_LIGHT
         image:
-          name: dante-ui
+          name: o5-ui

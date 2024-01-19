@@ -8,10 +8,8 @@ import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui/dante.ts';
 import { useErrorHandler } from '@/lib/error.ts';
-import { getRowSelect } from '@/components/data-table/row-select/row-select.tsx';
 
 const columns: ColumnDef<O5DanteV1DeadMessageState>[] = [
-  getRowSelect(true),
   {
     header: 'Message ID',
     accessorFn: (row) => row.messageId,

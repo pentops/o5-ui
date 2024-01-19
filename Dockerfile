@@ -1,6 +1,6 @@
 FROM nginx:alpine
 
-LABEL org.opencontainers.image.source=https://github.com/pentops/dante-ui
+LABEL org.opencontainers.image.source=https://github.com/pentops/o5-ui
 
 WORKDIR /usr/share/nginx/html
 
