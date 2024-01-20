@@ -13,6 +13,10 @@ export interface PsmStateV1EventObjectOptions {
 export interface PsmStateV1EventTypeObjectOptions {
 }
 
+export interface PsmStateV1StateField {
+    primaryKey?: boolean;
+}
+
 export interface PsmStateV1EventField {
     eventType?: boolean;
     metadata?: boolean;

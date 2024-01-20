@@ -7,6 +7,7 @@ export * from './moretypes/proto/moretypes/v1/decimal';
 export * from './o5-pb/proto/o5/application/v1/application';
 export * from './o5-pb/proto/o5/auth/v1/actor';
 export * from './o5-pb/proto/o5/auth/v1/annotations';
+export * from './o5-pb/proto/o5/auth/v1/service/auth_service';
 export * from './o5-pb/proto/o5/dante/v1/dead_message';
 export * from './o5-pb/proto/o5/dante/v1/service/dead_message_command';
 export * from './o5-pb/proto/o5/dante/v1/service/dead_message_query';

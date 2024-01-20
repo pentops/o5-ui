@@ -5,6 +5,11 @@
 export interface PsmListV1MessageConstraint {
 }
 
+export interface PsmListV1ListRequestMessage {
+    defaultSort?: string[];
+    sortTiebreaker?: string[];
+}
+
 export interface PsmListV1OneofConstraint {
     filtering?: PsmListV1FilteringConstraint;
 }
