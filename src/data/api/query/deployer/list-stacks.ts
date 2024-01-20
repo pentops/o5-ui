@@ -3,6 +3,7 @@ import { KeyBase, makeRequest } from '@/data/api/client.ts';
 import { buildRequestInit } from '@/data/api/search-params.ts';
 import { O5DeployerV1ServiceListStacksRequest, O5DeployerV1ServiceListStacksResponse } from '@/data/types';
 import { getNextPageParam } from '@/data/api/pagination.ts';
+import { useSelectedRealmBaseUrl } from '@/context/api-context.ts';
 
 export const LIST_STACKS_KEY: KeyBase = { scope: 'stacks', entity: 'list', service: 'DeployerService.ListStacks' } as const;
 
@@ -13,9 +14,11 @@ export async function listStacks(baseUrl: string, request: O5DeployerV1ServiceLi
 }
 
 export function useListStacks(request?: O5DeployerV1ServiceListStacksRequest) {
+  const baseUrl = useSelectedRealmBaseUrl();
+
   return useInfiniteQuery({
     queryKey: [LIST_STACKS_KEY, request],
-    queryFn: async ({ pageParam }) => listStacks('', pageParam ? { ...request, page: { token: pageParam } } : request),
+    queryFn: async ({ pageParam }) => listStacks(baseUrl, pageParam ? { ...request, page: { token: pageParam } } : request),
     getNextPageParam,
     initialPageParam: undefined,
   });

@@ -3,6 +3,7 @@ import { KeyBase, makeRequest } from '@/data/api/client.ts';
 import { buildRequestInit } from '@/data/api/search-params.ts';
 import { O5DeployerV1ServiceListDeploymentsRequest, O5DeployerV1ServiceListDeploymentsResponse } from '@/data/types';
 import { getNextPageParam } from '@/data/api/pagination.ts';
+import { useSelectedRealmBaseUrl } from '@/context/api-context.ts';
 
 export const LIST_DEPLOYMENTS_KEY: KeyBase = { scope: 'deployments', entity: 'list', service: 'DeployerService.ListDeployments' } as const;
 
@@ -13,9 +14,11 @@ export async function listDeployments(baseUrl: string, request: O5DeployerV1Serv
 }
 
 export function useListDeployments(request?: O5DeployerV1ServiceListDeploymentsRequest) {
+  const baseUrl = useSelectedRealmBaseUrl();
+
   return useInfiniteQuery({
     queryKey: [LIST_DEPLOYMENTS_KEY, request],
-    queryFn: async ({ pageParam }) => listDeployments('', pageParam ? { ...request, page: { token: pageParam } } : request),
+    queryFn: async ({ pageParam }) => listDeployments(baseUrl, pageParam ? { ...request, page: { token: pageParam } } : request),
     getNextPageParam,
     initialPageParam: undefined,
   });

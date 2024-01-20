@@ -3,6 +3,7 @@ import { KeyBase, makeRequest } from '@/data/api/client.ts';
 import { O5DanteV1ServiceRejectDeadMessageRequest, O5DanteV1ServiceRejectDeadMessageResponse } from '@/data/types';
 import { GET_MESSAGE_KEY, LIST_MESSAGES_KEY } from '@/data/api';
 import { buildRequestInit } from '../../search-params';
+import { useSelectedRealmBaseUrl } from '@/context/api-context.ts';
 
 const REJECT_MESSAGE_KEY: KeyBase = {
   scope: 'message',
@@ -18,11 +19,12 @@ export async function rejectMessage(baseUrl: string, request: O5DanteV1ServiceRe
 
 export function useRejectMessage() {
   const queryClient = useQueryClient();
+  const baseUrl = useSelectedRealmBaseUrl();
 
   return useMutation({
     mutationKey: [REJECT_MESSAGE_KEY],
     async mutationFn(request: O5DanteV1ServiceRejectDeadMessageRequest) {
-      return rejectMessage('', request);
+      return rejectMessage(baseUrl, request);
     },
     onSettled(res) {
       queryClient.invalidateQueries({ queryKey: [LIST_MESSAGES_KEY] });

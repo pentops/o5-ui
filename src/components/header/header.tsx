@@ -1,7 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useWhoAmI } from '@/data/api';
+import { useSelectedRealmId, useSetRealmId } from '@/context/api-context.ts';
 
 export function Header() {
+  const { data } = useWhoAmI();
+  const realmId = useSelectedRealmId();
+  const setRealmId = useSetRealmId();
+
   return (
     <header className="supports-backdrop-blur:bg-background/60 sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="max-w-8xl mx-auto">
@@ -13,6 +20,27 @@ export function Header() {
             <div className="relative flex items-center ml-auto">
               <nav className="text-sm leading-6 font-semibold text-slate-700 dark:text-slate-200">
                 <ul className="flex space-x-8">
+                  {(data?.realmAccess?.length || 0) > 1 && (
+                    <li>
+                      <Select
+                        onValueChange={(value: string) => {
+                          setRealmId(value);
+                        }}
+                        value={realmId}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Realm" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {data?.realmAccess?.map((realm) => (
+                            <SelectItem key={realm.realmId} value={realm.realmId}>
+                              {realm.realmName || realm.realmId}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </li>
+                  )}
                   <li>
                     <Link to="/deployment">Deployments</Link>
                   </li>

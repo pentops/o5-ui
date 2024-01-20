@@ -3,6 +3,7 @@ import { KeyBase, makeRequest } from '@/data/api/client.ts';
 import { O5DanteV1ServiceUpdateDeadMessageRequest, O5DanteV1ServiceUpdateDeadMessageResponse } from '@/data/types';
 import { GET_MESSAGE_KEY, LIST_MESSAGES_KEY } from '@/data/api';
 import { buildRequestInit } from '../../search-params';
+import { useSelectedRealmBaseUrl } from '@/context/api-context.ts';
 
 const UPDATE_MESSAGE_KEY: KeyBase = {
   scope: 'message',
@@ -18,11 +19,12 @@ export async function updateMessage(baseUrl: string, request: O5DanteV1ServiceUp
 
 export function useUpdateMessage() {
   const queryClient = useQueryClient();
+  const baseUrl = useSelectedRealmBaseUrl();
 
   return useMutation({
     mutationKey: [UPDATE_MESSAGE_KEY],
     async mutationFn(request: O5DanteV1ServiceUpdateDeadMessageRequest) {
-      return updateMessage('', request);
+      return updateMessage(baseUrl, request);
     },
     onSettled(res) {
       queryClient.invalidateQueries({ queryKey: [LIST_MESSAGES_KEY] });
