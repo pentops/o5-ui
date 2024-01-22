@@ -33,7 +33,7 @@ export function Header() {
                         </SelectTrigger>
                         <SelectContent>
                           {data?.realmAccess?.map((realm) => (
-                            <SelectItem key={realm.realmId} value={realm.realmId}>
+                            <SelectItem key={realm.realmId} value={realm.realmId || ''}>
                               {realm.realmName || realm.realmId}
                             </SelectItem>
                           ))}
