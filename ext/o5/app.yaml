@@ -1,4 +1,4 @@
-name: "o5-ui"
+name: "o5ui"
 
 deploymentConfig:
   quickMode: true
@@ -16,3 +16,4 @@ runtimes:
         demand: DEMAND_LIGHT
         image:
           name: o5-ui
+          registry: ghcr.io/pentops
