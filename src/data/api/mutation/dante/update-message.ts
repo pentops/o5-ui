@@ -19,7 +19,7 @@ export async function updateMessage(baseUrl: string, request: O5DanteV1ServiceUp
 
 export function useUpdateMessage() {
   const queryClient = useQueryClient();
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl] = useSelectedRealmBaseUrl();
 
   return useMutation({
     mutationKey: [UPDATE_MESSAGE_KEY],

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useWhoAmI } from '@/data/api';
+import { O5AuthV1ServiceRealmAccess } from '@/data/types';
 
 interface ApiContextState {
   realmId: string | undefined;
@@ -19,14 +20,14 @@ export function useSetRealmId() {
   return useApiContext((state) => state.setRealmId);
 }
 
-export function useSelectedRealm() {
+export function useSelectedRealm(): [O5AuthV1ServiceRealmAccess | undefined, boolean] {
   const realmId = useSelectedRealmId();
-  const { data } = useWhoAmI();
+  const { data, isLoading } = useWhoAmI();
 
-  return data?.realmAccess?.find((realm) => realm.realmId === realmId);
+  return [data?.realmAccess?.find((realm) => realm.realmId === realmId), isLoading];
 }
 
-export function useSelectedRealmBaseUrl() {
-  const realm = useSelectedRealm();
-  return realm?.baseUrl || '';
+export function useSelectedRealmBaseUrl(): [string, boolean] {
+  const [realm, isLoading] = useSelectedRealm();
+  return [realm?.baseUrl || '', isLoading];
 }

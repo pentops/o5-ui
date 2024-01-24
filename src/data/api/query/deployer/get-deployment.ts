@@ -12,11 +12,11 @@ export async function getDeployment(baseUrl: string, request: O5DeployerV1Servic
 }
 
 export function useDeployment(request?: O5DeployerV1ServiceGetDeploymentRequest) {
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();
 
   return useQuery({
-    queryKey: [GET_DEPLOYMENT_KEY, request],
+    queryKey: [GET_DEPLOYMENT_KEY, request, baseUrl],
     queryFn: async () => getDeployment(baseUrl, request),
-    enabled: Boolean(request?.deploymentId),
+    enabled: Boolean(!loadingRealm && request?.deploymentId),
   });
 }

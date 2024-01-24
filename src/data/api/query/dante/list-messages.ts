@@ -14,12 +14,13 @@ export async function listMessages(baseUrl: string, request: O5DanteV1ServiceLis
 }
 
 export function useListMessages(request?: O5DanteV1ServiceListDeadMessagesRequest) {
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();
 
   return useInfiniteQuery({
-    queryKey: [LIST_MESSAGES_KEY],
+    queryKey: [LIST_MESSAGES_KEY, request, baseUrl],
     queryFn: async ({ pageParam }) => listMessages(baseUrl, pageParam ? { ...request, page: { token: pageParam } } : request),
     getNextPageParam,
     initialPageParam: undefined,
+    enabled: !loadingRealm,
   });
 }

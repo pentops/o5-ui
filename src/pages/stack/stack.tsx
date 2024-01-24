@@ -133,7 +133,7 @@ export function Stack() {
               renderWhenEmpty="-"
               value={
                 data?.state?.currentDeployment?.deploymentId ? (
-                  <UUID to={`/deployment/${data.state.currentDeployment.deploymentId}`} uuid={data.state.currentDeployment.deploymentId} />
+                  <UUID short to={`/deployment/${data.state.currentDeployment.deploymentId}`} uuid={data.state.currentDeployment.deploymentId} />
                 ) : undefined
               }
             />
@@ -141,13 +141,13 @@ export function Stack() {
               isLoading={isLoading}
               label="Current Deployment Version"
               renderWhenEmpty="-"
-              value={data?.state?.currentDeployment?.version}
+              value={data?.state?.currentDeployment?.version ? <UUID short uuid={data.state.currentDeployment.version} /> : undefined}
             />
             <NutritionFact
               isLoading={isLoading}
               label="Queued Deployments"
               renderWhenEmpty="-"
-              value={data?.state?.queuedDeployments?.map((d) => `${d.deploymentId} (${d.version})`).join('\n')}
+              value={data?.state?.queuedDeployments?.map((d) => <UUID short key={d.deploymentId} to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />)}
             />
           </CardContent>
         </Card>

@@ -36,10 +36,13 @@ const columns: ColumnDef<O5DeployerV1StackState>[] = [
   {
     header: 'Current Deployment Version',
     accessorFn: (row) => row.currentDeployment?.version,
+    cell: ({ getValue }) => {
+      return <UUID canCopy short uuid={getValue<string>()} />;
+    },
   },
   {
     header: 'Queued Deployments',
-    accessorFn: (row) => row.queuedDeployments?.map((d) => `${d.deploymentId} (${d.version})`).join(', ') || '-',
+    accessorFn: (row) => row.queuedDeployments?.map((d) => <UUID short to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />) || '-',
   },
 ];
 

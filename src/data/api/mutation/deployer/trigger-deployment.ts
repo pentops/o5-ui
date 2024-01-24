@@ -19,7 +19,7 @@ export async function triggerDeployment(baseUrl: string, request: O5DanteV1Servi
 
 export function useTriggerDeployment() {
   const queryClient = useQueryClient();
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl] = useSelectedRealmBaseUrl();
 
   return useMutation({
     mutationKey: [TRIGGER_DEPLOYMENT_KEY],

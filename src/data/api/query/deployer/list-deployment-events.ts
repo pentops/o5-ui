@@ -18,12 +18,13 @@ export async function listDeploymentEvents(baseUrl: string, request: O5DeployerV
 }
 
 export function useListDeploymentEvents(request?: O5DeployerV1ServiceListDeploymentEventsRequest) {
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();
 
   return useInfiniteQuery({
-    queryKey: [LIST_DEPLOYMENT_EVENTS_KEY, request],
+    queryKey: [LIST_DEPLOYMENT_EVENTS_KEY, request, baseUrl],
     queryFn: async ({ pageParam }) => listDeploymentEvents(baseUrl, pageParam ? { ...request, page: { token: pageParam } } : request),
     getNextPageParam,
     initialPageParam: undefined,
+    enabled: !loadingRealm,
   });
 }

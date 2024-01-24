@@ -12,11 +12,11 @@ export async function getStack(baseUrl: string, request: O5DeployerV1ServiceGetS
 }
 
 export function useStack(request?: O5DeployerV1ServiceGetStackRequest) {
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();
 
   return useQuery({
-    queryKey: [GET_STACK_KEY, request],
+    queryKey: [GET_STACK_KEY, request, baseUrl],
     queryFn: async () => getStack(baseUrl, request),
-    enabled: Boolean(request?.stackId),
+    enabled: Boolean(!loadingRealm && request?.stackId),
   });
 }

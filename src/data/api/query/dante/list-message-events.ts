@@ -13,10 +13,11 @@ export async function listMessageEvents(baseUrl: string, request: O5DanteV1Servi
 }
 
 export function useListMessageEvents(request?: O5DanteV1ServiceListDeadMessageEventsRequest) {
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();
 
   return useQuery({
-    queryKey: [LIST_MESSAGE_EVENTS_KEY],
+    queryKey: [LIST_MESSAGE_EVENTS_KEY, request, baseUrl],
     queryFn: async () => listMessageEvents(baseUrl, request),
+    enabled: !loadingRealm,
   });
 }

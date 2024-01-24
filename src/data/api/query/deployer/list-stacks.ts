@@ -14,12 +14,13 @@ export async function listStacks(baseUrl: string, request: O5DeployerV1ServiceLi
 }
 
 export function useListStacks(request?: O5DeployerV1ServiceListStacksRequest) {
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();
 
   return useInfiniteQuery({
-    queryKey: [LIST_STACKS_KEY, request],
+    queryKey: [LIST_STACKS_KEY, request, baseUrl],
     queryFn: async ({ pageParam }) => listStacks(baseUrl, pageParam ? { ...request, page: { token: pageParam } } : request),
     getNextPageParam,
     initialPageParam: undefined,
+    enabled: !loadingRealm,
   });
 }

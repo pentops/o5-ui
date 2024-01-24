@@ -19,7 +19,7 @@ export async function rejectMessage(baseUrl: string, request: O5DanteV1ServiceRe
 
 export function useRejectMessage() {
   const queryClient = useQueryClient();
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl] = useSelectedRealmBaseUrl();
 
   return useMutation({
     mutationKey: [REJECT_MESSAGE_KEY],

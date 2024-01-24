@@ -14,12 +14,13 @@ export async function listDeployments(baseUrl: string, request: O5DeployerV1Serv
 }
 
 export function useListDeployments(request?: O5DeployerV1ServiceListDeploymentsRequest) {
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();
 
   return useInfiniteQuery({
-    queryKey: [LIST_DEPLOYMENTS_KEY, request],
+    queryKey: [LIST_DEPLOYMENTS_KEY, request, baseUrl],
     queryFn: async ({ pageParam }) => listDeployments(baseUrl, pageParam ? { ...request, page: { token: pageParam } } : request),
     getNextPageParam,
     initialPageParam: undefined,
+    enabled: !loadingRealm,
   });
 }

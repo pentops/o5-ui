@@ -19,7 +19,7 @@ export async function replayMessage(baseUrl: string, request: O5DanteV1ServiceRe
 
 export function useReplayMessage() {
   const queryClient = useQueryClient();
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl] = useSelectedRealmBaseUrl();
 
   return useMutation({
     mutationKey: [REPLAY_MESSAGE_KEY],

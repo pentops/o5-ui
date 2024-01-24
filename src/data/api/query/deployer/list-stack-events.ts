@@ -14,12 +14,13 @@ export async function listStackEvents(baseUrl: string, request: O5DeployerV1Serv
 }
 
 export function useListStackEvents(request?: O5DeployerV1ServiceListStackEventsRequest) {
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();
 
   return useInfiniteQuery({
-    queryKey: [LIST_STACK_EVENTS_KEY, request],
+    queryKey: [LIST_STACK_EVENTS_KEY, request, baseUrl],
     queryFn: async ({ pageParam }) => listStackEvents(baseUrl, pageParam ? { ...request, page: { token: pageParam } } : request),
     getNextPageParam,
     initialPageParam: undefined,
+    enabled: !loadingRealm,
   });
 }

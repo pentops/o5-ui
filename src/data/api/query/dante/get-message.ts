@@ -13,11 +13,11 @@ export async function getMessage(baseUrl: string, request: O5DanteV1ServiceGetDe
 }
 
 export function useMessage(request?: O5DanteV1ServiceGetDeadMessageRequest) {
-  const baseUrl = useSelectedRealmBaseUrl();
+  const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();
 
   return useQuery({
-    queryKey: [GET_MESSAGE_KEY, request?.messageId],
+    queryKey: [GET_MESSAGE_KEY, request?.messageId, baseUrl],
     queryFn: async () => getMessage(baseUrl, request),
-    enabled: Boolean(request?.messageId),
+    enabled: Boolean(!loadingRealm && request?.messageId),
   });
 }
