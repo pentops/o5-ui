@@ -18,7 +18,7 @@ import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
 import { InvariantViolationPayloadDialog } from '@/pages/dead-letter/invariant-violation-payload-dialog/invariant-violation-payload-dialog.tsx';
 
 function renderProblem(problem: O5DanteV1Problem | undefined) {
-  return match(problem)
+  return match(problem?.type)
     .with({ invariantViolation: P.not(P.nullish) }, (p) => {
       return (
         <>
@@ -76,13 +76,13 @@ const eventColumns: ColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
 ];
 
 function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageEvent>) {
-  const problemType = getDeadMessageProblem(row.original.event?.created?.spec);
+  const problemType = getDeadMessageProblem(row.original.event?.type?.created?.spec);
 
   return (
     <div className="flex flex-col gap-4">
       <NutritionFact vertical label="Actor" value="-" />
 
-      {match(row.original.event)
+      {match(row.original.event?.type)
         .with({ updated: P.not(P.nullish) }, (e) => {
           return (
             <>

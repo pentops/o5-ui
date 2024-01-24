@@ -1,5 +1,4 @@
 import ts from 'typescript';
-import protobuf from 'protobufjs';
 import { camelCase, constantCase, pascalCase } from 'change-case';
 
 const optionalFieldMarker = ts.factory.createToken(ts.SyntaxKind.QuestionToken);
@@ -69,7 +68,7 @@ export default {
   },
   customMemberBuilder: (field, getBaseFieldType) => {
     // Handle enums
-    if (field.partOf instanceof protobuf.OneOf && !field.options?.['proto3_optional']) {
+    if (field.partOf?.constructor?.name === 'OneOf' && !field.options?.['proto3_optional']) {
       // Handle oneof fields
       if (field.id === field.partOf.fieldsArray[0].id) {
         const oneofMembers = field.partOf.fieldsArray.map((f) =>

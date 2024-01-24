@@ -90,7 +90,7 @@ export const deploymentEventTypeLabels: Record<DeploymentEventType, string> = {
 };
 
 export function getDeploymentEventType(event: O5DeployerV1DeploymentEvent | undefined) {
-  return match(event?.event)
+  return match(event?.event?.type)
     .with({ created: P.not(P.nullish) }, () => DeploymentEventType.Created)
     .with({ triggered: P.not(P.nullish) }, () => DeploymentEventType.Triggered)
     .with({ stackCreate: P.not(P.nullish) }, () => DeploymentEventType.StackCreate)

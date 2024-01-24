@@ -6,10 +6,12 @@ export interface O5DeployerV1ServiceTriggerDeploymentRequest {
     deploymentId?: string;
     environmentName?: string;
     // start oneof "source"
-    github?: {
-        owner?: string;
-        repo?: string;
-        commit?: string;
+    source?: {
+        github?: {
+            owner?: string;
+            repo?: string;
+            commit?: string;
+        };
     }; // end oneof "source"
 }
 

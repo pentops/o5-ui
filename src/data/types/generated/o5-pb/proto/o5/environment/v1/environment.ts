@@ -5,7 +5,9 @@
 export interface O5EnvironmentV1Environment {
     fullName?: string;
     // start oneof "provider"
-    aws?: O5EnvironmentV1Aws; // end oneof "provider"
+    provider?: {
+        aws?: O5EnvironmentV1Aws;
+    }; // end oneof "provider"
     trustJwks?: string[];
     vars?: O5EnvironmentV1CustomVariable[];
     corsOrigins?: string[];
@@ -14,10 +16,12 @@ export interface O5EnvironmentV1Environment {
 export interface O5EnvironmentV1CustomVariable {
     name?: string;
     // start oneof "src"
-    value?: string;
-    join?: {
-        delimiter?: string;
-        values?: string[];
+    src?: {
+        value?: string;
+        join?: {
+            delimiter?: string;
+            values?: string[];
+        };
     }; // end oneof "src"
 }
 

@@ -9,11 +9,11 @@ export enum DeadMessageProblem {
 }
 
 export function getDeadMessageProblem(capturedMessage: O5DanteV1DeadMessageSpec | undefined): DeadMessageProblem {
-  if (capturedMessage?.problem?.invariantViolation) {
+  if (capturedMessage?.problem?.type?.invariantViolation) {
     return DeadMessageProblem.InvariantViolation;
   }
 
-  if (capturedMessage?.problem?.unhandledError) {
+  if (capturedMessage?.problem?.type?.unhandledError) {
     return DeadMessageProblem.UnhandledError;
   }
 
@@ -43,19 +43,19 @@ export enum DeadMessageEventType {
 }
 
 export function getDeadMessageEventType(event: O5DanteV1DeadMessageEventType | undefined): DeadMessageEventType {
-  if (event?.created) {
+  if (event?.type?.created) {
     return DeadMessageEventType.Created;
   }
 
-  if (event?.updated) {
+  if (event?.type?.updated) {
     return DeadMessageEventType.Updated;
   }
 
-  if (event?.replayed) {
+  if (event?.type?.replayed) {
     return DeadMessageEventType.Replayed;
   }
 
-  if (event?.rejected) {
+  if (event?.type?.rejected) {
     return DeadMessageEventType.Rejected;
   }
 

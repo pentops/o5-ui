@@ -54,7 +54,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1StackEvent>) {
     <div className="flex flex-col gap-4">
       <NutritionFact vertical label="Actor" value="-" />
 
-      {match(row.original.event)
+      {match(row.original.event?.type)
         .with({ triggered: P.not(P.nullish) }, (e) => (
           <>
             <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.triggered.applicationName} />

@@ -16,22 +16,24 @@ export interface PsmListV1OneofConstraint {
 
 export interface PsmListV1FieldConstraint {
     // start oneof "type"
-    double?: PsmListV1NumericRules;
-    fixed32?: PsmListV1NumericRules;
-    fixed64?: PsmListV1NumericRules;
-    float?: PsmListV1NumericRules;
-    int32?: PsmListV1NumericRules;
-    int64?: PsmListV1NumericRules;
-    sfixed32?: PsmListV1NumericRules;
-    sfixed64?: PsmListV1NumericRules;
-    sint32?: PsmListV1NumericRules;
-    sint64?: PsmListV1NumericRules;
-    uint32?: PsmListV1NumericRules;
-    uint64?: PsmListV1NumericRules;
-    bool?: PsmListV1BoolRules;
-    string?: PsmListV1StringRules;
-    enum?: PsmListV1EnumRules;
-    timestamp?: PsmListV1TimestampRules; // end oneof "type"
+    type?: {
+        double?: PsmListV1NumericRules;
+        fixed32?: PsmListV1NumericRules;
+        fixed64?: PsmListV1NumericRules;
+        float?: PsmListV1NumericRules;
+        int32?: PsmListV1NumericRules;
+        int64?: PsmListV1NumericRules;
+        sfixed32?: PsmListV1NumericRules;
+        sfixed64?: PsmListV1NumericRules;
+        sint32?: PsmListV1NumericRules;
+        sint64?: PsmListV1NumericRules;
+        uint32?: PsmListV1NumericRules;
+        uint64?: PsmListV1NumericRules;
+        bool?: PsmListV1BoolRules;
+        string?: PsmListV1StringRules;
+        enum?: PsmListV1EnumRules;
+        timestamp?: PsmListV1TimestampRules;
+    }; // end oneof "type"
 }
 
 export interface PsmListV1FilteringConstraint {
@@ -59,9 +61,11 @@ export interface PsmListV1BoolRules {
 
 export interface PsmListV1StringRules {
     // start oneof "wellKnown"
-    openText?: PsmListV1OpenTextRules;
-    date?: PsmListV1DateRules;
-    foreignKey?: PsmListV1ForeignKeyRules; // end oneof "wellKnown"
+    wellKnown?: {
+        openText?: PsmListV1OpenTextRules;
+        date?: PsmListV1DateRules;
+        foreignKey?: PsmListV1ForeignKeyRules;
+    }; // end oneof "wellKnown"
 }
 
 export interface PsmListV1OpenTextRules {
@@ -74,8 +78,10 @@ export interface PsmListV1DateRules {
 
 export interface PsmListV1ForeignKeyRules {
     // start oneof "type"
-    uniqueString?: PsmListV1UniqueStringRules;
-    uuid?: PsmListV1UuidRules; // end oneof "type"
+    type?: {
+        uniqueString?: PsmListV1UniqueStringRules;
+        uuid?: PsmListV1UuidRules;
+    }; // end oneof "type"
 }
 
 export interface PsmListV1UniqueStringRules {

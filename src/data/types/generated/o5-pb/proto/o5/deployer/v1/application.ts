@@ -22,21 +22,23 @@ export interface O5DeployerV1Parameter {
 
 export interface O5DeployerV1ParameterSourceType {
     // start oneof "type"
-    static?: {
-        value?: string;
-    };
-    wellKnown?: {
-        name?: string;
-    };
-    rulePriority?: {
-        routeGroup?: O5ApplicationV1RouteGroup;
-    };
-    desiredCount?: {};
-    crossEnvSns?: {
-        envName?: string;
-    };
-    envVar?: {
-        name?: string;
+    type?: {
+        static?: {
+            value?: string;
+        };
+        wellKnown?: {
+            name?: string;
+        };
+        rulePriority?: {
+            routeGroup?: O5ApplicationV1RouteGroup;
+        };
+        desiredCount?: {};
+        crossEnvSns?: {
+            envName?: string;
+        };
+        envVar?: {
+            name?: string;
+        };
     }; // end oneof "type"
 }
 
@@ -52,15 +54,19 @@ export interface O5DeployerV1KeyValue {
 export interface O5DeployerV1CloudFormationStackParameter {
     name?: string;
     // start oneof "source"
-    value?: string;
-    resolve?: O5DeployerV1CloudFormationStackParameterType; // end oneof "source"
+    source?: {
+        value?: string;
+        resolve?: O5DeployerV1CloudFormationStackParameterType;
+    }; // end oneof "source"
 }
 
 export interface O5DeployerV1CloudFormationStackParameterType {
     // start oneof "type"
-    rulePriority?: {
-        routeGroup?: O5ApplicationV1RouteGroup;
-    };
-    desiredCount?: {}; // end oneof "type"
+    type?: {
+        rulePriority?: {
+            routeGroup?: O5ApplicationV1RouteGroup;
+        };
+        desiredCount?: {};
+    }; // end oneof "type"
 }
 

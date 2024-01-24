@@ -23,8 +23,10 @@ export interface O5DanteV1DeadMessageSpec {
 
 export interface O5DanteV1Problem {
     // start oneof "type"
-    invariantViolation?: O5DanteV1InvariantViolation;
-    unhandledError?: O5DanteV1UnhandledError; // end oneof "type"
+    type?: {
+        invariantViolation?: O5DanteV1InvariantViolation;
+        unhandledError?: O5DanteV1UnhandledError;
+    }; // end oneof "type"
 }
 
 export enum O5DanteV1MessageStatus {
@@ -65,15 +67,17 @@ export interface O5DanteV1DeadMessageEvent {
 
 export interface O5DanteV1DeadMessageEventType {
     // start oneof "type"
-    created?: {
-        spec?: O5DanteV1DeadMessageSpec;
-    };
-    updated?: {
-        spec?: O5DanteV1DeadMessageSpec;
-    };
-    replayed?: {};
-    rejected?: {
-        reason?: string;
+    type?: {
+        created?: {
+            spec?: O5DanteV1DeadMessageSpec;
+        };
+        updated?: {
+            spec?: O5DanteV1DeadMessageSpec;
+        };
+        replayed?: {};
+        rejected?: {
+            reason?: string;
+        };
     }; // end oneof "type"
 }
 

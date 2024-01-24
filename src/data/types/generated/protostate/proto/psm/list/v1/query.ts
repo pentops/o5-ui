@@ -21,8 +21,10 @@ export interface PsmListV1Sort {
 export interface PsmListV1Filter {
     field?: string;
     // start oneof "filterValue"
-    value?: string;
-    range?: PsmListV1Range; // end oneof "filterValue"
+    filterValue?: {
+        value?: string;
+        range?: PsmListV1Range;
+    }; // end oneof "filterValue"
 }
 
 export interface PsmListV1Range {

@@ -27,7 +27,7 @@ export const stackStatusLabels: Record<O5DeployerV1StackStatus, string> = {
 };
 
 export function getStackEventType(event: O5DeployerV1StackEvent | undefined) {
-  return match(event?.event)
+  return match(event?.event?.type)
     .with({ triggered: P.not(P.nullish) }, () => StackEventType.Triggered)
     .with({ deploymentCompleted: P.not(P.nullish) }, () => StackEventType.DeploymentCompleted)
     .with({ deploymentFailed: P.not(P.nullish) }, () => StackEventType.DeploymentFailed)

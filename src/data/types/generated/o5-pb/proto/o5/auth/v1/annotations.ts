@@ -4,8 +4,10 @@
 
 export interface O5AuthV1AuthMethodOptions {
     // start oneof "authMethod"
-    jwtBearer?: O5AuthV1AuthMethodJwtBearer;
-    none?: O5AuthV1AuthMethodNone; // end oneof "authMethod"
+    authMethod?: {
+        jwtBearer?: O5AuthV1AuthMethodJwtBearer;
+        none?: O5AuthV1AuthMethodNone;
+    }; // end oneof "authMethod"
 }
 
 export interface O5AuthV1AuthMethodNone {

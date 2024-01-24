@@ -61,7 +61,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentEvent>) {
     <div className="flex flex-col gap-4">
       <NutritionFact vertical label="Actor" value="-" />
 
-      {match(row.original.event)
+      {match(row.original.event?.type)
         .with({ created: P.not(P.nullish) }, (e) => (
           <div className="flex flex-col gap-2">
             <h3>Spec</h3>
@@ -86,7 +86,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentEvent>) {
                 <NutritionFact label="RDS Host Server Group" value={db.rdsHost?.serverGroup} />
                 <NutritionFact label="RDS Host Secret Name" value={db.rdsHost?.secretName} />
 
-                {match(db.database)
+                {match(db.database?.engine)
                   .with({ postgres: P.not(P.nullish) }, (d) => (
                     <>
                       <NutritionFact label="Engine" value="PostgreSQL" />
@@ -98,7 +98,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentEvent>) {
                       <NutritionFact label="Migrate Container Command" value={JSON.stringify(d.postgres?.migrateContainer?.command || [])} />
                       <NutritionFact
                         label="Migrate Container Image"
-                        value={match(d.postgres.migrateContainer)
+                        value={match(d.postgres.migrateContainer?.source)
                           .with({ imageUrl: P.not(P.nullish) }, (i) => i.imageUrl)
                           .with({ image: P.not(P.nullish) }, (i) => `${i.image.registry} (${i.image.name}:${i.image.tag})`)
                           .otherwise(() => '')}
@@ -116,7 +116,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentEvent>) {
                                 <div>
                                   <span>{envVar.name}: </span>
                                   <span>
-                                    {match(envVar)
+                                    {match(envVar.spec)
                                       .with({ value: P.string }, (v) => v.value)
                                       .with({ secret: P.not(P.nullish) }, (v) => `Name: ${v.secret.secretName}, JSON Key: ${v.secret.jsonKey}`)
                                       .with({ o5: P.not(P.nullish) }, (v) => v.o5)
@@ -124,7 +124,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentEvent>) {
                                       .with(
                                         { blobstore: P.not(P.nullish) },
                                         (v) =>
-                                          `Blobstore Name: ${v.blobstore.name}, Sub Path: ${v.blobstore.subPath}, S3 Direct: ${v.blobstore.s3Direct}`,
+                                          `Blobstore Name: ${v.blobstore.name}, Sub Path: ${v.blobstore.subPath}, S3 Direct: ${v.blobstore.format?.s3Direct}`,
                                       )
                                       .with({ envMap: P.not(P.nullish) }, () => 'Environment Map')
                                       .with({ fromEnv: P.not(P.nullish) }, (v) => v.fromEnv.name)
@@ -148,10 +148,10 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentEvent>) {
                 <NutritionFact label="Name" value={param.name} />
                 <NutritionFact
                   label="Source"
-                  value={match(param)
+                  value={match(param.source)
                     .with({ value: P.string }, (p) => p.value)
                     .with({ resolve: P.not(P.nullish) }, (p) =>
-                      match(p.resolve)
+                      match(p.resolve.type)
                         .with({ rulePriority: P.not(P.nullish) }, (s) => `Route Group: ${s.rulePriority.routeGroup}`)
                         .with({ desiredCount: P.not(P.nullish) }, () => `Desired Count`)
                         .otherwise(() => ''),
