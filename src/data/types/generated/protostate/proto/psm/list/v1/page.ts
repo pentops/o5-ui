@@ -5,7 +5,7 @@
 export interface PsmListV1PageRequest {
     token?: string;
     // format: int64
-    limit?: string;
+    pageSize?: string;
 }
 
 export interface PsmListV1PageResponse {
