@@ -8,6 +8,7 @@ runtimes:
     routes:
       - prefix: "/"
         protocol: ROUTE_PROTOCOL_HTTP
+        subdomains: [o5]
         bypass_ingress: true
         port: 80
         route_group: ROUTE_GROUP_FALLBACK
