@@ -19,6 +19,7 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { match, P } from 'ts-pattern';
 import { NumberFormat } from '@/components/format/number/number-format.tsx';
+import { TriggerDeploymentDialog } from '@/pages/deployment/trigger-deployment-dialog/trigger-deployment-dialog.tsx';
 
 const eventColumns: ColumnDef<O5DeployerV1DeploymentEvent>[] = [
   getRowExpander(),
@@ -208,7 +209,9 @@ export function Deployment() {
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
         <h1 className="text-2xl">Deployment: {deploymentId ? <UUID uuid={deploymentId} /> : <Skeleton />}</h1>
+        {deploymentId && <TriggerDeploymentDialog deploymentId={deploymentId} />}
       </div>
+
       <div className="w-full inline-flex gap-4 flex-wrap lg:flex-nowrap">
         <Card className="flex-grow lg:flex-grow-0 w-[325px] h-fit">
           <CardHeader className="text-lg font-semibold">Details</CardHeader>
@@ -230,7 +233,7 @@ export function Deployment() {
               columns={eventColumns}
               data={data?.events || []}
               renderSubComponent={renderSubRow}
-              showSkeleton={Boolean(isLoading || error)}
+              showSkeleton={Boolean(data === undefined || isLoading || error)}
             />
           </CardContent>
         </Card>

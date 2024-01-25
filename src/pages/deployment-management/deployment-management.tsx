@@ -10,6 +10,7 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { applicationDemandLevels, deploymentStatusLabels, migrationStatusLabels, stackLifecycleLabels } from '@/data/types/ui/deployer.ts';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
+import { TriggerDeploymentDialog } from '@/pages/deployment/trigger-deployment-dialog/trigger-deployment-dialog.tsx';
 
 const columns: ColumnDef<O5DeployerV1DeploymentState>[] = [
   getRowExpander(),
@@ -48,6 +49,16 @@ const columns: ColumnDef<O5DeployerV1DeploymentState>[] = [
   {
     header: 'Last Stack Lifecycle',
     accessorFn: (row) => stackLifecycleLabels[row.lastStackLifecycle!] || '',
+  },
+  {
+    header: () => {
+      return <div className="block w-[65px]" />;
+    },
+    id: 'actions',
+    accessorFn: (row) => row.deploymentId,
+    cell: ({ getValue }) => {
+      return <TriggerDeploymentDialog deploymentId={getValue<string>()} />;
+    },
   },
 ];
 
@@ -213,7 +224,7 @@ function DeploymentManagement() {
         data={flatData}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         renderSubComponent={renderSubRow}
-        showSkeleton={Boolean(isLoading || error)}
+        showSkeleton={Boolean(data === undefined || isLoading || error)}
       />
     </div>
   );

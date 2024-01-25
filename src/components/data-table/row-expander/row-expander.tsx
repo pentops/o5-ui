@@ -16,5 +16,6 @@ export function getRowExpander<TData>(): ColumnDef<TData> {
       ) : null;
     },
     maxSize: 15,
+    minSize: 15,
   };
 }

@@ -75,7 +75,7 @@ export function StackManagement() {
         columns={columns}
         data={flatData}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
-        showSkeleton={Boolean(isLoading || error)}
+        showSkeleton={Boolean(data === undefined || isLoading || error)}
       />
     </div>
   );

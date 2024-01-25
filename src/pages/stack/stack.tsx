@@ -147,7 +147,9 @@ export function Stack() {
               isLoading={isLoading}
               label="Queued Deployments"
               renderWhenEmpty="-"
-              value={data?.state?.queuedDeployments?.map((d) => <UUID short key={d.deploymentId} to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />)}
+              value={data?.state?.queuedDeployments?.map((d) => (
+                <UUID short key={d.deploymentId} to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />
+              ))}
             />
           </CardContent>
         </Card>
@@ -160,7 +162,7 @@ export function Stack() {
               columns={eventColumns}
               data={data?.events || []}
               renderSubComponent={renderSubRow}
-              showSkeleton={Boolean(isLoading || error)}
+              showSkeleton={Boolean(data === undefined || isLoading || error)}
             />
           </CardContent>
         </Card>

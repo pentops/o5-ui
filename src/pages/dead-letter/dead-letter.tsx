@@ -225,7 +225,7 @@ export function DeadLetter() {
               columns={eventColumns}
               data={data?.events || []}
               renderSubComponent={renderSubRow}
-              showSkeleton={Boolean(isLoading || error)}
+              showSkeleton={Boolean(data === undefined || isLoading || error)}
             />
           </CardContent>
         </Card>

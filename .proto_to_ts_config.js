@@ -68,7 +68,11 @@ export default {
   },
   customMemberBuilder: (field, getBaseFieldType) => {
     // Handle enums
-    if (field.partOf?.constructor?.name === 'OneOf' && !field.options?.['proto3_optional']) {
+    if (
+      field.partOf?.constructor?.name === 'OneOf' &&
+      !field.options?.['proto3_optional'] &&
+      !Boolean(field.parent?.options?.['(j5.ext.v1.message).is_oneof_wrapper'])
+    ) {
       // Handle oneof fields
       if (field.id === field.partOf.fieldsArray[0].id) {
         const oneofMembers = field.partOf.fieldsArray.map((f) =>
