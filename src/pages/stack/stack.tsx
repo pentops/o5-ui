@@ -52,7 +52,7 @@ const eventColumns: ColumnDef<O5DeployerV1StackEvent>[] = [
 function renderSubRow({ row }: TableRow<O5DeployerV1StackEvent>) {
   return (
     <div className="flex flex-col gap-4">
-      <NutritionFact vertical label="Actor" value="-" />
+      <NutritionFact label="Actor" value="-" />
 
       {match(row.original.event?.type)
         .with({ triggered: P.not(P.nullish) }, (e) => (
