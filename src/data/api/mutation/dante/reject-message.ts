@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { KeyBase, makeRequest } from '@/data/api/client.ts';
+import { KeyBase } from '@/data/api/client.ts';
 import { O5DanteV1ServiceRejectDeadMessageRequest, O5DanteV1ServiceRejectDeadMessageResponse } from '@/data/types';
 import { GET_MESSAGE_KEY, LIST_MESSAGES_KEY } from '@/data/api';
-import { buildRequestInit } from '../../search-params';
 import { useSelectedRealmBaseUrl } from '@/context/api-context.ts';
+import { buildMergedRequestInit, makeRequest } from '@pentops/jsonapi-request';
 
 const REJECT_MESSAGE_KEY: KeyBase = {
   scope: 'message',
@@ -13,7 +13,7 @@ const REJECT_MESSAGE_KEY: KeyBase = {
 
 export async function rejectMessage(baseUrl: string, request: O5DanteV1ServiceRejectDeadMessageRequest) {
   return makeRequest<O5DanteV1ServiceRejectDeadMessageResponse, O5DanteV1ServiceRejectDeadMessageRequest>(
-    ...buildRequestInit('POST', baseUrl, '/dante/v1/c/messages/:messageId/shelve', request),
+    ...buildMergedRequestInit('POST', baseUrl, '/dante/v1/c/messages/:messageId/shelve', request),
   );
 }
 

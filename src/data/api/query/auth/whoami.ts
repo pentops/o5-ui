@@ -1,16 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
-import { KeyBase, makeRequest } from '@/data/api/client.ts';
-import { buildRequestInit } from '@/data/api/search-params.ts';
+import { KeyBase } from '@/data/api/client.ts';
 import { O5AuthV1ServiceWhoamiRequest, O5AuthV1ServiceWhoamiResponse } from '@/data/types';
 import { useSelectedRealmId, useSetRealmId } from '@/context/api-context.ts';
 import { useEffect } from 'react';
+import { buildMergedRequestInit, makeRequest } from '@pentops/jsonapi-request';
 
 const WHOAMI_STALE_TIME = 1000 * 60 * 60; // 1 hour
 
 export const WHOAMI_KEY: KeyBase = { scope: 'session', entity: 'detail', service: 'AuthService.Whoami' } as const;
 
 export async function whoAmI(request: O5AuthV1ServiceWhoamiRequest | undefined) {
-  return makeRequest<O5AuthV1ServiceWhoamiResponse, O5AuthV1ServiceWhoamiRequest>(...buildRequestInit('GET', '', '/o5-auth/v1/whoami', request));
+  return makeRequest<O5AuthV1ServiceWhoamiResponse, O5AuthV1ServiceWhoamiRequest>(
+    ...buildMergedRequestInit('GET', '', '/o5-auth/v1/whoami', request),
+  );
 }
 
 export function useWhoAmI() {

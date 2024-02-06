@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { KeyBase, makeRequest } from '@/data/api/client.ts';
+import { KeyBase } from '@/data/api/client.ts';
 import { O5DanteV1ServiceReplayDeadMessageRequest, O5DanteV1ServiceReplayDeadMessageResponse } from '@/data/types';
 import { GET_MESSAGE_KEY, LIST_MESSAGES_KEY } from '@/data/api';
-import { buildRequestInit } from '../../search-params';
 import { useSelectedRealmBaseUrl } from '@/context/api-context.ts';
+import { buildMergedRequestInit, makeRequest } from '@pentops/jsonapi-request';
 
 const REPLAY_MESSAGE_KEY: KeyBase = {
   scope: 'message',
@@ -13,7 +13,7 @@ const REPLAY_MESSAGE_KEY: KeyBase = {
 
 export async function replayMessage(baseUrl: string, request: O5DanteV1ServiceReplayDeadMessageRequest) {
   return makeRequest<O5DanteV1ServiceReplayDeadMessageResponse, O5DanteV1ServiceReplayDeadMessageRequest>(
-    ...buildRequestInit('POST', baseUrl, '/dante/v1/c/messages/:messageId/replay', request),
+    ...buildMergedRequestInit('POST', baseUrl, '/dante/v1/c/messages/:messageId/replay', request),
   );
 }
 

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { KeyBase, makeRequest } from '@/data/api/client.ts';
+import { KeyBase } from '@/data/api/client.ts';
 import { O5DeployerV1ServiceTriggerDeploymentRequest, O5DeployerV1ServiceTriggerDeploymentResponse } from '@/data/types';
 import { LIST_DEPLOYMENTS_KEY } from '@/data/api/query/deployer';
-import { buildRequestInit } from '../../search-params';
 import { useSelectedRealmBaseUrl } from '@/context/api-context.ts';
+import { buildMergedRequestInit, makeRequest } from '@pentops/jsonapi-request';
 
 const TRIGGER_DEPLOYMENT_KEY: KeyBase = {
   scope: 'deployments',
@@ -13,7 +13,7 @@ const TRIGGER_DEPLOYMENT_KEY: KeyBase = {
 
 export async function triggerDeployment(baseUrl: string, request: O5DeployerV1ServiceTriggerDeploymentRequest) {
   return makeRequest<O5DeployerV1ServiceTriggerDeploymentResponse, O5DeployerV1ServiceTriggerDeploymentRequest>(
-    ...buildRequestInit('POST', baseUrl, '/deployer/v1/c/deployments/:deploymentId', request),
+    ...buildMergedRequestInit('POST', baseUrl, '/deployer/v1/c/deployments/:deploymentId', request),
   );
 }
 
