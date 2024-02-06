@@ -81,7 +81,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
           <RocketIcon aria-hidden />
         </DialogTrigger>
         <DialogContent>
-          <form onSubmit={form.handleSubmit(handleEdit)}>
+          <form className="w-100 overflow-auto" onSubmit={form.handleSubmit(handleEdit)}>
             <DialogHeader>
               <DialogTitle>Trigger Deployment</DialogTitle>
               <DialogDescription asChild>

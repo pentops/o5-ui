@@ -64,7 +64,7 @@ export function ConfirmRejectAlert({ messageId }: ConfirmRejectAlertProps) {
           <Cross1Icon aria-hidden />
         </AlertDialogTrigger>
         <AlertDialogContent>
-          <form onSubmit={form.handleSubmit(handleReject)}>
+          <form className="w-100 overflow-auto" onSubmit={form.handleSubmit(handleReject)}>
             <AlertDialogHeader>
               <AlertDialogTitle>Reject message?</AlertDialogTitle>
               <AlertDialogDescription asChild>

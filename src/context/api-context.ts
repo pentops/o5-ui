@@ -29,5 +29,10 @@ export function useSelectedRealm(): [O5AuthV1ServiceRealmAccess | undefined, boo
 
 export function useSelectedRealmBaseUrl(): [string, boolean] {
   const [realm, isLoading] = useSelectedRealm();
+
+  if (import.meta.env.DEV && import.meta.env.VITE_REALM_PROXY_TARGET) {
+    return [`${window.location.origin}/apiproxy`, isLoading];
+  }
+
   return [realm?.baseUrl || '', isLoading];
 }

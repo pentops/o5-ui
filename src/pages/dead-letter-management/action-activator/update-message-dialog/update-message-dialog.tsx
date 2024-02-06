@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Pencil1Icon } from '@radix-ui/react-icons';
 import { useForm } from 'react-hook-form';
@@ -15,6 +15,7 @@ import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
 import { useUpdateMessage } from '@/data/api/mutation';
 import { O5DanteV1DeadMessageSpec } from '@/data/types';
 import { Input } from '@/components/ui/input.tsx';
+import { formatJSONString } from '@/lib/json.ts';
 
 const schema = z.object({
   message: z.object({
@@ -48,24 +49,39 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
         payload: {
           proto: {
             '@type': data?.message?.currentSpec?.payload?.proto?.['@type'] || '',
-            'value':
-              JSON.stringify(data?.message?.currentSpec?.payload?.proto?.value, null, 2) ||
+            'value': data?.message?.currentSpec?.payload?.proto?.value || '',
+          },
+          json: formatJSONString(
+            data?.message?.currentSpec?.payload?.json ||
               `{
   
 }`,
-          },
-          json:
-            JSON.stringify(data?.message?.currentSpec?.payload?.json, null, 2) ||
-            `{
-  
-}`,
+          ),
         },
       },
     }),
     [data?.message?.currentSpec?.payload?.json, data?.message?.currentSpec?.payload?.proto],
   );
 
-  const form = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
+  const form = useForm<Values>({ defaultValues, resetOptions: { keepDefaultValues: false, keepDirtyValues: false }, resolver: zodResolver(schema) });
+
+  useEffect(() => {
+    if (data?.message?.currentSpec?.payload?.json) {
+      form.setValue('message.payload.json', formatJSONString(data.message.currentSpec.payload?.json));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.message?.currentSpec?.payload?.json]);
+
+  useEffect(() => {
+    if (data?.message?.currentSpec?.payload?.proto?.value) {
+      form.setValue('message.payload.proto.value', data.message.currentSpec.payload.proto.value);
+    }
+
+    if (data?.message?.currentSpec?.payload?.proto?.['@type']) {
+      form.setValue('message.payload.proto.@type', data.message.currentSpec.payload.proto['@type']);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.message?.currentSpec?.payload?.proto]);
 
   async function handleEdit(values: Values) {
     try {
@@ -96,7 +112,7 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
           <Pencil1Icon aria-hidden />
         </DialogTrigger>
         <DialogContent>
-          <form onSubmit={form.handleSubmit(handleEdit)}>
+          <form className="w-100 overflow-auto" onSubmit={form.handleSubmit(handleEdit)}>
             <DialogHeader>
               <DialogTitle>Edit Message</DialogTitle>
               <DialogDescription asChild>

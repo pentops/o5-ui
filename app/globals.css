@@ -58,6 +58,10 @@
     @apply block bg-background text-foreground h-screen w-screen;
   }
 
+  a {
+    text-decoration: dotted underline 1px;
+  }
+
   .scrollbars::-webkit-scrollbar {
     background-color: transparent;
     width: 0.25rem;

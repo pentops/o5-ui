@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/data-table/data-table.tsx';
-import { O5DanteV1DeadMessageState } from '@/data/types';
+import { deadMessageStatusLabels, O5DanteV1DeadMessageState } from '@/data/types';
 import { useListMessages } from '@/data/api';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
@@ -23,6 +23,10 @@ const columns: ColumnDef<O5DanteV1DeadMessageState>[] = [
     cell: ({ getValue }) => {
       return <UUID canCopy short uuid={getValue<string>()} />;
     },
+  },
+  {
+    header: 'Status',
+    accessorFn: (row) => deadMessageStatusLabels[row.status!] || '',
   },
   {
     header: 'Queue',

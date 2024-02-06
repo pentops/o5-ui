@@ -1,4 +1,4 @@
-import { O5DanteV1DeadMessageEventType, O5DanteV1DeadMessageSpec } from '@/data/types';
+import { O5DanteV1DeadMessageEventType, O5DanteV1DeadMessageSpec, O5DanteV1MessageStatus } from '@/data/types';
 import { O5DanteV1Urgency } from '@/data/types';
 
 // ui-only enum to help with dead message problem oneOf
@@ -68,4 +68,12 @@ export const deadMessageEventTypeLabels: Record<DeadMessageEventType, string> = 
   [DeadMessageEventType.Updated]: 'Updated',
   [DeadMessageEventType.Replayed]: 'Replayed',
   [DeadMessageEventType.Rejected]: 'Rejected',
+};
+
+export const deadMessageStatusLabels: Record<O5DanteV1MessageStatus, string> = {
+  [O5DanteV1MessageStatus.Unspecified]: 'Unspecified',
+  [O5DanteV1MessageStatus.Created]: 'Created',
+  [O5DanteV1MessageStatus.Rejected]: 'Rejected',
+  [O5DanteV1MessageStatus.Replayed]: 'Replayed',
+  [O5DanteV1MessageStatus.Updated]: 'Updated',
 };

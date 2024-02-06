@@ -163,7 +163,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentEvent>) {
             ))}
 
             <h4>SNS Topics</h4>
-            {e.created.spec?.snsTopics?.join(', ')}
+            {e.created.spec?.snsTopics?.map((topic) => topic.name).join(', ') || '-'}
           </div>
         ))
         .with({ stackScale: P.not(P.nullish) }, (e) => (
@@ -225,7 +225,7 @@ export function Deployment() {
           </CardContent>
         </Card>
 
-        <Card className="flex-grow h-fit">
+        <Card className="flex-grow h-fit basis-5/6">
           <CardHeader className="text-lg font-semibold">Events</CardHeader>
           <CardContent>
             <DataTable

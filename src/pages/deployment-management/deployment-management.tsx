@@ -164,13 +164,13 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentState>) {
         ))}
 
         <h4>SNS Topics</h4>
-        {row.original.spec?.snsTopics?.join(', ')}
+        {row.original.spec?.snsTopics?.map((topic) => topic.name).join(', ') || '-'}
       </div>
 
       <div className="flex flex-col gap-2">
         <h3>Stack Output</h3>
         <div className="grid grid-cols-2 gap-2">
-          {row.original.stackOutput?.map((output) => <NutritionFact key={output.name} label={output.name} value={output.value} />)}
+          {row.original.stackOutput?.map((output) => <NutritionFact key={output.name} label={output.name} value={output.value} />) || '-'}
         </div>
       </div>
 
@@ -189,7 +189,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentState>) {
               <NutritionFact label="Status" value={migrationStatusLabels[migration.status!] || ''} />
             </div>
           </div>
-        ))}
+        )) || '-'}
       </div>
     </div>
   );

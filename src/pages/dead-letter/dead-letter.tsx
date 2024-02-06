@@ -9,13 +9,21 @@ import { ActionActivator } from '@/pages/dead-letter-management/action-activator
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import { ColumnDef } from '@tanstack/react-table';
-import { deadMessageEventTypeLabels, getDeadMessageEventType, O5DanteV1DeadMessageEvent, O5DanteV1Problem, O5DanteV1Urgency } from '@/data/types';
+import {
+  deadMessageEventTypeLabels,
+  deadMessageStatusLabels,
+  getDeadMessageEventType,
+  O5DanteV1DeadMessageEvent,
+  O5DanteV1Problem,
+  O5DanteV1Urgency,
+} from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { DeadMessageProblem, deadMessageProblemLabels, getDeadMessageProblem, urgencyLabels } from '@/data/types/ui/dante.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
 import { InvariantViolationPayloadDialog } from '@/pages/dead-letter/invariant-violation-payload-dialog/invariant-violation-payload-dialog.tsx';
+import { formatJSONString } from '@/lib/json.ts';
 
 function renderProblem(problem: O5DanteV1Problem | undefined) {
   return match(problem?.type)
@@ -115,7 +123,7 @@ function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageEvent>) {
 
               {renderProblem(e.updated.spec?.problem)}
 
-              <NutritionFact vertical label="JSON" value={<JSONEditor disabled value={e.updated.spec?.payload?.json || ''} />} />
+              <NutritionFact vertical label="JSON" value={<JSONEditor disabled value={formatJSONString(e.updated.spec?.payload?.json || '')} />} />
             </>
           );
         })
@@ -151,7 +159,7 @@ function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageEvent>) {
 
               {renderProblem(e.created.spec?.problem)}
 
-              <NutritionFact vertical label="JSON" value={<JSONEditor disabled value={e.created.spec?.payload?.json || ''} />} />
+              <NutritionFact vertical label="JSON" value={<JSONEditor disabled value={formatJSONString(e.created.spec?.payload?.json || '')} />} />
             </>
           );
         })
@@ -185,6 +193,12 @@ export function DeadLetter() {
               renderWhenEmpty="-"
               value={data?.message?.currentSpec?.infraMessageId ? <UUID canCopy short uuid={data.message.currentSpec.infraMessageId} /> : null}
             />
+            <NutritionFact
+              isLoading={isLoading}
+              label="Status"
+              renderWhenEmpty="-"
+              value={data?.message?.status ? deadMessageStatusLabels[data.message.status] : null}
+            />
             <NutritionFact isLoading={isLoading} label="Queue Name" renderWhenEmpty="-" value={data?.message?.currentSpec?.queueName} />
             <NutritionFact isLoading={isLoading} label="gRPC Name" renderWhenEmpty="-" value={data?.message?.currentSpec?.grpcName} />
             <NutritionFact
@@ -217,18 +231,27 @@ export function DeadLetter() {
             {renderProblem(data?.message?.currentSpec?.problem)}
           </CardContent>
         </Card>
-        <Card className="flex-grow h-fit">
-          <CardHeader className="text-lg font-semibold">Events</CardHeader>
-          <CardContent>
-            <DataTable
-              getRowCanExpand
-              columns={eventColumns}
-              data={data?.events || []}
-              renderSubComponent={renderSubRow}
-              showSkeleton={Boolean(data === undefined || isLoading || error)}
-            />
-          </CardContent>
-        </Card>
+        <div className="flex-grow h-fit basis-5/6 flex flex-col gap-4">
+          <Card className="flex-grow h-fit">
+            <CardHeader className="text-lg font-semibold">Payload</CardHeader>
+            <CardContent>
+              <JSONEditor disabled value={formatJSONString(data?.message?.currentSpec?.payload?.json || '')} />
+            </CardContent>
+          </Card>
+
+          <Card className="flex-grow h-fit">
+            <CardHeader className="text-lg font-semibold">Events</CardHeader>
+            <CardContent>
+              <DataTable
+                getRowCanExpand
+                columns={eventColumns}
+                data={data?.events || []}
+                renderSubComponent={renderSubRow}
+                showSkeleton={Boolean(data === undefined || isLoading || error)}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

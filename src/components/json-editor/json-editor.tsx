@@ -46,7 +46,7 @@ export const JSONEditor = React.forwardRef((props: JSONEditorProps, ref: React.R
     >
       <Editor
         {...props}
-        className="font-mono text-xs bg-transparent"
+        className="font-mono text-xs bg-transparent whitespace-pre break-words"
         value={props.value || '{}'}
         onValueChange={(value) => {
           try {

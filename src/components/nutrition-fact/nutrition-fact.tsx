@@ -12,9 +12,9 @@ interface NutritionFactProps {
 
 export function NutritionFact({ isLoading, label, renderWhenEmpty, value, vertical = true }: NutritionFactProps) {
   return (
-    <div className={clsx('flex place-content-between text-sm', vertical ? 'flex-col items-start gap-2' : 'items-center gap-4')}>
-      <span className={clsx('font-semibold', vertical && 'w-full')}>{label}</span>
-      <span className={clsx('whitespace-pre', vertical && 'w-full', !vertical && 'text-right')}>
+    <div className={clsx('flex text-sm h-auto', vertical ? 'flex-col items-start gap-2' : 'place-content-between items-center gap-4')}>
+      <span className={clsx('font-semibold break-words', vertical && 'w-full')}>{label}</span>
+      <span className={clsx('whitespace-normal break-words', vertical && 'w-full', !vertical && 'text-right')}>
         {isLoading ? <Skeleton className="h-4 w-full min-w-[125px]" /> : value || renderWhenEmpty}
       </span>
     </div>
