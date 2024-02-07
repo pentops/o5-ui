@@ -1,23 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { KeyBase } from '@/data/api/client.ts';
-import { O5DanteV1ServiceGetDeadMessageRequest, O5DanteV1ServiceGetDeadMessageResponse } from '@/data/types';
+import { O5DanteV1GetDeadMessageRequest } from '@/data/types';
 import { useSelectedRealmBaseUrl } from '@/context/api-context.ts';
-import { buildMergedRequestInit, makeRequest } from '@pentops/jsonapi-request';
+import { o5DanteV1DeadMessageQueryServiceGetDeadMessage } from '@/data/api/generated';
 
 export const GET_MESSAGE_KEY: KeyBase = { scope: 'messages', entity: 'detail', service: 'DanteService.GetMessage' } as const;
 
-export async function getMessage(baseUrl: string, request: O5DanteV1ServiceGetDeadMessageRequest | undefined) {
-  return makeRequest<O5DanteV1ServiceGetDeadMessageResponse, O5DanteV1ServiceGetDeadMessageRequest>(
-    ...buildMergedRequestInit('GET', baseUrl, '/dante/v1/q/message/:messageId', request),
-  );
-}
-
-export function useMessage(request?: O5DanteV1ServiceGetDeadMessageRequest) {
+export function useMessage(request?: O5DanteV1GetDeadMessageRequest) {
   const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();
 
   return useQuery({
     queryKey: [GET_MESSAGE_KEY, request?.messageId, baseUrl],
-    queryFn: async () => getMessage(baseUrl, request),
+    queryFn: async () => o5DanteV1DeadMessageQueryServiceGetDeadMessage(baseUrl, request),
     enabled: Boolean(!loadingRealm && request?.messageId),
   });
 }

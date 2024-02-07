@@ -14,17 +14,12 @@ import { useMessage } from '@/data/api';
 import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
 import { useUpdateMessage } from '@/data/api/mutation';
 import { O5DanteV1DeadMessageSpec } from '@/data/types';
-import { Input } from '@/components/ui/input.tsx';
 import { formatJSONString } from '@/lib/json.ts';
 
 const schema = z.object({
   message: z.object({
     payload: z.object({
       json: z.string(),
-      proto: z.object({
-        '@type': z.string(),
-        'value': z.any(),
-      }),
     }),
   }),
 });
@@ -47,10 +42,6 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
     () => ({
       message: {
         payload: {
-          proto: {
-            '@type': data?.message?.currentSpec?.payload?.proto?.['@type'] || '',
-            'value': data?.message?.currentSpec?.payload?.proto?.value || '',
-          },
           json: formatJSONString(
             data?.message?.currentSpec?.payload?.json ||
               `{
@@ -60,7 +51,7 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
         },
       },
     }),
-    [data?.message?.currentSpec?.payload?.json, data?.message?.currentSpec?.payload?.proto],
+    [data?.message?.currentSpec?.payload?.json],
   );
 
   const form = useForm<Values>({ defaultValues, resetOptions: { keepDefaultValues: false, keepDirtyValues: false }, resolver: zodResolver(schema) });
@@ -71,17 +62,6 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.message?.currentSpec?.payload?.json]);
-
-  useEffect(() => {
-    if (data?.message?.currentSpec?.payload?.proto?.value) {
-      form.setValue('message.payload.proto.value', data.message.currentSpec.payload.proto.value);
-    }
-
-    if (data?.message?.currentSpec?.payload?.proto?.['@type']) {
-      form.setValue('message.payload.proto.@type', data.message.currentSpec.payload.proto['@type']);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.message?.currentSpec?.payload?.proto]);
 
   async function handleEdit(values: Values) {
     try {
@@ -132,34 +112,6 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
               render={({ field }) => (
                 <FormItem className="py-2">
                   <FormLabel>Message JSON</FormLabel>
-                  <FormControl>
-                    <JSONEditor {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="message.payload.proto.@type"
-              render={({ field }) => (
-                <FormItem className="py-2">
-                  <FormLabel>Proto Type</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="message.payload.proto.value"
-              render={({ field }) => (
-                <FormItem className="py-2">
-                  <FormLabel>Proto Value</FormLabel>
                   <FormControl>
                     <JSONEditor {...field} />
                   </FormControl>

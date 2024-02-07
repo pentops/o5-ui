@@ -1,17 +1,17 @@
 const EXCLUDED_NAMESPACES = ['service', 'topic'];
 
-module.exports = {
+export default {
   jdefJsonSource: {
     service: {
       url: process.env.O5_REGISTRY_JDEF_URL,
     },
   },
   typeOutput: {
-    directory: './data/types/generated',
+    directory: './src/data/types/generated',
     fileName: 'index.ts',
   },
   clientOutput: {
-    directory: './data/api/generated',
+    directory: './src/data/api/generated',
     fileName: 'index.ts',
   },
   types: {
