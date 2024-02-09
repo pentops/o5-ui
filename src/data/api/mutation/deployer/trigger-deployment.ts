@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { v4 as uuid } from 'uuid';
 import { KeyBase } from '@/data/api/client.ts';
 import { O5DeployerV1TriggerDeploymentRequest } from '@/data/types';
 import { LIST_DEPLOYMENTS_KEY } from '@/data/api/query/deployer';
@@ -18,6 +19,10 @@ export function useTriggerDeployment() {
   return useMutation({
     mutationKey: [TRIGGER_DEPLOYMENT_KEY],
     async mutationFn(request: O5DeployerV1TriggerDeploymentRequest) {
+      if (!request.deploymentId) {
+        request.deploymentId = uuid();
+      }
+
       return o5DeployerV1DeploymentCommandServiceTriggerDeployment(baseUrl, request);
     },
     onSettled() {

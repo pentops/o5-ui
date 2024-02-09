@@ -42,7 +42,14 @@ const columns: ColumnDef<O5DeployerV1StackState>[] = [
   },
   {
     header: 'Queued Deployments',
-    accessorFn: (row) => row.queuedDeployments?.map((d) => <UUID short to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />) || '-',
+    accessorFn: (row) => row.queuedDeployments?.map((d) => d.deploymentId || '-'),
+    cell: ({ row }) =>
+      row.original.queuedDeployments?.map((d, i) => (
+        <React.Fragment key={d.deploymentId}>
+          <UUID canCopy short to={d.deploymentId} uuid={d.deploymentId} />
+          {i !== row.original.queuedDeployments!.length - 1 && ', '}
+        </React.Fragment>
+      )),
   },
 ];
 

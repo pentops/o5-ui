@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { RocketIcon } from '@radix-ui/react-icons';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { UUID } from '@/components/uuid/uuid.tsx';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
@@ -39,38 +39,42 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
 
   const { data, error: messageError } = useDeployment(isOpen ? { deploymentId } : undefined);
   useErrorHandler(messageError, 'Failed to load deployment');
+
   const defaultValues = useMemo(
     () => ({
-      deploymentId,
       environmentName: data?.state?.spec?.environmentName || '',
       source: {
         github: {
           owner: '',
-          repo: '',
+          repo: data?.state?.spec?.appName || '',
           commit: '',
         },
       },
     }),
-    [data?.state?.spec?.environmentName, deploymentId],
+    [data?.state?.spec],
   );
 
   const form = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
 
+  useEffect(() => {
+    if (isOpen) {
+      form.reset(defaultValues);
+    }
+  }, [defaultValues, form, isOpen]);
+
   async function handleEdit(values: Values) {
     try {
-      if (deploymentId) {
-        await mutateAsync({
-          deploymentId,
-          ...values,
-        });
+      await mutateAsync({
+        deploymentId: uuid(),
+        ...values,
+      });
 
-        toast({
-          title: 'Deployment triggered',
-          description: `Deployment ${deploymentId} has been triggered.`,
-        });
+      toast({
+        title: 'Deployment triggered',
+        description: `Deployment ${values.source.github.owner}/${values.source.github.repo}:${values.source.github.commit} has been triggered.`,
+      });
 
-        setIsOpen(false);
-      }
+      setIsOpen(false);
     } catch {}
   }
 
@@ -86,11 +90,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
               <DialogTitle>Trigger Deployment</DialogTitle>
               <DialogDescription asChild>
                 <div>
-                  Trigger deployment for deployment{' '}
-                  <strong>
-                    (<UUID uuid={deploymentId} />)
-                  </strong>
-                  .
+                  Trigger deployment for <strong>{data?.state?.spec?.appName || 'your app'}</strong>.
                 </div>
               </DialogDescription>
             </DialogHeader>
