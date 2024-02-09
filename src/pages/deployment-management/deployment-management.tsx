@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { match, P } from 'ts-pattern';
 import { useListDeployments } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
-import { O5DeployerV1DeploymentState } from '@/data/types';
+import { O5DeployerV1DeploymentState, O5DeployerV1DeploymentStatus } from '@/data/types';
 import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import { ColumnDef } from '@tanstack/react-table';
 import { UUID } from '@/components/uuid/uuid.tsx';
@@ -11,6 +11,7 @@ import { applicationDemandLevels, deploymentStatusLabels, migrationStatusLabels,
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { TriggerDeploymentDialog } from '@/pages/deployment/trigger-deployment-dialog/trigger-deployment-dialog.tsx';
+import { ConfirmTerminateDeploymentAlert } from '@/pages/deployment/confirm-terminate-deployment-alert/confirm-terminate-deployment-alert.tsx';
 
 const columns: ColumnDef<O5DeployerV1DeploymentState>[] = [
   getRowExpander(),
@@ -56,8 +57,15 @@ const columns: ColumnDef<O5DeployerV1DeploymentState>[] = [
     },
     id: 'actions',
     accessorFn: (row) => row.deploymentId,
-    cell: ({ getValue }) => {
-      return <TriggerDeploymentDialog deploymentId={getValue<string>()} />;
+    cell: ({ getValue, row }) => {
+      return (
+        <div className="flex items-center justify-end gap-2">
+          <TriggerDeploymentDialog deploymentId={getValue<string>()} />
+          {![O5DeployerV1DeploymentStatus.Done, O5DeployerV1DeploymentStatus.Failed, O5DeployerV1DeploymentStatus.Terminated].includes(
+            row.original.status!,
+          ) && <ConfirmTerminateDeploymentAlert deploymentId={getValue<string>()} />}
+        </div>
+      );
     },
   },
 ];
@@ -216,6 +224,7 @@ function DeploymentManagement() {
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
         <h1 className="text-2xl pb-4">Deployment Management</h1>
+        <TriggerDeploymentDialog />
       </div>
 
       <DataTable

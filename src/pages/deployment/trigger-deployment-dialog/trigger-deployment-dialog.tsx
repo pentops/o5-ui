@@ -28,7 +28,7 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 interface TriggerDeploymentDialogProps {
-  deploymentId: string;
+  deploymentId?: string;
 }
 
 export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialogProps) {
@@ -37,7 +37,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
   const { mutateAsync, isPending, error } = useTriggerDeployment();
   useErrorHandler(error, 'Error triggering deployment');
 
-  const { data, error: messageError } = useDeployment(isOpen ? { deploymentId } : undefined);
+  const { data, error: messageError } = useDeployment(isOpen && deploymentId ? { deploymentId } : undefined);
   useErrorHandler(messageError, 'Failed to load deployment');
 
   const defaultValues = useMemo(
@@ -90,7 +90,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
               <DialogTitle>Trigger Deployment</DialogTitle>
               <DialogDescription asChild>
                 <div>
-                  Trigger deployment for <strong>{data?.state?.spec?.appName || 'your app'}</strong>.
+                  Initiate a deployment for <strong>{data?.state?.spec?.appName || 'your app'}</strong>.
                 </div>
               </DialogDescription>
             </DialogHeader>

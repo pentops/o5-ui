@@ -26,6 +26,7 @@ export const deploymentStatusLabels: Record<O5DeployerV1DeploymentStatus, string
   [O5DeployerV1DeploymentStatus.Upserted]: 'Upserted',
   [O5DeployerV1DeploymentStatus.Done]: 'Done',
   [O5DeployerV1DeploymentStatus.Failed]: 'Failed',
+  [O5DeployerV1DeploymentStatus.Terminated]: 'Terminated',
 };
 
 export const stackLifecycleLabels: Record<O5DeployerV1StackLifecycle, string> = {

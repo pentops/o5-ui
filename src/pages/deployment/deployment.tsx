@@ -12,6 +12,7 @@ import {
   deploymentEventTypeLabels,
   getDeploymentEventType,
   O5DeployerV1DeploymentEvent,
+  O5DeployerV1DeploymentStatus,
   stackLifecycleLabels,
 } from '@/data/types';
 import { ColumnDef } from '@tanstack/react-table';
@@ -20,6 +21,7 @@ import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { match, P } from 'ts-pattern';
 import { NumberFormat } from '@/components/format/number/number-format.tsx';
 import { TriggerDeploymentDialog } from '@/pages/deployment/trigger-deployment-dialog/trigger-deployment-dialog.tsx';
+import { ConfirmTerminateDeploymentAlert } from '@/pages/deployment/confirm-terminate-deployment-alert/confirm-terminate-deployment-alert.tsx';
 
 const eventColumns: ColumnDef<O5DeployerV1DeploymentEvent>[] = [
   getRowExpander(),
@@ -209,7 +211,14 @@ export function Deployment() {
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
         <h1 className="text-2xl">Deployment: {deploymentId ? <UUID uuid={deploymentId} /> : <Skeleton />}</h1>
-        {deploymentId && <TriggerDeploymentDialog deploymentId={deploymentId} />}
+        {deploymentId && (
+          <div className="flex items-center justify-end gap-2">
+            <TriggerDeploymentDialog deploymentId={deploymentId} />
+            {![O5DeployerV1DeploymentStatus.Done, O5DeployerV1DeploymentStatus.Failed, O5DeployerV1DeploymentStatus.Terminated].includes(
+              data?.state?.status!,
+            ) && <ConfirmTerminateDeploymentAlert deploymentId={deploymentId} />}
+          </div>
+        )}
       </div>
 
       <div className="w-full inline-flex gap-4 flex-wrap lg:flex-nowrap">

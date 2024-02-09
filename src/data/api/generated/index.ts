@@ -4,17 +4,21 @@
 import { buildMergedRequestInit, makeRequest } from '@pentops/jsonapi-request';
 import type {
   O5AuthV1WhoamiResponse,
-  O5DanteV1GetDeadMessageResponse,
-  O5DanteV1GetDeadMessageRequest,
-  O5DanteV1ListDeadMessagesResponse,
-  O5DanteV1ListDeadMessageEventsResponse,
-  O5DanteV1ListDeadMessageEventsRequest,
   O5DanteV1UpdateDeadMessageResponse,
   O5DanteV1UpdateDeadMessageRequest,
   O5DanteV1ReplayDeadMessageResponse,
   O5DanteV1ReplayDeadMessageRequest,
   O5DanteV1RejectDeadMessageResponse,
   O5DanteV1RejectDeadMessageRequest,
+  O5DanteV1GetDeadMessageResponse,
+  O5DanteV1GetDeadMessageRequest,
+  O5DanteV1ListDeadMessagesResponse,
+  O5DanteV1ListDeadMessageEventsResponse,
+  O5DanteV1ListDeadMessageEventsRequest,
+  O5DeployerV1TriggerDeploymentResponse,
+  O5DeployerV1TriggerDeploymentRequest,
+  O5DeployerV1TerminateDeploymentResponse,
+  O5DeployerV1TerminateDeploymentRequest,
   O5DeployerV1GetDeploymentResponse,
   O5DeployerV1GetDeploymentRequest,
   O5DeployerV1ListDeploymentEventsResponse,
@@ -27,12 +31,40 @@ import type {
   O5DeployerV1ListStacksRequest,
   O5DeployerV1ListStackEventsResponse,
   O5DeployerV1ListStackEventsRequest,
-  O5DeployerV1TriggerDeploymentResponse,
-  O5DeployerV1TriggerDeploymentRequest,
 } from '../../types/generated';
 
 export async function o5AuthV1AuthServiceWhoami(baseUrl: string | undefined, requestInit?: RequestInit): Promise<O5AuthV1WhoamiResponse | undefined> {
   return makeRequest<O5AuthV1WhoamiResponse>(...buildMergedRequestInit('GET', baseUrl || '', '/o5-auth/v1/whoami', undefined, requestInit));
+}
+
+export async function o5DanteV1DeadMessageCommandServiceUpdateDeadMessage(
+  baseUrl: string | undefined,
+  request?: O5DanteV1UpdateDeadMessageRequest,
+  requestInit?: RequestInit,
+): Promise<O5DanteV1UpdateDeadMessageResponse | undefined> {
+  return makeRequest<O5DanteV1UpdateDeadMessageResponse, O5DanteV1UpdateDeadMessageRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/dante/v1/c/messages/:messageId/update', request, requestInit),
+  );
+}
+
+export async function o5DanteV1DeadMessageCommandServiceReplayDeadMessage(
+  baseUrl: string | undefined,
+  request?: O5DanteV1ReplayDeadMessageRequest,
+  requestInit?: RequestInit,
+): Promise<O5DanteV1ReplayDeadMessageResponse | undefined> {
+  return makeRequest<O5DanteV1ReplayDeadMessageResponse, O5DanteV1ReplayDeadMessageRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/dante/v1/c/messages/:messageId/replay', request, requestInit),
+  );
+}
+
+export async function o5DanteV1DeadMessageCommandServiceRejectDeadMessage(
+  baseUrl: string | undefined,
+  request?: O5DanteV1RejectDeadMessageRequest,
+  requestInit?: RequestInit,
+): Promise<O5DanteV1RejectDeadMessageResponse | undefined> {
+  return makeRequest<O5DanteV1RejectDeadMessageResponse, O5DanteV1RejectDeadMessageRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/dante/v1/c/messages/:messageId/shelve', request, requestInit),
+  );
 }
 
 export async function o5DanteV1DeadMessageQueryServiceGetDeadMessage(
@@ -64,33 +96,23 @@ export async function o5DanteV1DeadMessageQueryServiceListDeadMessageEvents(
   );
 }
 
-export async function o5DanteV1DeadMessageCommandServiceUpdateDeadMessage(
+export async function o5DeployerV1DeploymentCommandServiceTriggerDeployment(
   baseUrl: string | undefined,
-  request?: O5DanteV1UpdateDeadMessageRequest,
+  request?: O5DeployerV1TriggerDeploymentRequest,
   requestInit?: RequestInit,
-): Promise<O5DanteV1UpdateDeadMessageResponse | undefined> {
-  return makeRequest<O5DanteV1UpdateDeadMessageResponse, O5DanteV1UpdateDeadMessageRequest>(
-    ...buildMergedRequestInit('POST', baseUrl || '', '/dante/v1/c/messages/:messageId/update', request, requestInit),
+): Promise<O5DeployerV1TriggerDeploymentResponse | undefined> {
+  return makeRequest<O5DeployerV1TriggerDeploymentResponse, O5DeployerV1TriggerDeploymentRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/c/deployments/:deploymentId', request, requestInit),
   );
 }
 
-export async function o5DanteV1DeadMessageCommandServiceReplayDeadMessage(
+export async function o5DeployerV1DeploymentCommandServiceTerminateDeployment(
   baseUrl: string | undefined,
-  request?: O5DanteV1ReplayDeadMessageRequest,
+  request?: O5DeployerV1TerminateDeploymentRequest,
   requestInit?: RequestInit,
-): Promise<O5DanteV1ReplayDeadMessageResponse | undefined> {
-  return makeRequest<O5DanteV1ReplayDeadMessageResponse, O5DanteV1ReplayDeadMessageRequest>(
-    ...buildMergedRequestInit('POST', baseUrl || '', '/dante/v1/c/messages/:messageId/replay', request, requestInit),
-  );
-}
-
-export async function o5DanteV1DeadMessageCommandServiceRejectDeadMessage(
-  baseUrl: string | undefined,
-  request?: O5DanteV1RejectDeadMessageRequest,
-  requestInit?: RequestInit,
-): Promise<O5DanteV1RejectDeadMessageResponse | undefined> {
-  return makeRequest<O5DanteV1RejectDeadMessageResponse, O5DanteV1RejectDeadMessageRequest>(
-    ...buildMergedRequestInit('POST', baseUrl || '', '/dante/v1/c/messages/:messageId/shelve', request, requestInit),
+): Promise<O5DeployerV1TerminateDeploymentResponse | undefined> {
+  return makeRequest<O5DeployerV1TerminateDeploymentResponse, O5DeployerV1TerminateDeploymentRequest>(
+    ...buildMergedRequestInit('DELETE', baseUrl || '', '/deployer/v1/c/deployments/:deploymentId', request, requestInit),
   );
 }
 
@@ -151,15 +173,5 @@ export async function o5DeployerV1DeploymentQueryServiceListStackEvents(
 ): Promise<O5DeployerV1ListStackEventsResponse | undefined> {
   return makeRequest<O5DeployerV1ListStackEventsResponse, O5DeployerV1ListStackEventsRequest>(
     ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/stack/:stackId/events', request, requestInit),
-  );
-}
-
-export async function o5DeployerV1DeploymentCommandServiceTriggerDeployment(
-  baseUrl: string | undefined,
-  request?: O5DeployerV1TriggerDeploymentRequest,
-  requestInit?: RequestInit,
-): Promise<O5DeployerV1TriggerDeploymentResponse | undefined> {
-  return makeRequest<O5DeployerV1TriggerDeploymentResponse, O5DeployerV1TriggerDeploymentRequest>(
-    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/c/deployments/:deploymentId', request, requestInit),
   );
 }
