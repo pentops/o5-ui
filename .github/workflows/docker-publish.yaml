@@ -43,6 +43,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build SPA
+        env:
+          VITE_APP_VERSION: ${{github.sha}}
         run: pnpm build
 
       - name: Build and push Docker images
