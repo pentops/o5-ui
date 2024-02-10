@@ -12,7 +12,7 @@ function RootRedirect() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate('/deployment');
+    navigate('/stack');
   }, []);
 
   return null;

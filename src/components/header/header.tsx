@@ -44,13 +44,13 @@ export function Header() {
                     </li>
                   )}
                   <li>
-                    <Link className="no-underline" to="/deployment">
-                      Deployments
+                    <Link className="no-underline" to="/stack">
+                      Stacks
                     </Link>
                   </li>
                   <li>
-                    <Link className="no-underline" to="/stack">
-                      Stacks
+                    <Link className="no-underline" to="/deployment">
+                      Deployments
                     </Link>
                   </li>
                   <li>

@@ -30,7 +30,7 @@ const columns: ColumnDef<O5DeployerV1StackState>[] = [
     header: 'Current Deployment',
     accessorFn: (row) => row.currentDeployment?.deploymentId,
     cell: ({ getValue }) => {
-      return <UUID canCopy short to={getValue<string>()} uuid={getValue<string>()} />;
+      return <UUID canCopy short to={`deployment/${getValue<string>()}`} uuid={getValue<string>()} />;
     },
   },
   {
@@ -46,7 +46,7 @@ const columns: ColumnDef<O5DeployerV1StackState>[] = [
     cell: ({ row }) =>
       row.original.queuedDeployments?.map((d, i) => (
         <React.Fragment key={d.deploymentId}>
-          <UUID canCopy short to={d.deploymentId} uuid={d.deploymentId} />
+          <UUID canCopy short to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />
           {i !== row.original.queuedDeployments!.length - 1 && ', '}
         </React.Fragment>
       )),
