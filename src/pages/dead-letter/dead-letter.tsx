@@ -21,7 +21,7 @@ import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { DeadMessageProblem, deadMessageProblemLabels, getDeadMessageProblem, urgencyLabels } from '@/data/types/ui/dante.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
-import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
+import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { InvariantViolationPayloadDialog } from '@/pages/dead-letter/invariant-violation-payload-dialog/invariant-violation-payload-dialog.tsx';
 import { formatJSONString } from '@/lib/json.ts';
 
@@ -123,7 +123,7 @@ function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageEvent>) {
 
               {renderProblem(e.updated.spec?.problem)}
 
-              <NutritionFact vertical label="JSON" value={<JSONEditor disabled value={formatJSONString(e.updated.spec?.payload?.json || '')} />} />
+              <NutritionFact vertical label="JSON" value={<CodeEditor disabled value={formatJSONString(e.updated.spec?.payload?.json || '')} />} />
             </>
           );
         })
@@ -159,7 +159,7 @@ function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageEvent>) {
 
               {renderProblem(e.created.spec?.problem)}
 
-              <NutritionFact vertical label="JSON" value={<JSONEditor disabled value={formatJSONString(e.created.spec?.payload?.json || '')} />} />
+              <NutritionFact vertical label="JSON" value={<CodeEditor disabled value={formatJSONString(e.created.spec?.payload?.json || '')} />} />
             </>
           );
         })
@@ -235,7 +235,7 @@ export function DeadLetter() {
           <Card className="flex-grow h-fit">
             <CardHeader className="text-lg font-semibold">Payload</CardHeader>
             <CardContent>
-              <JSONEditor disabled value={formatJSONString(data?.message?.currentSpec?.payload?.json || '')} />
+              <CodeEditor disabled value={formatJSONString(data?.message?.currentSpec?.payload?.json || '')} />
             </CardContent>
           </Card>
 

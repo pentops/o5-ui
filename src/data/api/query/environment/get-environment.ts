@@ -4,7 +4,7 @@ import { O5DeployerV1GetEnvironmentRequest } from '@/data/types';
 import { useSelectedRealmBaseUrl } from '@/context/api-context.ts';
 import { o5DeployerV1DeploymentQueryServiceGetEnvironment } from '@/data/api/generated';
 
-const GET_ENVIRONMENT_KEY: KeyBase = { scope: 'environments', entity: 'detail', service: 'DeployerService.GetEnvironment' } as const;
+export const GET_ENVIRONMENT_KEY: KeyBase = { scope: 'environments', entity: 'detail', service: 'DeployerService.GetEnvironment' } as const;
 
 export function useEnvironment(request?: O5DeployerV1GetEnvironmentRequest) {
   const [baseUrl, loadingRealm] = useSelectedRealmBaseUrl();

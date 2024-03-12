@@ -6,15 +6,17 @@ import { highlight, languages } from 'prismjs/components/prism-core';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-yaml';
 import 'prismjs/themes/prism-tomorrow.css';
 
-export type JSONEditorProps = React.HTMLAttributes<HTMLDivElement> & {
+export type CodeEditorProps = React.HTMLAttributes<HTMLDivElement> & {
   // Props for the component
   value: string;
   tabSize?: number;
   insertSpaces?: boolean;
   ignoreTabKey?: boolean;
   style?: React.CSSProperties;
+  language?: 'json' | 'yaml';
 
   // Props for the textarea
   textareaId?: string;
@@ -38,7 +40,7 @@ export type JSONEditorProps = React.HTMLAttributes<HTMLDivElement> & {
   preClassName?: string;
 };
 
-export const JSONEditor = React.forwardRef((props: JSONEditorProps, ref: React.Ref<HTMLDivElement>) => {
+export const CodeEditor = React.forwardRef((props: CodeEditorProps, ref: React.Ref<HTMLDivElement>) => {
   return (
     <div
       className="scrollbars max-h-96 overflow-auto rounded-md border border-input bg-transparent shadow-sm focus-visible:outline-none focus-within:ring-1 focus-within:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -53,7 +55,7 @@ export const JSONEditor = React.forwardRef((props: JSONEditorProps, ref: React.R
             props.onChange?.({ target: { name: props.name, value } } as React.ChangeEvent<HTMLInputElement>);
           } catch {}
         }}
-        highlight={(code) => highlight(code, languages.json)}
+        highlight={(code) => highlight(code, languages[props.language || 'json'])}
         padding={10}
       />
     </div>

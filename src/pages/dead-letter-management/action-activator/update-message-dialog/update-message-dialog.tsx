@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { useErrorHandler } from '@/lib/error.ts';
 import { useMessage } from '@/data/api';
-import { JSONEditor } from '@/components/json-editor/json-editor.tsx';
+import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { useUpdateMessage } from '@/data/api/mutation';
 import { O5DanteV1DeadMessageSpec } from '@/data/types';
 import { formatJSONString } from '@/lib/json.ts';
@@ -113,7 +113,7 @@ export function UpdateMessageDialog({ messageId }: UpdateMessageDialogProps) {
                 <FormItem className="py-2">
                   <FormLabel>Message JSON</FormLabel>
                   <FormControl>
-                    <JSONEditor {...field} />
+                    <CodeEditor {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

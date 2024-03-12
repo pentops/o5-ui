@@ -13,6 +13,7 @@ import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { match, P } from 'ts-pattern';
 import { buildEnvironmentCustomVariables, buildEnvironmentProvider } from '@/pages/environment/build-facts.tsx';
+import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
 
 const eventColumns: ColumnDef<O5DeployerV1EnvironmentEvent, any>[] = [
   getRowExpander(),
@@ -104,6 +105,7 @@ export function Environment() {
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
         <h1 className="text-2xl">Environment: {environmentId ? <UUID uuid={environmentId} /> : <Skeleton />}</h1>
+        {environmentId && <UpsertEnvironmentDialog environmentId={environmentId} />}
       </div>
       <div className="w-full inline-flex gap-4 flex-wrap lg:flex-nowrap">
         <Card className="flex-grow lg:flex-grow-0 w-[325px] h-fit">

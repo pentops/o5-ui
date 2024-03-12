@@ -9,54 +9,33 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { useErrorHandler } from '@/lib/error.ts';
-import { useStack } from '@/data/api';
-import { useUpsertStack } from '@/data/api/mutation';
-import { Input } from '@/components/ui/input.tsx';
+import { useUpsertEnvironment } from '@/data/api/mutation';
+import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 
 const schema = z.object({
-  config: z.object({
-    codeSource: z.object({
-      type: z.object({
-        github: z.object({
-          owner: z.string(),
-          repo: z.string(),
-          branch: z.string(),
-        }),
-      }),
-    }),
+  src: z.object({
+    configJson: z.string().optional(),
+    configYaml: z.string().optional(),
   }),
 });
 
 type Values = z.infer<typeof schema>;
 
-interface UpsertStackDialogProps {
-  stackId?: string;
+interface UpsertEnvironmentDialogProps {
+  environmentId?: string;
 }
 
-export function UpsertStackDialog({ stackId }: UpsertStackDialogProps) {
+export function UpsertEnvironmentDialog({ environmentId }: UpsertEnvironmentDialogProps) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const { mutateAsync, isPending, error } = useUpsertStack();
-  useErrorHandler(error, 'Error upserting stack');
+  const { mutateAsync, isPending, error } = useUpsertEnvironment();
+  useErrorHandler(error, 'Error upserting environment');
 
-  const { data, error: messageError } = useStack(isOpen && stackId ? { stackId } : undefined);
-  useErrorHandler(messageError, 'Failed to load stack');
   const defaultValues = useMemo(
     () => ({
-      config: {
-        ...data?.state?.config,
-        codeSource: {
-          type: {
-            github: {
-              owner: data?.state?.config?.codeSource?.type?.github?.owner,
-              repo: data?.state?.config?.codeSource?.type?.github?.repo,
-              branch: data?.state?.config?.codeSource?.type?.github?.branch,
-            },
-          },
-        },
-      },
+      src: {},
     }),
-    [data],
+    [],
   );
 
   const form = useForm<Values>({ defaultValues, resetOptions: { keepDefaultValues: false, keepDirtyValues: false }, resolver: zodResolver(schema) });
@@ -64,13 +43,13 @@ export function UpsertStackDialog({ stackId }: UpsertStackDialogProps) {
   async function handleEdit(values: Values) {
     try {
       await mutateAsync({
-        stackId,
+        environmentId,
         ...values,
       });
 
       toast({
-        title: 'Stack upserted',
-        description: `Stack ${stackId} has been upserted.`,
+        title: 'Environment upserted',
+        description: `Environment ${environmentId} has been upserted.`,
       });
 
       setIsOpen(false);
@@ -80,23 +59,23 @@ export function UpsertStackDialog({ stackId }: UpsertStackDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Form {...form}>
-        <DialogTrigger aria-label="Upsert stack">
+        <DialogTrigger aria-label="Upsert environment">
           <Pencil1Icon aria-hidden />
         </DialogTrigger>
         <DialogContent>
           <form className="w-100 overflow-auto" onSubmit={form.handleSubmit(handleEdit)}>
             <DialogHeader>
-              <DialogTitle>Upsert Stack</DialogTitle>
+              <DialogTitle>Upsert Environment</DialogTitle>
             </DialogHeader>
 
             <FormField
               control={form.control}
-              name="config.codeSource.type.github.owner"
+              name="src.configJson"
               render={({ field }) => (
                 <FormItem className="py-2">
-                  <FormLabel>GitHub Owner</FormLabel>
+                  <FormLabel>Config JSON</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <CodeEditor {...field} value={field.value || ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -105,26 +84,12 @@ export function UpsertStackDialog({ stackId }: UpsertStackDialogProps) {
 
             <FormField
               control={form.control}
-              name="config.codeSource.type.github.repo"
+              name="src.configYaml"
               render={({ field }) => (
                 <FormItem className="py-2">
-                  <FormLabel>GitHub Repository</FormLabel>
+                  <FormLabel>Config YAML</FormLabel>
                   <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="config.codeSource.type.github.branch"
-              render={({ field }) => (
-                <FormItem className="py-2">
-                  <FormLabel>Branch</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
+                    <CodeEditor {...field} language="yaml" value={field.value || ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
