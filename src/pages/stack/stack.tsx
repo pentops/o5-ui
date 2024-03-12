@@ -12,6 +12,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { match, P } from 'ts-pattern';
+import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 
 const eventColumns: ColumnDef<O5DeployerV1StackEvent>[] = [
   getRowExpander(),
@@ -164,6 +165,7 @@ export function Stack() {
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
         <h1 className="text-2xl">Stack: {stackId ? <UUID uuid={stackId} /> : <Skeleton />}</h1>
+        {stackId && <UpsertStackDialog stackId={stackId} />}
       </div>
       <div className="w-full inline-flex gap-4 flex-wrap lg:flex-nowrap">
         <Card className="flex-grow lg:flex-grow-0 w-[325px] h-fit">
