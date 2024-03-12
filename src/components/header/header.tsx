@@ -58,6 +58,11 @@ export function Header() {
                       Dead Letters
                     </Link>
                   </li>
+                  <li>
+                    <Link className="no-underline" to="/environment">
+                      Environments
+                    </Link>
+                  </li>
                 </ul>
               </nav>
             </div>

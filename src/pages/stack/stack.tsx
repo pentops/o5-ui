@@ -1,5 +1,5 @@
-import React from 'react';
-import { useStack } from '@/data/api';
+import React, { useMemo } from 'react';
+import { useListStackEvents, useStack } from '@/data/api';
 import { useParams } from 'react-router-dom';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
@@ -58,7 +58,14 @@ function renderSubRow({ row }: TableRow<O5DeployerV1StackEvent>) {
         .with({ triggered: P.not(P.nullish) }, (e) => (
           <>
             <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.triggered.applicationName} />
-            <NutritionFact label="Environment Name" renderWhenEmpty="-" value={e.triggered.applicationName} />
+            <NutritionFact label="Environment Name" renderWhenEmpty="-" value={e.triggered.environmentName} />
+            <NutritionFact
+              label="Environment ID"
+              renderWhenEmpty="-"
+              value={
+                e.triggered.environmentId ? <UUID to={`/environment/${e.triggered.environmentId}`} uuid={e.triggered.environmentId} /> : undefined
+              }
+            />
             <NutritionFact
               label="Deployment"
               renderWhenEmpty="-"
@@ -69,6 +76,27 @@ function renderSubRow({ row }: TableRow<O5DeployerV1StackEvent>) {
               }
             />
             <NutritionFact label="Deployment Version" renderWhenEmpty="-" value={e.triggered.deployment?.version} />
+          </>
+        ))
+        .with({ configured: P.not(P.nullish) }, (e) => (
+          <>
+            <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.configured.applicationName} />
+            <NutritionFact label="Environment Name" renderWhenEmpty="-" value={e.configured.environmentName} />
+            <NutritionFact
+              label="Environment ID"
+              renderWhenEmpty="-"
+              value={
+                e.configured.environmentId ? (
+                  <UUID short to={`/environment/${e.configured.environmentId}`} uuid={e.configured.environmentId} />
+                ) : undefined
+              }
+            />
+
+            <h4>Code Source</h4>
+            <NutritionFact label="Type" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github ? 'GitHub' : ''} />
+            <NutritionFact label="Owner" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.owner} />
+            <NutritionFact label="Repository" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.repo} />
+            <NutritionFact label="Branch" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.branch} />
           </>
         ))
         .with({ deploymentCompleted: P.not(P.nullish) }, (e) => (
@@ -109,6 +137,28 @@ export function Stack() {
   const { stackId } = useParams();
   const { data, isLoading, error } = useStack({ stackId });
   useErrorHandler(error, 'Failed to load stack');
+  const {
+    data: eventsData,
+    isLoading: eventsAreLoading,
+    error: eventsError,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useListStackEvents({ stackId });
+  useErrorHandler(eventsError, 'Failed to load stack events');
+  const flattenedEvents = useMemo(() => {
+    if (!eventsData?.pages) {
+      return [];
+    }
+
+    return eventsData.pages.reduce((acc, page) => {
+      if (page?.events) {
+        return [...acc, ...page.events];
+      }
+
+      return acc;
+    }, [] as O5DeployerV1StackEvent[]);
+  }, [eventsData?.pages]);
 
   return (
     <div className="w-full">
@@ -160,9 +210,10 @@ export function Stack() {
             <DataTable
               getRowCanExpand
               columns={eventColumns}
-              data={data?.events || []}
+              data={flattenedEvents}
+              pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
               renderSubComponent={renderSubRow}
-              showSkeleton={Boolean(data === undefined || isLoading || error)}
+              showSkeleton={Boolean(data === undefined || eventsAreLoading || error)}
             />
           </CardContent>
         </Card>

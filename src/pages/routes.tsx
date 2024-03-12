@@ -7,6 +7,8 @@ import DeploymentManagement from '@/pages/deployment-management/deployment-manag
 import { StackManagement } from '@/pages/stack-management/stack-management.tsx';
 import { Stack } from '@/pages/stack/stack.tsx';
 import { Deployment } from '@/pages/deployment/deployment.tsx';
+import { EnvironmentManagement } from '@/pages/environment-management/environment-management.tsx';
+import { Environment } from '@/pages/environment/environment.tsx';
 
 function RootRedirect() {
   const navigate = useNavigate();
@@ -38,6 +40,20 @@ export const router = createBrowserRouter([
           {
             path: ':deploymentId',
             element: <Deployment />,
+          },
+        ],
+      },
+      {
+        path: 'environment',
+        element: <Outlet />,
+        children: [
+          {
+            path: '',
+            element: <EnvironmentManagement />,
+          },
+          {
+            path: ':environmentId',
+            element: <Environment />,
           },
         ],
       },

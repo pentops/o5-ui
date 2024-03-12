@@ -3,14 +3,16 @@ import { O5DeployerV1StackEvent, O5DeployerV1StackStatus } from '@/data/types';
 
 export enum StackEventType {
   Unspecified = 'Unspecified',
-  Triggered = 'Triggered',
+  Available = 'Available',
+  Configured = 'Configured',
   DeploymentCompleted = 'DeploymentCompleted',
   DeploymentFailed = 'DeploymentFailed',
-  Available = 'Available',
+  Triggered = 'Triggered',
 }
 
 export const stackEventTypeLabels: Record<StackEventType, string> = {
   [StackEventType.Unspecified]: 'Unspecified',
+  [StackEventType.Configured]: 'Configured',
   [StackEventType.Triggered]: 'Triggered',
   [StackEventType.DeploymentCompleted]: 'Deployment Completed',
   [StackEventType.DeploymentFailed]: 'Deployment Failed',
@@ -29,6 +31,7 @@ export const stackStatusLabels: Record<O5DeployerV1StackStatus, string> = {
 export function getStackEventType(event: O5DeployerV1StackEvent | undefined) {
   return match(event?.event?.type)
     .with({ triggered: P.not(P.nullish) }, () => StackEventType.Triggered)
+    .with({ configured: P.not(P.nullish) }, () => StackEventType.Configured)
     .with({ deploymentCompleted: P.not(P.nullish) }, () => StackEventType.DeploymentCompleted)
     .with({ deploymentFailed: P.not(P.nullish) }, () => StackEventType.DeploymentFailed)
     .with({ available: P.not(P.nullish) }, () => StackEventType.Available)

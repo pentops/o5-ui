@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { KeyBase } from '@/data/api/client.ts';
 import { O5DeployerV1ListDeploymentEventsRequest } from '@/data/types';
-import { getNextPageParam } from '@/data/api/pagination.ts';
+import { getNextPageParam, mergePageParam } from '@/data/api/pagination.ts';
 import { useSelectedRealmBaseUrl } from '@/context/api-context.ts';
 import { o5DeployerV1DeploymentQueryServiceListDeploymentEvents } from '@/data/api/generated';
 
@@ -16,8 +16,7 @@ export function useListDeploymentEvents(request?: O5DeployerV1ListDeploymentEven
 
   return useInfiniteQuery({
     queryKey: [LIST_DEPLOYMENT_EVENTS_KEY, request, baseUrl],
-    queryFn: async ({ pageParam }) =>
-      o5DeployerV1DeploymentQueryServiceListDeploymentEvents(baseUrl, pageParam ? { ...request, page: { token: pageParam } } : request),
+    queryFn: async ({ pageParam }) => o5DeployerV1DeploymentQueryServiceListDeploymentEvents(baseUrl, mergePageParam(request, pageParam)),
     getNextPageParam,
     initialPageParam: undefined,
     enabled: !loadingRealm,

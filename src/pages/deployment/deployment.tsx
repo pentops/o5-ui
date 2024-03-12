@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useDeployment } from '@/data/api';
+import { useDeployment, useListDeploymentEvents } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
@@ -91,10 +91,40 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentEvent>) {
   );
 }
 
+function canTerminateDeployment(status: O5DeployerV1DeploymentStatus | undefined) {
+  if (!status) {
+    return false;
+  }
+
+  return ![O5DeployerV1DeploymentStatus.Done, O5DeployerV1DeploymentStatus.Failed, O5DeployerV1DeploymentStatus.Terminated].includes(status);
+}
+
 export function Deployment() {
   const { deploymentId } = useParams();
   const { data, isLoading, error } = useDeployment({ deploymentId });
   useErrorHandler(error, 'Failed to load deployment');
+  const {
+    data: eventsData,
+    isLoading: eventsAreLoading,
+    error: eventsError,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useListDeploymentEvents({ deploymentId });
+  useErrorHandler(eventsError, 'Failed to load deployment events');
+  const flattenedEvents = useMemo(() => {
+    if (!eventsData?.pages) {
+      return [];
+    }
+
+    return eventsData.pages.reduce((acc, page) => {
+      if (page?.events) {
+        return [...acc, ...page.events];
+      }
+
+      return acc;
+    }, [] as O5DeployerV1DeploymentEvent[]);
+  }, [eventsData?.pages]);
 
   return (
     <div className="w-full">
@@ -103,9 +133,7 @@ export function Deployment() {
         {deploymentId && (
           <div className="flex items-center justify-end gap-2">
             <TriggerDeploymentDialog deploymentId={deploymentId} />
-            {![O5DeployerV1DeploymentStatus.Done, O5DeployerV1DeploymentStatus.Failed, O5DeployerV1DeploymentStatus.Terminated].includes(
-              data?.state?.status!,
-            ) && <ConfirmTerminateDeploymentAlert deploymentId={deploymentId} />}
+            {canTerminateDeployment(data?.state?.status) && <ConfirmTerminateDeploymentAlert deploymentId={deploymentId} />}
           </div>
         )}
       </div>
@@ -129,9 +157,10 @@ export function Deployment() {
             <DataTable
               getRowCanExpand
               columns={eventColumns}
-              data={data?.events || []}
+              data={flattenedEvents}
+              pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
               renderSubComponent={renderSubRow}
-              showSkeleton={Boolean(data === undefined || isLoading || error)}
+              showSkeleton={Boolean(data === undefined || eventsAreLoading || error)}
             />
           </CardContent>
         </Card>
