@@ -5,6 +5,7 @@ import { O5DeployerV1StackState, stackStatusLabels } from '@/data/types';
 import { DataTable } from '@/components/data-table/data-table.tsx';
 import { ColumnDef } from '@tanstack/react-table';
 import { UUID } from '@/components/uuid/uuid.tsx';
+import { useTableState } from '@/components/data-table/state.ts';
 
 const columns: ColumnDef<O5DeployerV1StackState>[] = [
   {
@@ -54,7 +55,8 @@ const columns: ColumnDef<O5DeployerV1StackState>[] = [
 ];
 
 export function StackManagement() {
-  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListStacks();
+  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListStacks({ query: psmQuery });
   useErrorHandler(error, 'Failed to load stacks');
 
   const flatData = useMemo(() => {
@@ -80,7 +82,9 @@ export function StackManagement() {
       <DataTable
         getRowCanExpand
         columns={columns}
+        controlledColumnSort={sortValues}
         data={flatData}
+        onColumnSort={setSortValues}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         showSkeleton={Boolean(data === undefined || isLoading || error)}
       />

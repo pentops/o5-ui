@@ -43,7 +43,9 @@ const eventColumns: ColumnDef<O5DeployerV1DeploymentEvent>[] = [
   },
   {
     header: 'Timestamp',
+    id: 'metadata.timestamp',
     accessorFn: (row) => row.metadata?.timestamp,
+    enableSorting: true,
     cell: ({ getValue }) => {
       return (
         <DateFormat
@@ -160,7 +162,7 @@ export function Deployment() {
               data={flattenedEvents}
               pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
               renderSubComponent={renderSubRow}
-              showSkeleton={Boolean(data === undefined || eventsAreLoading || error)}
+              showSkeleton={Boolean(flattenedEvents === undefined || eventsAreLoading || error)}
             />
           </CardContent>
         </Card>

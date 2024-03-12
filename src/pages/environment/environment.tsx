@@ -14,6 +14,7 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { match, P } from 'ts-pattern';
 import { buildEnvironmentCustomVariables, buildEnvironmentProvider } from '@/pages/environment/build-facts.tsx';
 import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
+import { useTableState } from '@/components/data-table/state.ts';
 
 const eventColumns: ColumnDef<O5DeployerV1EnvironmentEvent, any>[] = [
   getRowExpander(),
@@ -26,7 +27,9 @@ const eventColumns: ColumnDef<O5DeployerV1EnvironmentEvent, any>[] = [
   },
   {
     header: 'Timestamp',
+    id: 'metadata.timestamp',
     accessorFn: (row) => row.metadata?.timestamp,
+    enableSorting: true,
     cell: ({ getValue }) => {
       return (
         <DateFormat
@@ -78,6 +81,8 @@ export function Environment() {
   const { environmentId } = useParams();
   const { data, error, isLoading } = useEnvironment({ environmentId });
   useErrorHandler(error, 'Failed to load environment');
+
+  const { sortValues, setSortValues, psmQuery } = useTableState();
   const {
     data: eventsData,
     error: eventsError,
@@ -85,7 +90,7 @@ export function Environment() {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useListEnvironmentEvents({ environmentId });
+  } = useListEnvironmentEvents({ environmentId, query: psmQuery });
   useErrorHandler(eventsError, 'Failed to load environment events');
   const flattenedEvents = useMemo(() => {
     if (!eventsData?.pages) {
@@ -132,10 +137,12 @@ export function Environment() {
               <DataTable
                 getRowCanExpand
                 columns={eventColumns}
+                controlledColumnSort={sortValues}
                 data={flattenedEvents || []}
+                onColumnSort={setSortValues}
                 pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
                 renderSubComponent={renderSubRow}
-                showSkeleton={Boolean(data === undefined || eventsAreLoading || error)}
+                showSkeleton={Boolean(flattenedEvents === undefined || eventsAreLoading || error)}
               />
             </CardContent>
           </Card>

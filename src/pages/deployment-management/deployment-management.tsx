@@ -22,6 +22,7 @@ import { TriggerDeploymentDialog } from '@/pages/deployment/trigger-deployment-d
 import { ConfirmTerminateDeploymentAlert } from '@/pages/deployment/confirm-terminate-deployment-alert/confirm-terminate-deployment-alert.tsx';
 import { buildDeploymentSpecFacts } from '@/pages/deployment/build-facts.tsx';
 import { buildCFStackOutput } from '@/pages/stack/build-facts.tsx';
+import { useTableState } from '@/components/data-table/state.ts';
 
 const columns: ColumnDef<O5DeployerV1DeploymentState>[] = [
   getRowExpander(),
@@ -144,7 +145,8 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentState>) {
 }
 
 function DeploymentManagement() {
-  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListDeployments();
+  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListDeployments({ query: psmQuery });
   useErrorHandler(error, 'Failed to load deployments');
   const flatData = useMemo(() => {
     if (!data?.pages) {
@@ -170,7 +172,9 @@ function DeploymentManagement() {
       <DataTable
         getRowCanExpand
         columns={columns}
+        controlledColumnSort={sortValues}
         data={flatData}
+        onColumnSort={setSortValues}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         renderSubComponent={renderSubRow}
         showSkeleton={Boolean(data === undefined || isLoading || error)}

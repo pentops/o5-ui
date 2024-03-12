@@ -8,6 +8,7 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { environmentStatusLabels } from '@/data/types/ui/environment.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { buildEnvironmentCustomVariables, buildEnvironmentProvider } from '@/pages/environment/build-facts.tsx';
+import { useTableState } from '@/components/data-table/state.ts';
 
 const columns: ColumnDef<O5DeployerV1EnvironmentState>[] = [
   {
@@ -44,7 +45,8 @@ function renderSubRow({ row }: TableRow<O5DeployerV1EnvironmentState>) {
 }
 
 export function EnvironmentManagement() {
-  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListEnvironments();
+  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListEnvironments({ query: psmQuery });
   useErrorHandler(error, 'Failed to load environments');
 
   const flatData = useMemo(() => {
@@ -70,7 +72,9 @@ export function EnvironmentManagement() {
       <DataTable
         getRowCanExpand
         columns={columns}
+        controlledColumnSort={sortValues}
         data={flatData}
+        onColumnSort={setSortValues}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         renderSubComponent={renderSubRow}
         showSkeleton={Boolean(data === undefined || isLoading || error)}

@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { useListStackEvents, useStack } from '@/data/api';
 import { useParams } from 'react-router-dom';
+import { match, P } from 'ts-pattern';
+import { ColumnDef } from '@tanstack/react-table';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
@@ -8,11 +10,10 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getStackEventType, O5DeployerV1StackEvent, stackEventTypeLabels, stackStatusLabels } from '@/data/types';
 import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
-import { ColumnDef } from '@tanstack/react-table';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
-import { match, P } from 'ts-pattern';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
+import { useTableState } from '@/components/data-table/state.ts';
 
 const eventColumns: ColumnDef<O5DeployerV1StackEvent>[] = [
   getRowExpander(),
@@ -32,7 +33,9 @@ const eventColumns: ColumnDef<O5DeployerV1StackEvent>[] = [
   },
   {
     header: 'Timestamp',
+    id: 'metadata.timestamp',
     accessorFn: (row) => row.metadata?.timestamp,
+    enableSorting: true,
     cell: ({ getValue }) => {
       return (
         <DateFormat
@@ -138,6 +141,8 @@ export function Stack() {
   const { stackId } = useParams();
   const { data, isLoading, error } = useStack({ stackId });
   useErrorHandler(error, 'Failed to load stack');
+
+  const { sortValues, setSortValues, psmQuery } = useTableState();
   const {
     data: eventsData,
     isLoading: eventsAreLoading,
@@ -145,7 +150,7 @@ export function Stack() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useListStackEvents({ stackId });
+  } = useListStackEvents({ stackId, query: psmQuery });
   useErrorHandler(eventsError, 'Failed to load stack events');
   const flattenedEvents = useMemo(() => {
     if (!eventsData?.pages) {
@@ -212,10 +217,12 @@ export function Stack() {
             <DataTable
               getRowCanExpand
               columns={eventColumns}
+              controlledColumnSort={sortValues}
               data={flattenedEvents}
               pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
+              onColumnSort={setSortValues}
               renderSubComponent={renderSubRow}
-              showSkeleton={Boolean(data === undefined || eventsAreLoading || error)}
+              showSkeleton={Boolean(flattenedEvents === undefined || eventsAreLoading || error)}
             />
           </CardContent>
         </Card>

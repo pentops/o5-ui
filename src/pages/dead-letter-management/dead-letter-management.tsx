@@ -8,6 +8,7 @@ import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui/dante.ts';
 import { useErrorHandler } from '@/lib/error.ts';
+import { useTableState } from '@/components/data-table/state.ts';
 
 const columns: ColumnDef<O5DanteV1DeadMessageState>[] = [
   {
@@ -71,7 +72,8 @@ const columns: ColumnDef<O5DanteV1DeadMessageState>[] = [
 ];
 
 function DeadLetterManagement() {
-  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListMessages();
+  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListMessages({ query: psmQuery });
   useErrorHandler(error, 'Failed to load dead letter messages');
   const flatData = useMemo(() => {
     if (!data?.pages) {
@@ -95,7 +97,9 @@ function DeadLetterManagement() {
 
       <DataTable
         columns={columns}
+        controlledColumnSort={sortValues}
         data={flatData}
+        onColumnSort={setSortValues}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         showSkeleton={Boolean(data === undefined || isLoading || error)}
       />

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { match, P } from 'ts-pattern';
 import { useParams } from 'react-router-dom';
-import { useMessage } from '@/data/api';
+import { useListMessageEvents, useMessage } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
@@ -24,6 +24,7 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { InvariantViolationPayloadDialog } from '@/pages/dead-letter/invariant-violation-payload-dialog/invariant-violation-payload-dialog.tsx';
 import { formatJSONString } from '@/lib/json.ts';
+import { useTableState } from '@/components/data-table/state.ts';
 
 function renderProblem(problem: O5DanteV1Problem | undefined) {
   return match(problem?.type)
@@ -61,7 +62,9 @@ const eventColumns: ColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
   },
   {
     header: 'Timestamp',
+    id: 'metadata.timestamp',
     accessorFn: (row) => row.metadata?.timestamp,
+    enableSorting: true,
     cell: ({ getValue }) => {
       return (
         <DateFormat
@@ -175,6 +178,31 @@ export function DeadLetter() {
   const { messageId } = useParams();
   const { data, error, isLoading } = useMessage({ messageId });
   useErrorHandler(error, 'Failed to load dead letter message');
+
+  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const {
+    data: eventsData,
+    isLoading: eventsAreLoading,
+    error: eventsError,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useListMessageEvents({ messageId, query: psmQuery });
+  useErrorHandler(eventsError, 'Failed to load message events');
+  const flattenedEvents = useMemo(() => {
+    if (!eventsData?.pages) {
+      return [];
+    }
+
+    return eventsData.pages.reduce((acc, page) => {
+      if (page?.events) {
+        return [...acc, ...page.events];
+      }
+
+      return acc;
+    }, [] as O5DanteV1DeadMessageEvent[]);
+  }, [eventsData?.pages]);
+
   const problemType = getDeadMessageProblem(data?.message?.currentSpec);
 
   return (
@@ -245,9 +273,12 @@ export function DeadLetter() {
               <DataTable
                 getRowCanExpand
                 columns={eventColumns}
-                data={data?.events || []}
+                controlledColumnSort={sortValues}
+                data={flattenedEvents}
+                onColumnSort={setSortValues}
+                pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
                 renderSubComponent={renderSubRow}
-                showSkeleton={Boolean(data === undefined || isLoading || error)}
+                showSkeleton={Boolean(flattenedEvents === undefined || eventsAreLoading || error)}
               />
             </CardContent>
           </Card>

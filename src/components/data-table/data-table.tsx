@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { ColumnDef, flexRender, getCoreRowModel, OnChangeFn, Row, RowSelectionState, useReactTable } from '@tanstack/react-table';
+import { TriangleUpIcon, TriangleDownIcon } from '@radix-ui/react-icons';
+import { ColumnDef, flexRender, getCoreRowModel, OnChangeFn, Row, RowSelectionState, SortingState, useReactTable } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { useIntersectionObserverAction } from '@/lib/intersection-observer.ts';
@@ -26,7 +27,7 @@ function getTableColumns<TData, TValue>(columns: ColumnDef<TData, TValue>[], sho
   if (showSkeleton) {
     return columns.map((column, i) => ({
       ...column,
-      id: `${column.id || i}-skeleton`,
+      id: `${column.id || i}`,
       cell: () => <Skeleton className="h-4 w-full" />,
     }));
   }
@@ -34,16 +35,22 @@ function getTableColumns<TData, TValue>(columns: ColumnDef<TData, TValue>[], sho
   return columns;
 }
 
+const DEFAULT_COLUMN_DEF = {
+  enableSorting: false,
+} as const;
+
 interface TablePagination {
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
   fetchNextPage: () => Promise<any>;
 }
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends Object, TValue> {
   columns: ColumnDef<TData, TValue>[];
+  controlledColumnSort?: SortingState;
   data: TData[];
   getRowCanExpand?: true | ((row: Row<TData>) => boolean);
+  onColumnSort?: OnChangeFn<SortingState>;
   onRowSelect?: OnChangeFn<RowSelectionState>;
   pagination?: TablePagination;
   renderSubComponent?: (props: TableRow<TData>) => React.ReactElement;
@@ -51,10 +58,12 @@ interface DataTableProps<TData, TValue> {
   showSkeleton?: boolean;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends Object, TValue>({
   columns,
+  controlledColumnSort,
   data,
   getRowCanExpand,
+  onColumnSort,
   onRowSelect,
   pagination,
   renderSubComponent,
@@ -69,13 +78,17 @@ export function DataTable<TData, TValue>({
   const tableColumns = useMemo(() => getTableColumns(columns, showSkeleton), [columns, showSkeleton]);
   const table = useReactTable({
     data: tableData,
+    defaultColumn: DEFAULT_COLUMN_DEF,
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     enableExpanding: Boolean(getRowCanExpand && renderSubComponent),
     getRowCanExpand: getRowCanExpand === true ? allRowsCanExpand : getRowCanExpand,
     enableRowSelection: onRowSelect && !showSkeleton,
     onRowSelectionChange: onRowSelect,
-    state: { rowSelection: rowSelections || {} },
+    onSortingChange: onColumnSort,
+    state: { rowSelection: rowSelections || {}, sorting: controlledColumnSort },
+    manualSorting: true,
+    enableSorting: true,
   });
 
   return (
@@ -85,9 +98,24 @@ export function DataTable<TData, TValue>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                const canSort = header.column.getCanSort();
+                const sort = header.column.getIsSorted();
+                const content = header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext());
+
                 return (
-                  <TableHead style={{ maxWidth: header.column.columnDef.maxSize }} key={header.id}>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  <TableHead
+                    aria-sort={canSort ? (sort ? (sort === 'desc' ? 'descending' : 'ascending') : 'none') : undefined}
+                    style={{ maxWidth: header.column.columnDef.maxSize }}
+                    key={header.id}
+                  >
+                    {canSort ? (
+                      <button className="flex gap-1 items-center" onClick={header.column.getToggleSortingHandler()} type="button">
+                        {content}
+                        {sort === false ? null : sort === 'asc' ? <TriangleUpIcon /> : <TriangleDownIcon />}
+                      </button>
+                    ) : (
+                      content
+                    )}
                   </TableHead>
                 );
               })}
