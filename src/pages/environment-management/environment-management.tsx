@@ -15,7 +15,8 @@ const columns: ColumnDef<O5DeployerV1EnvironmentState>[] = [
     header: 'ID',
     accessorKey: 'environmentId',
     cell: ({ getValue }) => {
-      return <UUID canCopy short to={getValue<string>()} uuid={getValue<string>()} />;
+      const value = getValue<string>();
+      return value ? <UUID canCopy short to={`/environment/${value}`} uuid={value} /> : null;
     },
   },
   {
@@ -66,7 +67,7 @@ export function EnvironmentManagement() {
   return (
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
-        <h1 className="text-2xl pb-4">Environment Management</h1>
+        <h1 className="text-2xl">Environment Management</h1>
       </div>
 
       <DataTable

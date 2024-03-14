@@ -15,14 +15,16 @@ const columns: ColumnDef<O5DanteV1DeadMessageState>[] = [
     header: 'Message ID',
     accessorFn: (row) => row.messageId,
     cell: ({ getValue }) => {
-      return <UUID canCopy short to={getValue<string>()} uuid={getValue<string>()} />;
+      const value = getValue<string>();
+      return value ? <UUID canCopy short to={`/message/${value}`} uuid={value} /> : null;
     },
   },
   {
     header: 'Infra ID',
     accessorFn: (row) => row.currentSpec?.infraMessageId,
     cell: ({ getValue }) => {
-      return <UUID canCopy short uuid={getValue<string>()} />;
+      const value = getValue<string>();
+      return value ? <UUID canCopy short uuid={value} /> : null;
     },
   },
   {
@@ -92,7 +94,7 @@ function DeadLetterManagement() {
   return (
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
-        <h1 className="text-2xl pb-4">Dead Letter Management</h1>
+        <h1 className="text-2xl">Dead Letter Management</h1>
       </div>
 
       <DataTable

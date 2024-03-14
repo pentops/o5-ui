@@ -33,7 +33,7 @@ export function UUID({ canCopy, className, short, to, uuid, ...rest }: UUIDProps
   return (
     <span className={clsx('inline-flex content-center gap-1 font-mono', className)} {...rest}>
       {to ? <Link to={to}>{uuidToRender}</Link> : <span>{uuidToRender}</span>}
-      {canCopy && (
+      {canCopy && uuidToRender && (
         <TooltipProvider>
           <Tooltip open={isShowingCopiedNotice}>
             <TooltipTrigger asChild>

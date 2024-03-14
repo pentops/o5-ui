@@ -21,7 +21,8 @@ const eventColumns: ColumnDef<O5DeployerV1StackEvent>[] = [
     header: 'ID',
     accessorFn: (row) => row.metadata?.eventId,
     cell: ({ getValue }) => {
-      return <UUID canCopy short uuid={getValue<string>()} />;
+      const value = getValue<string>();
+      return value ? <UUID canCopy short uuid={value} /> : null;
     },
   },
   {
@@ -222,7 +223,7 @@ export function Stack() {
               pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
               onColumnSort={setSortValues}
               renderSubComponent={renderSubRow}
-              showSkeleton={Boolean(flattenedEvents === undefined || eventsAreLoading || error)}
+              showSkeleton={Boolean(eventsData === undefined || eventsAreLoading || eventsError)}
             />
           </CardContent>
         </Card>

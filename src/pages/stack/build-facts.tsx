@@ -6,8 +6,12 @@ import React from 'react';
 export function buildCFStackOutput(output: O5DeployerV1CFStackOutput | undefined) {
   return (
     <div className="grid grid-cols-2 gap-2">
-      <NutritionFact label="Lifecycle" value={output?.lifecycle} />
-      <NutritionFact label="Outputs" value={<CodeEditor value={deployerKeyValuePairsToJSON(output?.outputs)} />} />
+      <NutritionFact renderWhenEmpty="-" label="Lifecycle" value={output?.lifecycle} />
+      <NutritionFact
+        renderWhenEmpty="-"
+        label="Outputs"
+        value={output?.outputs ? <CodeEditor value={deployerKeyValuePairsToJSON(output?.outputs)} /> : ''}
+      />
     </div>
   );
 }

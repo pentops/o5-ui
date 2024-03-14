@@ -12,7 +12,8 @@ const columns: ColumnDef<O5DeployerV1StackState>[] = [
     header: 'ID',
     accessorKey: 'stackId',
     cell: ({ getValue }) => {
-      return <UUID canCopy short to={getValue<string>()} uuid={getValue<string>()} />;
+      const value = getValue<string>();
+      return value ? <UUID canCopy short to={`/stack/${value}`} uuid={value} /> : null;
     },
   },
   {
@@ -31,14 +32,16 @@ const columns: ColumnDef<O5DeployerV1StackState>[] = [
     header: 'Current Deployment',
     accessorFn: (row) => row.currentDeployment?.deploymentId,
     cell: ({ getValue }) => {
-      return <UUID canCopy short to={`deployment/${getValue<string>()}`} uuid={getValue<string>()} />;
+      const value = getValue<string>();
+      return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
     },
   },
   {
     header: 'Current Deployment Version',
     accessorFn: (row) => row.currentDeployment?.version,
     cell: ({ getValue }) => {
-      return <UUID canCopy short uuid={getValue<string>()} />;
+      const value = getValue<string>();
+      return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
     },
   },
   {
@@ -76,7 +79,7 @@ export function StackManagement() {
   return (
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
-        <h1 className="text-2xl pb-4">Stack Management</h1>
+        <h1 className="text-2xl">Stack Management</h1>
       </div>
 
       <DataTable

@@ -11,6 +11,9 @@ dependencies:
   '@pentops/jsonapi-request':
     specifier: ^0.0.2
     version: 0.0.2(uuid@9.0.1)
+  '@pentops/react-table-state-psm':
+    specifier: ^0.0.2
+    version: 0.0.2(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)
@@ -796,6 +799,16 @@ packages:
     dependencies:
       qs: 6.11.2
       uuid: 9.0.1
+
+  /@pentops/react-table-state-psm@0.0.2(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Pki/XPnhOa/DmBGpkpNwyy8R6gK0NloP6dIt+og9eKPH/YBiv+v+G8H4H5LvxNA4aUFxmzVQUfqVs3tIZCZgIA==}
+    peerDependencies:
+      react: ^18.2.0
+      react-dom: ^18.2.0
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
 
   /@pkgjs/parseargs@0.11.0:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}

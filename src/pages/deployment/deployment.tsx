@@ -75,7 +75,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentEvent>) {
         .with({ stackWaitFailure: P.not(P.nullish) }, (e) => <NutritionFact label="Error" value={e.stackWaitFailure.error} />)
         .with({ stepResult: P.not(P.nullish) }, (e) => (
           <>
-            <NutritionFact label="Step ID" value={<UUID short uuid={e.stepResult.stepId} />} />
+            <NutritionFact label="Step ID" value={<UUID canCopy short uuid={e.stepResult.stepId} />} />
             <NutritionFact label="Status" value={deploymentStepStatusLabels[e.stepResult.status!]} />
             <NutritionFact label="Error" value={e.stepResult.error} />
 
@@ -162,7 +162,7 @@ export function Deployment() {
               data={flattenedEvents}
               pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
               renderSubComponent={renderSubRow}
-              showSkeleton={Boolean(flattenedEvents === undefined || eventsAreLoading || error)}
+              showSkeleton={Boolean(eventsData === undefined || eventsAreLoading || eventsError)}
             />
           </CardContent>
         </Card>

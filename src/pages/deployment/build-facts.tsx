@@ -32,7 +32,7 @@ export function buildDeploymentSpecFacts(spec: O5DeployerV1DeploymentSpec | unde
           <NutritionFact label="Secret Output Name" value={db.secretOutputName} />
           <NutritionFact label="Extensions" value={db.dbExtensions?.join(', ')} />
         </div>
-      ))}
+      )) || '-'}
 
       <h4>Parameters</h4>
       {spec?.parameters?.map((param) => (
@@ -51,7 +51,7 @@ export function buildDeploymentSpecFacts(spec: O5DeployerV1DeploymentSpec | unde
               .otherwise(() => '')}
           />
         </div>
-      ))}
+      )) || '-'}
 
       <h4>SNS Topics</h4>
       {spec?.snsTopics?.join(', ') || '-'}

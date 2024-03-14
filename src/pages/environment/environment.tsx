@@ -128,7 +128,19 @@ export function Environment() {
         <div className="flex-grow h-fit basis-5/6 flex flex-col gap-4">
           <Card className="flex-grow h-fit">
             <CardHeader className="text-lg font-semibold">Config</CardHeader>
-            <CardContent></CardContent>
+            <CardContent>
+              <div className="flex flex-col gap-4">
+                <NutritionFact renderWhenEmpty="-" label="Full Name" value={data?.state?.config?.fullName} />
+                <NutritionFact renderWhenEmpty="-" label="CORS Origins" value={data?.state?.config?.corsOrigins?.join('\n')} />
+                <NutritionFact renderWhenEmpty="-" label="Trust JWKS" value={data?.state?.config?.trustJwks?.join('\n')} />
+
+                <h4>Provider</h4>
+                {buildEnvironmentProvider(data?.state?.config?.provider)}
+
+                <h4>Variables</h4>
+                {buildEnvironmentCustomVariables(data?.state?.config?.vars)}
+              </div>
+            </CardContent>
           </Card>
 
           <Card className="flex-grow h-fit">
@@ -142,7 +154,7 @@ export function Environment() {
                 onColumnSort={setSortValues}
                 pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
                 renderSubComponent={renderSubRow}
-                showSkeleton={Boolean(flattenedEvents === undefined || eventsAreLoading || error)}
+                showSkeleton={Boolean(flattenedEvents === undefined || eventsAreLoading || eventsError)}
               />
             </CardContent>
           </Card>

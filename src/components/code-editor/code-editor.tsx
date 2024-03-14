@@ -9,6 +9,17 @@ import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-yaml';
 import 'prismjs/themes/prism-tomorrow.css';
 
+type SupportedLanguage = 'json' | 'yaml';
+
+function getDefaultValue(language: SupportedLanguage) {
+  switch (language) {
+    case 'json':
+      return '{}';
+    case 'yaml':
+      return '';
+  }
+}
+
 export type CodeEditorProps = React.HTMLAttributes<HTMLDivElement> & {
   // Props for the component
   value: string;
@@ -49,7 +60,7 @@ export const CodeEditor = React.forwardRef((props: CodeEditorProps, ref: React.R
       <Editor
         {...props}
         className="font-mono text-xs bg-transparent whitespace-pre break-words"
-        value={props.value || '{}'}
+        value={props.value || getDefaultValue(props.language || 'json')}
         onValueChange={(value) => {
           try {
             props.onChange?.({ target: { name: props.name, value } } as React.ChangeEvent<HTMLInputElement>);

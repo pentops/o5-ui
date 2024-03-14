@@ -97,10 +97,14 @@ function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageEvent>) {
         .with({ updated: P.not(P.nullish) }, (e) => {
           return (
             <>
-              <NutritionFact vertical label="Version ID" value={<UUID uuid={e.updated.spec?.versionId} />} />
+              <NutritionFact vertical label="Version ID" value={e.updated.spec?.versionId ? <UUID uuid={e.updated.spec?.versionId} /> : undefined} />
               <NutritionFact vertical label="Queue Name" value={e.updated.spec?.queueName} />
               <NutritionFact vertical label="gRPC Name" value={e.updated.spec?.grpcName} />
-              <NutritionFact vertical label="Infa Message ID" value={<UUID uuid={e.updated.spec?.infraMessageId} />} />
+              <NutritionFact
+                vertical
+                label="Infa Message ID"
+                value={e.updated.spec?.infraMessageId ? <UUID uuid={e.updated.spec?.infraMessageId} /> : undefined}
+              />
               <NutritionFact
                 vertical
                 label="Created At"
@@ -278,7 +282,7 @@ export function DeadLetter() {
                 onColumnSort={setSortValues}
                 pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
                 renderSubComponent={renderSubRow}
-                showSkeleton={Boolean(flattenedEvents === undefined || eventsAreLoading || error)}
+                showSkeleton={Boolean(eventsData === undefined || eventsAreLoading || eventsError)}
               />
             </CardContent>
           </Card>
