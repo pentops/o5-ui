@@ -12,8 +12,7 @@ import {
   O5DeployerV1DeploymentState,
   O5DeployerV1DeploymentStatus,
 } from '@/data/types';
-import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
-import { ColumnDef } from '@tanstack/react-table';
+import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { deploymentStatusLabels } from '@/data/types/ui/deployer.ts';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
@@ -24,7 +23,7 @@ import { buildDeploymentSpecFacts } from '@/pages/deployment/build-facts.tsx';
 import { buildCFStackOutput } from '@/pages/stack/build-facts.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 
-const columns: ColumnDef<O5DeployerV1DeploymentState>[] = [
+const columns: CustomColumnDef<O5DeployerV1DeploymentState>[] = [
   getRowExpander(),
   {
     header: 'ID',
@@ -52,7 +51,16 @@ const columns: ColumnDef<O5DeployerV1DeploymentState>[] = [
   },
   {
     header: 'Status',
+    id: 'status',
     accessorFn: (row) => deploymentStatusLabels[row.status!] || '',
+    filter: {
+      type: {
+        select: {
+          isMultiple: true,
+          options: Object.entries(deploymentStatusLabels).map(([value, label]) => ({ value, label })),
+        },
+      },
+    },
   },
   {
     header: 'Stack',
@@ -66,6 +74,7 @@ const columns: ColumnDef<O5DeployerV1DeploymentState>[] = [
     header: () => {
       return <div className="block w-[65px]" />;
     },
+    align: 'right',
     id: 'actions',
     accessorFn: (row) => row.deploymentId,
     cell: ({ getValue, row }) => {
@@ -155,7 +164,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentState>) {
 }
 
 function DeploymentManagement() {
-  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } = useTableState();
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListDeployments({ query: psmQuery });
   useErrorHandler(error, 'Failed to load deployments');
   const flatData = useMemo(() => {
@@ -184,7 +193,9 @@ function DeploymentManagement() {
         columns={columns}
         controlledColumnSort={sortValues}
         data={flatData}
+        filterValues={filterValues}
         onColumnSort={setSortValues}
+        onFilter={setFilterValues}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         renderSubComponent={renderSubRow}
         showSkeleton={Boolean(data === undefined || isLoading || error)}

@@ -2,20 +2,19 @@ import React, { useMemo } from 'react';
 import { useListStackEvents, useStack } from '@/data/api';
 import { useParams } from 'react-router-dom';
 import { match, P } from 'ts-pattern';
-import { ColumnDef } from '@tanstack/react-table';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getStackEventType, O5DeployerV1StackEvent, stackEventTypeLabels, stackStatusLabels } from '@/data/types';
-import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
+import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 
-const eventColumns: ColumnDef<O5DeployerV1StackEvent>[] = [
+const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
   getRowExpander(),
   {
     header: 'ID',
@@ -35,6 +34,7 @@ const eventColumns: ColumnDef<O5DeployerV1StackEvent>[] = [
   {
     header: 'Timestamp',
     id: 'metadata.timestamp',
+    align: 'right',
     accessorFn: (row) => row.metadata?.timestamp,
     enableSorting: true,
     cell: ({ getValue }) => {
@@ -50,6 +50,16 @@ const eventColumns: ColumnDef<O5DeployerV1StackEvent>[] = [
           value={getValue<string>()}
         />
       );
+    },
+    filter: {
+      type: {
+        date: {
+          isFlexible: true,
+          exactLabel: 'Pick a date',
+          startLabel: 'Min',
+          endLabel: 'Max',
+        },
+      },
     },
   },
 ];
@@ -143,7 +153,7 @@ export function Stack() {
   const { data, isLoading, error } = useStack({ stackId });
   useErrorHandler(error, 'Failed to load stack');
 
-  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, filterValues, setFilterValues, psmQuery } = useTableState();
   const {
     data: eventsData,
     isLoading: eventsAreLoading,
@@ -220,8 +230,10 @@ export function Stack() {
               columns={eventColumns}
               controlledColumnSort={sortValues}
               data={flattenedEvents}
-              pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
+              filterValues={filterValues}
               onColumnSort={setSortValues}
+              onFilter={setFilterValues}
+              pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
               renderSubComponent={renderSubRow}
               showSkeleton={Boolean(eventsData === undefined || eventsAreLoading || eventsError)}
             />

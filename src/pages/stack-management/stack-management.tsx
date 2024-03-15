@@ -2,12 +2,11 @@ import React, { useMemo } from 'react';
 import { useListStacks } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { O5DeployerV1StackState, stackStatusLabels } from '@/data/types';
-import { DataTable } from '@/components/data-table/data-table.tsx';
-import { ColumnDef } from '@tanstack/react-table';
+import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 
-const columns: ColumnDef<O5DeployerV1StackState>[] = [
+const columns: CustomColumnDef<O5DeployerV1StackState>[] = [
   {
     header: 'ID',
     accessorKey: 'stackId',
@@ -26,7 +25,16 @@ const columns: ColumnDef<O5DeployerV1StackState>[] = [
   },
   {
     header: 'Status',
+    id: 'status',
     accessorFn: (row) => stackStatusLabels[row.status!] || '',
+    filter: {
+      type: {
+        select: {
+          isMultiple: true,
+          options: Object.entries(stackStatusLabels).map(([value, label]) => ({ value, label })),
+        },
+      },
+    },
   },
   {
     header: 'Current Deployment',
@@ -58,7 +66,7 @@ const columns: ColumnDef<O5DeployerV1StackState>[] = [
 ];
 
 export function StackManagement() {
-  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } = useTableState();
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListStacks({ query: psmQuery });
   useErrorHandler(error, 'Failed to load stacks');
 
@@ -87,7 +95,9 @@ export function StackManagement() {
         columns={columns}
         controlledColumnSort={sortValues}
         data={flatData}
+        filterValues={filterValues}
         onColumnSort={setSortValues}
+        onFilter={setFilterValues}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         showSkeleton={Boolean(data === undefined || isLoading || error)}
       />

@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
-import { DataTable } from '@/components/data-table/data-table.tsx';
+import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { deadMessageStatusLabels, O5DanteV1DeadMessageState } from '@/data/types';
 import { useListMessages } from '@/data/api';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
@@ -10,7 +9,7 @@ import { deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui
 import { useErrorHandler } from '@/lib/error.ts';
 import { useTableState } from '@/components/data-table/state.ts';
 
-const columns: ColumnDef<O5DanteV1DeadMessageState>[] = [
+const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   {
     header: 'Message ID',
     accessorFn: (row) => row.messageId,
@@ -29,7 +28,16 @@ const columns: ColumnDef<O5DanteV1DeadMessageState>[] = [
   },
   {
     header: 'Status',
+    id: 'status',
     accessorFn: (row) => deadMessageStatusLabels[row.status!] || '',
+    filter: {
+      type: {
+        select: {
+          isMultiple: true,
+          options: Object.entries(deadMessageStatusLabels).map(([value, label]) => ({ value, label })),
+        },
+      },
+    },
   },
   {
     header: 'Queue',
@@ -45,6 +53,9 @@ const columns: ColumnDef<O5DanteV1DeadMessageState>[] = [
   },
   {
     header: 'Created At',
+    id: 'currentSpec.createdAt',
+    enableSorting: true,
+    align: 'right',
     accessorFn: (row) => row.currentSpec?.createdAt,
     cell: ({ getValue }) => {
       return (
@@ -60,12 +71,23 @@ const columns: ColumnDef<O5DanteV1DeadMessageState>[] = [
         />
       );
     },
+    filter: {
+      type: {
+        date: {
+          isFlexible: true,
+          exactLabel: 'Pick a date',
+          startLabel: 'Min',
+          endLabel: 'Max',
+        },
+      },
+    },
   },
   {
     header: () => {
       return <div className="block w-[65px]" />;
     },
     id: 'actions',
+    align: 'right',
     accessorFn: (row) => row.messageId,
     cell: ({ getValue }) => {
       return <ActionActivator messageId={getValue<string>()} />;
@@ -74,7 +96,7 @@ const columns: ColumnDef<O5DanteV1DeadMessageState>[] = [
 ];
 
 function DeadLetterManagement() {
-  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } = useTableState();
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListMessages({ query: psmQuery });
   useErrorHandler(error, 'Failed to load dead letter messages');
   const flatData = useMemo(() => {
@@ -101,7 +123,9 @@ function DeadLetterManagement() {
         columns={columns}
         controlledColumnSort={sortValues}
         data={flatData}
+        filterValues={filterValues}
         onColumnSort={setSortValues}
+        onFilter={setFilterValues}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         showSkeleton={Boolean(data === undefined || isLoading || error)}
       />

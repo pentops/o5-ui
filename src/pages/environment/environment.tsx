@@ -5,8 +5,7 @@ import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
-import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
-import { ColumnDef } from '@tanstack/react-table';
+import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import { environmentEventTypeLabels, environmentStatusLabels, getEnvironmentEventType, O5DeployerV1EnvironmentEvent } from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
@@ -16,7 +15,7 @@ import { buildEnvironmentCustomVariables, buildEnvironmentProvider } from '@/pag
 import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 
-const eventColumns: ColumnDef<O5DeployerV1EnvironmentEvent, any>[] = [
+const eventColumns: CustomColumnDef<O5DeployerV1EnvironmentEvent, any>[] = [
   getRowExpander(),
   {
     header: 'ID',
@@ -28,6 +27,7 @@ const eventColumns: ColumnDef<O5DeployerV1EnvironmentEvent, any>[] = [
   {
     header: 'Timestamp',
     id: 'metadata.timestamp',
+    align: 'right',
     accessorFn: (row) => row.metadata?.timestamp,
     enableSorting: true,
     cell: ({ getValue }) => {
@@ -43,6 +43,16 @@ const eventColumns: ColumnDef<O5DeployerV1EnvironmentEvent, any>[] = [
           value={getValue<string>()}
         />
       );
+    },
+    filter: {
+      type: {
+        date: {
+          isFlexible: true,
+          exactLabel: 'Pick a date',
+          startLabel: 'Min',
+          endLabel: 'Max',
+        },
+      },
     },
   },
   {
@@ -82,7 +92,7 @@ export function Environment() {
   const { data, error, isLoading } = useEnvironment({ environmentId });
   useErrorHandler(error, 'Failed to load environment');
 
-  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, filterValues, setFilterValues, psmQuery } = useTableState();
   const {
     data: eventsData,
     error: eventsError,
@@ -151,7 +161,9 @@ export function Environment() {
                 columns={eventColumns}
                 controlledColumnSort={sortValues}
                 data={flattenedEvents || []}
+                filterValues={filterValues}
                 onColumnSort={setSortValues}
+                onFilter={setFilterValues}
                 pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
                 renderSubComponent={renderSubRow}
                 showSkeleton={Boolean(flattenedEvents === undefined || eventsAreLoading || eventsError)}

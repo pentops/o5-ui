@@ -1,11 +1,15 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { TriangleUpIcon, TriangleDownIcon } from '@radix-ui/react-icons';
+import React, { useMemo, useState } from 'react';
+import { TriangleUpIcon, TriangleDownIcon, CaretSortIcon, MixerVerticalIcon } from '@radix-ui/react-icons';
 import { ColumnDef, flexRender, getCoreRowModel, OnChangeFn, Row, RowSelectionState, SortingState, useReactTable } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { useIntersectionObserverAction } from '@/lib/intersection-observer.ts';
+import { TableFilter as TableFilterType, TableFilterValueType } from '@/components/data-table/state.ts';
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
+import { TableFilter } from './filter/table-filter';
+import { cn } from '@/lib/utils.ts';
 
 const LOADING_ROWS = 20;
 
@@ -35,6 +39,11 @@ function getTableColumns<TData, TValue>(columns: ColumnDef<TData, TValue>[], sho
   return columns;
 }
 
+export type CustomColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
+  align?: 'left' | 'right' | 'center';
+  filter?: TableFilterType;
+};
+
 const DEFAULT_COLUMN_DEF = {
   enableSorting: false,
 } as const;
@@ -46,11 +55,13 @@ interface TablePagination {
 }
 
 interface DataTableProps<TData extends Object, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  columns: CustomColumnDef<TData, TValue>[];
   controlledColumnSort?: SortingState;
   data: TData[];
+  filterValues?: Record<string, TableFilterValueType>;
   getRowCanExpand?: true | ((row: Row<TData>) => boolean);
   onColumnSort?: OnChangeFn<SortingState>;
+  onFilter?: OnChangeFn<Record<string, TableFilterValueType>>;
   onRowSelect?: OnChangeFn<RowSelectionState>;
   pagination?: TablePagination;
   renderSubComponent?: (props: TableRow<TData>) => React.ReactElement;
@@ -62,8 +73,10 @@ export function DataTable<TData extends Object, TValue>({
   columns,
   controlledColumnSort,
   data,
+  filterValues,
   getRowCanExpand,
   onColumnSort,
+  onFilter,
   onRowSelect,
   pagination,
   renderSubComponent,
@@ -88,7 +101,7 @@ export function DataTable<TData extends Object, TValue>({
     onSortingChange: onColumnSort,
     state: { rowSelection: rowSelections || {}, sorting: controlledColumnSort },
     manualSorting: true,
-    enableSorting: true,
+    enableSorting: Boolean(onColumnSort),
   });
 
   return (
@@ -98,25 +111,74 @@ export function DataTable<TData extends Object, TValue>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                // eslint-disable-next-line react-hooks/rules-of-hooks
+                const [isOpen, setIsOpen] = useState(false);
+                const customColumnDef = header.column.columnDef as CustomColumnDef<TData, TValue>;
                 const canSort = header.column.getCanSort();
+                const filter = customColumnDef.filter;
                 const sort = header.column.getIsSorted();
                 const content = header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext());
+                const hasFilter = header.column?.columnDef?.id && filter && onFilter;
+                const hasFilterValue = filterValues?.[header.column.columnDef.id!];
 
-                return (
+                const base = (
                   <TableHead
                     aria-sort={canSort ? (sort ? (sort === 'desc' ? 'descending' : 'ascending') : 'none') : undefined}
                     style={{ maxWidth: header.column.columnDef.maxSize }}
                     key={header.id}
                   >
-                    {canSort ? (
-                      <button className="flex gap-1 items-center" onClick={header.column.getToggleSortingHandler()} type="button">
-                        {content}
-                        {sort === false ? null : sort === 'asc' ? <TriangleUpIcon /> : <TriangleDownIcon />}
-                      </button>
-                    ) : (
-                      content
-                    )}
+                    <div
+                      className={cn(
+                        'flex gap-2 items-center flex-nowrap',
+                        customColumnDef.align === 'right' && 'justify-end',
+                        customColumnDef.align === 'center' && 'justify-center',
+                        customColumnDef.align === 'left' && 'justify-start',
+                      )}
+                    >
+                      {canSort ? (
+                        <button
+                          aria-label="Toggle sort order"
+                          className="flex gap-1 items-center flex-nowrap"
+                          onClick={header.column.getToggleSortingHandler()}
+                          type="button"
+                        >
+                          {sort === false ? <CaretSortIcon /> : sort === 'asc' ? <TriangleUpIcon /> : <TriangleDownIcon />}
+                          {content}
+                        </button>
+                      ) : (
+                        content
+                      )}
+
+                      {hasFilter && (
+                        <PopoverTrigger asChild>
+                          <button aria-label="Apply filter" className="flex gap-1 items-center" type="button">
+                            <MixerVerticalIcon className={cn(hasFilterValue && 'text-sky-400')} width={12} />
+                          </button>
+                        </PopoverTrigger>
+                      )}
+                    </div>
                   </TableHead>
+                );
+
+                return hasFilter ? (
+                  <Popover key={header.id} open={isOpen} onOpenChange={setIsOpen}>
+                    <PopoverAnchor asChild>{base}</PopoverAnchor>
+                    <PopoverContent
+                      className="w-auto p-4 border bg-background shadow-lg"
+                      style={{ width: 'var(--radix-popper-anchor-width)', minWidth: 250 }}
+                    >
+                      <TableFilter
+                        id={header.column.columnDef.id!}
+                        onChange={onFilter}
+                        onClose={() => {
+                          setIsOpen(false);
+                        }}
+                        {...filter}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  base
                 );
               })}
             </TableRow>
@@ -127,11 +189,24 @@ export function DataTable<TData extends Object, TValue>({
             table.getRowModel().rows.map((row) => (
               <React.Fragment key={row.id}>
                 <TableRow data-state={row.getIsSelected() && 'selected'}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell style={{ maxWidth: cell.column.columnDef.maxSize }} key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const customColumnDef = cell.column.columnDef as CustomColumnDef<TData, TValue>;
+
+                    return (
+                      <TableCell style={{ maxWidth: cell.column.columnDef.maxSize }} key={cell.id}>
+                        <div
+                          className={cn(
+                            'flex gap-2 items-center flex-nowrap',
+                            customColumnDef.align === 'right' && 'justify-end',
+                            customColumnDef.align === 'center' && 'justify-center',
+                            customColumnDef.align === 'left' && 'justify-start',
+                          )}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </div>
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
                 {renderSubComponent && row.getIsExpanded() && (
                   <TableRow data-state="expanded">

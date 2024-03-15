@@ -6,7 +6,7 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
-import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
+import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import {
   deploymentEventTypeLabels,
   deploymentStepOutputTypeLabels,
@@ -16,7 +16,6 @@ import {
   O5DeployerV1DeploymentEvent,
   O5DeployerV1DeploymentStatus,
 } from '@/data/types';
-import { ColumnDef } from '@tanstack/react-table';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { match, P } from 'ts-pattern';
@@ -24,8 +23,9 @@ import { TriggerDeploymentDialog } from '@/pages/deployment/trigger-deployment-d
 import { ConfirmTerminateDeploymentAlert } from '@/pages/deployment/confirm-terminate-deployment-alert/confirm-terminate-deployment-alert.tsx';
 import { buildDeploymentSpecFacts } from '@/pages/deployment/build-facts.tsx';
 import { buildCFStackOutput } from '@/pages/stack/build-facts.tsx';
+import { useTableState } from '@/components/data-table/state.ts';
 
-const eventColumns: ColumnDef<O5DeployerV1DeploymentEvent>[] = [
+const eventColumns: CustomColumnDef<O5DeployerV1DeploymentEvent>[] = [
   getRowExpander(),
   {
     header: 'ID',
@@ -35,6 +35,7 @@ const eventColumns: ColumnDef<O5DeployerV1DeploymentEvent>[] = [
     },
   },
   {
+    id: 'event.type',
     header: 'Type',
     accessorFn: (row) => {
       const type = getDeploymentEventType(row);
@@ -44,6 +45,7 @@ const eventColumns: ColumnDef<O5DeployerV1DeploymentEvent>[] = [
   {
     header: 'Timestamp',
     id: 'metadata.timestamp',
+    align: 'right',
     accessorFn: (row) => row.metadata?.timestamp,
     enableSorting: true,
     cell: ({ getValue }) => {
@@ -59,6 +61,16 @@ const eventColumns: ColumnDef<O5DeployerV1DeploymentEvent>[] = [
           value={getValue<string>()}
         />
       );
+    },
+    filter: {
+      type: {
+        date: {
+          isFlexible: true,
+          exactLabel: 'Pick a date',
+          startLabel: 'Min',
+          endLabel: 'Max',
+        },
+      },
     },
   },
 ];
@@ -105,6 +117,8 @@ export function Deployment() {
   const { deploymentId } = useParams();
   const { data, isLoading, error } = useDeployment({ deploymentId });
   useErrorHandler(error, 'Failed to load deployment');
+
+  const eventTableState = useTableState();
   const {
     data: eventsData,
     isLoading: eventsAreLoading,
@@ -112,7 +126,7 @@ export function Deployment() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useListDeploymentEvents({ deploymentId });
+  } = useListDeploymentEvents({ deploymentId, query: eventTableState.psmQuery });
   useErrorHandler(eventsError, 'Failed to load deployment events');
   const flattenedEvents = useMemo(() => {
     if (!eventsData?.pages) {
@@ -159,7 +173,11 @@ export function Deployment() {
             <DataTable
               getRowCanExpand
               columns={eventColumns}
+              controlledColumnSort={eventTableState.sortValues}
               data={flattenedEvents}
+              filterValues={eventTableState.filterValues}
+              onColumnSort={eventTableState.setSortValues}
+              onFilter={eventTableState.setFilterValues}
               pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
               renderSubComponent={renderSubRow}
               showSkeleton={Boolean(eventsData === undefined || eventsAreLoading || eventsError)}

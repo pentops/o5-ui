@@ -2,15 +2,14 @@ import React, { useMemo } from 'react';
 import { useListEnvironments } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { O5DeployerV1EnvironmentState } from '@/data/types';
-import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
-import { ColumnDef } from '@tanstack/react-table';
+import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { environmentStatusLabels } from '@/data/types/ui/environment.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { buildEnvironmentCustomVariables, buildEnvironmentProvider } from '@/pages/environment/build-facts.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 
-const columns: ColumnDef<O5DeployerV1EnvironmentState>[] = [
+const columns: CustomColumnDef<O5DeployerV1EnvironmentState>[] = [
   {
     header: 'ID',
     accessorKey: 'environmentId',
@@ -25,7 +24,17 @@ const columns: ColumnDef<O5DeployerV1EnvironmentState>[] = [
   },
   {
     header: 'Status',
+    align: 'right',
+    id: 'status',
     accessorFn: (row) => environmentStatusLabels[row.status!] || '',
+    filter: {
+      type: {
+        select: {
+          isMultiple: true,
+          options: Object.entries(environmentStatusLabels).map(([value, label]) => ({ value, label })),
+        },
+      },
+    },
   },
 ];
 
@@ -46,7 +55,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1EnvironmentState>) {
 }
 
 export function EnvironmentManagement() {
-  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, psmQuery, setFilterValues, filterValues } = useTableState();
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListEnvironments({ query: psmQuery });
   useErrorHandler(error, 'Failed to load environments');
 
@@ -75,7 +84,9 @@ export function EnvironmentManagement() {
         columns={columns}
         controlledColumnSort={sortValues}
         data={flatData}
+        filterValues={filterValues}
         onColumnSort={setSortValues}
+        onFilter={setFilterValues}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         renderSubComponent={renderSubRow}
         showSkeleton={Boolean(data === undefined || isLoading || error)}

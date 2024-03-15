@@ -36,7 +36,7 @@ export function buildDeploymentSpecFacts(spec: O5DeployerV1DeploymentSpec | unde
 
       <h4>Parameters</h4>
       {spec?.parameters?.map((param) => (
-        <div key={param.name} className="grid grid-cols-2 gap-2 p-2 border-b border-slate-900/10 lg:px-8 lg:border-1 dark:border-slate-300/10">
+        <div key={param.name} className="grid grid-cols-2 gap-2 py-2 px-1 border-b border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
           <NutritionFact label="Name" value={param.name} />
           <NutritionFact
             label="Source"

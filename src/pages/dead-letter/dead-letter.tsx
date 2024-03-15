@@ -7,8 +7,7 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
-import { DataTable, TableRow } from '@/components/data-table/data-table.tsx';
-import { ColumnDef } from '@tanstack/react-table';
+import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
 import {
   deadMessageEventTypeLabels,
   deadMessageStatusLabels,
@@ -51,7 +50,7 @@ function renderProblem(problem: O5DanteV1Problem | undefined) {
     .otherwise(() => null);
 }
 
-const eventColumns: ColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
+const eventColumns: CustomColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
   getRowExpander(),
   {
     header: 'ID',
@@ -63,6 +62,7 @@ const eventColumns: ColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
   {
     header: 'Timestamp',
     id: 'metadata.timestamp',
+    align: 'right',
     accessorFn: (row) => row.metadata?.timestamp,
     enableSorting: true,
     cell: ({ getValue }) => {
@@ -78,6 +78,16 @@ const eventColumns: ColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
           value={getValue<string>()}
         />
       );
+    },
+    filter: {
+      type: {
+        date: {
+          isFlexible: true,
+          exactLabel: 'Pick a date',
+          startLabel: 'Min',
+          endLabel: 'Max',
+        },
+      },
     },
   },
   {
@@ -183,7 +193,7 @@ export function DeadLetter() {
   const { data, error, isLoading } = useMessage({ messageId });
   useErrorHandler(error, 'Failed to load dead letter message');
 
-  const { sortValues, setSortValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, filterValues, setFilterValues, psmQuery } = useTableState();
   const {
     data: eventsData,
     isLoading: eventsAreLoading,
@@ -279,7 +289,9 @@ export function DeadLetter() {
                 columns={eventColumns}
                 controlledColumnSort={sortValues}
                 data={flattenedEvents}
+                filterValues={filterValues}
                 onColumnSort={setSortValues}
+                onFilter={setFilterValues}
                 pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
                 renderSubComponent={renderSubRow}
                 showSkeleton={Boolean(eventsData === undefined || eventsAreLoading || eventsError)}
