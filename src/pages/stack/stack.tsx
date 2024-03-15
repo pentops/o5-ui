@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useListStackEvents, useStack } from '@/data/api';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { match, P } from 'ts-pattern';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
@@ -13,6 +13,7 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
+import { GitHubLogoIcon } from '@radix-ui/react-icons';
 
 const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
   getRowExpander(),
@@ -188,13 +189,56 @@ export function Stack() {
           <CardHeader className="text-lg font-semibold">Details</CardHeader>
           <CardContent className="w-full flex flex-col gap-4">
             <NutritionFact isLoading={isLoading} label="Application Name" renderWhenEmpty="-" value={data?.state?.applicationName} />
-            <NutritionFact isLoading={isLoading} label="Environment Name" renderWhenEmpty="-" value={data?.state?.environmentName} />
+
+            <NutritionFact
+              isLoading={isLoading}
+              label="Environment"
+              renderWhenEmpty="-"
+              value={
+                data?.state?.environmentId ? (
+                  <Link to={`/environment/${data.state.environmentId}`}>{data?.state?.environmentName || data?.state?.environmentId}</Link>
+                ) : (
+                  data?.state?.environmentName
+                )
+              }
+            />
+
+            <NutritionFact
+              isLoading={isLoading}
+              label="Code Source"
+              renderWhenEmpty="-"
+              value={match(data?.state?.config?.codeSource?.type)
+                .with({ github: P.not(P.nullish) }, (t) => {
+                  let linkTo = `https://github.com/`;
+                  let sourceDetail = '';
+
+                  if (t.github.owner && t.github.repo) {
+                    linkTo += `${t.github.owner}/${t.github.repo}`;
+                    sourceDetail = `${t.github.owner}/${t.github.repo}`;
+
+                    if (t.github.branch) {
+                      linkTo += `/tree/${t.github.branch}`;
+                      sourceDetail = `${sourceDetail}:${t.github.branch}`;
+                    }
+                  }
+
+                  return (
+                    <a href={linkTo} className="flex gap-1 items-center" target="_blank">
+                      <GitHubLogoIcon />
+                      {`GitHub${sourceDetail ? ` (${sourceDetail})` : ''}`}
+                    </a>
+                  );
+                })
+                .otherwise(() => undefined)}
+            />
+
             <NutritionFact
               isLoading={isLoading}
               label="Status"
               renderWhenEmpty="-"
               value={data?.state?.status ? stackStatusLabels[data.state.status] : undefined}
             />
+
             <NutritionFact
               isLoading={isLoading}
               label="Current Deployment"
@@ -205,12 +249,14 @@ export function Stack() {
                 ) : undefined
               }
             />
+
             <NutritionFact
               isLoading={isLoading}
               label="Current Deployment Version"
               renderWhenEmpty="-"
               value={data?.state?.currentDeployment?.version ? <UUID short uuid={data.state.currentDeployment.version} /> : undefined}
             />
+
             <NutritionFact
               isLoading={isLoading}
               label="Queued Deployments"
