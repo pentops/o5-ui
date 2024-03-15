@@ -13,15 +13,23 @@ import { useErrorHandler } from '@/lib/error.ts';
 import { useDeployment } from '@/data/api';
 import { useTriggerDeployment } from '@/data/api/mutation';
 import { Input } from '@/components/ui/input.tsx';
+import { Checkbox } from '@/components/ui/checkbox.tsx';
 
 const schema = z.object({
-  environmentName: z.string().min(1, { message: 'Environment Name is required' }),
+  environment: z.string().min(1, { message: 'Environment is required (ID or full name)' }),
   source: z.object({
     github: z.object({
       owner: z.string().min(1, { message: 'Owner is required' }),
       repo: z.string().min(1, { message: 'Repo is required' }),
       commit: z.string().min(1, { message: 'Commit is required' }),
     }),
+  }),
+  flags: z.object({
+    quickMode: z.boolean(),
+    rotateCredentials: z.boolean(),
+    cancelUpdates: z.boolean(),
+    dbOnly: z.boolean(),
+    infraOnly: z.boolean(),
   }),
 });
 
@@ -42,13 +50,20 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
 
   const defaultValues = useMemo(
     () => ({
-      environmentName: data?.state?.spec?.environmentName || '',
+      environment: data?.state?.spec?.environmentName || data?.state?.spec?.environmentId || '',
       source: {
         github: {
           owner: '',
           repo: data?.state?.spec?.appName || '',
           commit: '',
         },
+      },
+      flags: {
+        quickMode: false,
+        rotateCredentials: false,
+        cancelUpdates: false,
+        dbOnly: false,
+        infraOnly: false,
       },
     }),
     [data?.state?.spec],
@@ -85,7 +100,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
           <RocketIcon aria-hidden />
         </DialogTrigger>
         <DialogContent>
-          <form className="w-100 overflow-auto" onSubmit={form.handleSubmit(handleEdit)}>
+          <form className="w-100 overflow-auto flex flex-col gap-2" onSubmit={form.handleSubmit(handleEdit)}>
             <DialogHeader>
               <DialogTitle>Trigger Deployment</DialogTitle>
               <DialogDescription asChild>
@@ -97,7 +112,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
 
             <FormField
               control={form.control}
-              name="environmentName"
+              name="environment"
               render={({ field }) => (
                 <FormItem className="py-2">
                   <FormLabel>Environment Name</FormLabel>
@@ -109,33 +124,35 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="source.github.owner"
-              render={({ field }) => (
-                <FormItem className="py-2">
-                  <FormLabel>GitHub Owner</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <FormField
+                control={form.control}
+                name="source.github.owner"
+                render={({ field }) => (
+                  <FormItem className="py-2">
+                    <FormLabel>GitHub Owner</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="source.github.repo"
-              render={({ field }) => (
-                <FormItem className="py-2">
-                  <FormLabel>Repository</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="source.github.repo"
+                render={({ field }) => (
+                  <FormItem className="py-2">
+                    <FormLabel>Repository</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -150,6 +167,87 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
                 </FormItem>
               )}
             />
+
+            <legend className="flex flex-col gap-2 items-start space-x-0 space-y-0">
+              <h3>Flags</h3>
+
+              <div className="grid grid-cols-3 gap-2">
+                <FormField
+                  control={form.control}
+                  name="flags.quickMode"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Quick Mode</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="flags.rotateCredentials"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Rotate Credentials</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="flags.cancelUpdates"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Cancel Updates</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="flags.dbOnly"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Database Only</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="flags.infraOnly"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Infrastructure Only</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </legend>
 
             <DialogFooter>
               <DialogClose asChild>
