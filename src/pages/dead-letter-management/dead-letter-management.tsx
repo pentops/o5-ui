@@ -15,7 +15,7 @@ const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
     accessorFn: (row) => row.messageId,
     cell: ({ getValue }) => {
       const value = getValue<string>();
-      return value ? <UUID canCopy short to={`/message/${value}`} uuid={value} /> : null;
+      return value ? <UUID canCopy short to={`/dead-letter/${value}`} uuid={value} /> : null;
     },
   },
   {

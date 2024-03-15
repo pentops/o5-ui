@@ -15,7 +15,7 @@ import { buildEnvironmentCustomVariables, buildEnvironmentProvider } from '@/pag
 import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 
-const eventColumns: CustomColumnDef<O5DeployerV1EnvironmentEvent, any>[] = [
+const eventColumns: CustomColumnDef<O5DeployerV1EnvironmentEvent>[] = [
   getRowExpander(),
   {
     header: 'ID',
@@ -23,6 +23,10 @@ const eventColumns: CustomColumnDef<O5DeployerV1EnvironmentEvent, any>[] = [
     cell: ({ getValue }) => {
       return <UUID short uuid={getValue<string>()} />;
     },
+  },
+  {
+    header: 'Type',
+    accessorFn: (row) => environmentEventTypeLabels[getEnvironmentEventType(row.event)],
   },
   {
     header: 'Timestamp',
@@ -54,10 +58,6 @@ const eventColumns: CustomColumnDef<O5DeployerV1EnvironmentEvent, any>[] = [
         },
       },
     },
-  },
-  {
-    header: 'Type',
-    accessorFn: (row) => environmentEventTypeLabels[getEnvironmentEventType(row.event)],
   },
 ];
 

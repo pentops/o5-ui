@@ -60,6 +60,10 @@ const eventColumns: CustomColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
     },
   },
   {
+    header: 'Type',
+    accessorFn: (row) => deadMessageEventTypeLabels[getDeadMessageEventType(row.event)],
+  },
+  {
     header: 'Timestamp',
     id: 'metadata.timestamp',
     align: 'right',
@@ -89,10 +93,6 @@ const eventColumns: CustomColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
         },
       },
     },
-  },
-  {
-    header: 'Type',
-    accessorFn: (row) => deadMessageEventTypeLabels[getDeadMessageEventType(row.event)],
   },
 ];
 
