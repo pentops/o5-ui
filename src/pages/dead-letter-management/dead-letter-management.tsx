@@ -12,6 +12,7 @@ import { useTableState } from '@/components/data-table/state.ts';
 const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   {
     header: 'Message ID',
+    size: 112,
     accessorFn: (row) => row.messageId,
     cell: ({ getValue }) => {
       const value = getValue<string>();
@@ -20,6 +21,7 @@ const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   },
   {
     header: 'Infra ID',
+    size: 112,
     accessorFn: (row) => row.currentSpec?.infraMessageId,
     cell: ({ getValue }) => {
       const value = getValue<string>();
@@ -28,6 +30,7 @@ const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   },
   {
     header: 'Status',
+    size: 112,
     id: 'status',
     accessorFn: (row) => deadMessageStatusLabels[row.status!] || '',
     filter: {
@@ -42,20 +45,23 @@ const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   {
     header: 'Queue',
     accessorFn: (row) => row.currentSpec?.queueName,
+    size: 560,
   },
   {
     header: 'gRPC Name',
     accessorFn: (row) => row.currentSpec?.grpcName,
+    size: 280,
   },
   {
     header: 'Problem',
     accessorFn: (row) => deadMessageProblemLabels[getDeadMessageProblem(row.currentSpec)],
+    size: 600,
   },
   {
     header: 'Created At',
     id: 'currentSpec.createdAt',
     enableSorting: true,
-    align: 'right',
+    size: 225,
     accessorFn: (row) => row.currentSpec?.createdAt,
     cell: ({ getValue }) => {
       return (
@@ -84,8 +90,10 @@ const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   },
   {
     header: () => {
-      return <div className="block w-[65px]" />;
+      return <div className="block w-[40px]" />;
     },
+    size: 40,
+    minSize: 40,
     id: 'actions',
     align: 'right',
     accessorFn: (row) => row.messageId,
