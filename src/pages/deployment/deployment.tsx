@@ -31,14 +31,21 @@ const eventColumns: CustomColumnDef<O5DeployerV1DeploymentEvent>[] = [
   getRowExpander(),
   {
     header: 'ID',
+    id: 'metadata.eventId',
+    size: 110,
+    minSize: 110,
+    maxSize: 110,
     accessorFn: (row) => row.metadata?.eventId,
     cell: ({ getValue }) => {
       return <UUID canCopy short uuid={getValue<string>()} />;
     },
   },
   {
-    id: 'event.type',
     header: 'Type',
+    id: 'event.type',
+    size: 120,
+    minSize: 120,
+    maxSize: 150,
     accessorFn: (row) => {
       const type = getDeploymentEventType(row);
       return row.event ? deploymentEventTypeLabels[type] : '';

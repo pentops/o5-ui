@@ -10,7 +10,10 @@ export function Header() {
   const setRealmId = useSetRealmId();
 
   return (
-    <header className="supports-backdrop-blur:bg-background/60 sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur ">
+    <header
+      className="supports-backdrop-blur:bg-background/60 sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur"
+      style={{ height: 'var(--o5ui-header-height)' }}
+    >
       <div className="max-w-8xl mx-auto">
         <div className="p-4 border-b border-slate-900/10 lg:px-8 lg:border-1 dark:border-slate-300/10">
           <div className="relative flex items-center">

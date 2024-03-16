@@ -1,21 +1,30 @@
 import React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
 import { ChevronDownIcon, ChevronRightIcon } from '@radix-ui/react-icons';
+import { CustomColumnDef } from '@/components/data-table/data-table.tsx';
 
-export function getRowExpander<TData>(): ColumnDef<TData> {
+export function getRowExpander<TData>(): CustomColumnDef<TData> {
   return {
     id: 'expander',
-    header: () => <span aria-hidden>&zwnj;</span>,
+    className: 'justify-center',
+    header: () => {
+      return <div className="block w-[24px]" />;
+    },
     cell: ({ row }) => {
       const isExpanded = row.getIsExpanded();
 
       return row.getCanExpand() ? (
-        <button aria-label={isExpanded ? 'Collapse row' : 'Expand row'} onClick={row.getToggleExpandedHandler()} type="button">
+        <button
+          aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
+          onClick={row.getToggleExpandedHandler()}
+          type="button"
+          className="content-center justify-center"
+        >
           {isExpanded ? <ChevronDownIcon aria-hidden /> : <ChevronRightIcon aria-hidden />}
         </button>
       ) : null;
     },
-    maxSize: 15,
-    minSize: 15,
+    size: 24,
+    maxSize: 24,
+    minSize: 24,
   };
 }

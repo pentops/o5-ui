@@ -21,13 +21,21 @@ const eventColumns: CustomColumnDef<O5DeployerV1EnvironmentEvent>[] = [
   getRowExpander(),
   {
     header: 'ID',
+    id: 'metadata.eventId',
     accessorFn: (row) => row.metadata?.eventId,
+    size: 110,
+    minSize: 110,
+    maxSize: 110,
     cell: ({ getValue }) => {
-      return <UUID short uuid={getValue<string>()} />;
+      return <UUID canCopy short uuid={getValue<string>()} />;
     },
   },
   {
     header: 'Type',
+    id: 'event.type',
+    size: 120,
+    minSize: 100,
+    maxSize: 150,
     accessorFn: (row) => environmentEventTypeLabels[getEnvironmentEventType(row.event)],
   },
   {

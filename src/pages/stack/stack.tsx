@@ -14,11 +14,16 @@ import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 import { GitHubLogoIcon } from '@radix-ui/react-icons';
+import { buildCodeSourceFact } from '@/pages/stack/build-facts.tsx';
 
 const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
   getRowExpander(),
   {
     header: 'ID',
+    id: 'metadata.eventId',
+    size: 110,
+    minSize: 110,
+    maxSize: 110,
     accessorFn: (row) => row.metadata?.eventId,
     cell: ({ getValue }) => {
       const value = getValue<string>();
@@ -27,6 +32,10 @@ const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
   },
   {
     header: 'Type',
+    id: 'event.type',
+    size: 100,
+    minSize: 100,
+    maxSize: 100,
     accessorFn: (row) => {
       const type = getStackEventType(row);
       return row.event ? stackEventTypeLabels[type] : '';
@@ -219,34 +228,7 @@ export function Stack() {
               }
             />
 
-            <NutritionFact
-              isLoading={isLoading}
-              label="Code Source"
-              renderWhenEmpty="-"
-              value={match(data?.state?.config?.codeSource?.type)
-                .with({ github: P.not(P.nullish) }, (t) => {
-                  let linkTo = `https://github.com/`;
-                  let sourceDetail = '';
-
-                  if (t.github.owner && t.github.repo) {
-                    linkTo += `${t.github.owner}/${t.github.repo}`;
-                    sourceDetail = `${t.github.owner}/${t.github.repo}`;
-
-                    if (t.github.branch) {
-                      linkTo += `/tree/${t.github.branch}`;
-                      sourceDetail = `${sourceDetail}:${t.github.branch}`;
-                    }
-                  }
-
-                  return (
-                    <a href={linkTo} className="flex gap-1 items-center" target="_blank">
-                      <GitHubLogoIcon />
-                      {`GitHub${sourceDetail ? ` (${sourceDetail})` : ''}`}
-                    </a>
-                  );
-                })
-                .otherwise(() => undefined)}
-            />
+            {buildCodeSourceFact(data?.state?.config?.codeSource)}
 
             <NutritionFact
               isLoading={isLoading}

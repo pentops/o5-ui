@@ -8,59 +8,35 @@ import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
-import {
-  deadMessageEventTypeLabels,
-  deadMessageStatusLabels,
-  getDeadMessageEventType,
-  O5DanteV1DeadMessageEvent,
-  O5DanteV1Problem,
-  O5DanteV1Urgency,
-} from '@/data/types';
+import { deadMessageEventTypeLabels, deadMessageStatusLabels, getDeadMessageEventType, O5DanteV1DeadMessageEvent } from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
-import { DeadMessageProblem, deadMessageProblemLabels, getDeadMessageProblem, urgencyLabels } from '@/data/types/ui/dante.ts';
+import { DeadMessageProblem, deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui/dante.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
-import { InvariantViolationPayloadDialog } from '@/pages/dead-letter/invariant-violation-payload-dialog/invariant-violation-payload-dialog.tsx';
 import { formatJSONString } from '@/lib/json.ts';
 import { useTableState } from '@/components/data-table/state.ts';
-
-function renderProblem(problem: O5DanteV1Problem | undefined) {
-  return match(problem?.type)
-    .with({ invariantViolation: P.not(P.nullish) }, (p) => {
-      return (
-        <>
-          <NutritionFact label="Description" renderWhenEmpty="-" value={p.invariantViolation?.description} />
-          <NutritionFact
-            label="Description"
-            renderWhenEmpty="-"
-            value={urgencyLabels[(p.invariantViolation?.urgency as O5DanteV1Urgency | undefined) || O5DanteV1Urgency.Unspecified]}
-          />
-          <NutritionFact
-            label="Error"
-            renderWhenEmpty="-"
-            value={<InvariantViolationPayloadDialog payload={p.invariantViolation?.error?.json || ''} />}
-          />
-        </>
-      );
-    })
-    .with({ unhandledError: P.not(P.nullish) }, (p) => {
-      return <NutritionFact vertical label="Error" value={p.unhandledError.error} />;
-    })
-    .otherwise(() => null);
-}
+import { buildDeadMessageProblemFacts } from './build-facts';
 
 const eventColumns: CustomColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
   getRowExpander(),
   {
     header: 'ID',
+    id: 'metadata.eventId',
+    size: 110,
+    minSize: 110,
+    maxSize: 110,
     accessorFn: (row) => row.metadata?.eventId,
     cell: ({ getValue }) => {
-      return <UUID short uuid={getValue<string>()} />;
+      return <UUID canCopy short uuid={getValue<string>()} />;
     },
   },
   {
     header: 'Type',
+    id: 'event.type',
+    size: 120,
+    minSize: 100,
+    maxSize: 150,
     accessorFn: (row) => deadMessageEventTypeLabels[getDeadMessageEventType(row.event)],
   },
   {
@@ -138,7 +114,7 @@ function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageEvent>) {
                 value={problemType !== DeadMessageProblem.Unspecified ? deadMessageProblemLabels[problemType] : null}
               />
 
-              {renderProblem(e.updated.spec?.problem)}
+              {buildDeadMessageProblemFacts(e.updated.spec?.problem)}
 
               <NutritionFact vertical label="JSON" value={<CodeEditor disabled value={formatJSONString(e.updated.spec?.payload?.json || '')} />} />
             </>
@@ -174,7 +150,7 @@ function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageEvent>) {
                 value={problemType !== DeadMessageProblem.Unspecified ? deadMessageProblemLabels[problemType] : null}
               />
 
-              {renderProblem(e.created.spec?.problem)}
+              {buildDeadMessageProblemFacts(e.created.spec?.problem)}
 
               <NutritionFact vertical label="JSON" value={<CodeEditor disabled value={formatJSONString(e.created.spec?.payload?.json || '')} />} />
             </>
@@ -270,7 +246,7 @@ export function DeadLetter() {
               value={problemType !== DeadMessageProblem.Unspecified ? deadMessageProblemLabels[problemType] : null}
             />
 
-            {renderProblem(data?.message?.currentSpec?.problem)}
+            {buildDeadMessageProblemFacts(data?.message?.currentSpec?.problem)}
           </CardContent>
         </Card>
         <div className="flex-grow h-fit basis-5/6 flex flex-col gap-4">

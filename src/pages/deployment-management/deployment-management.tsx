@@ -31,6 +31,10 @@ const columns: CustomColumnDef<O5DeployerV1DeploymentState>[] = [
   {
     header: 'ID',
     accessorKey: 'deploymentId',
+    id: 'deploymentId',
+    size: 110,
+    minSize: 110,
+    maxSize: 110,
     cell: ({ getValue }) => {
       const value = getValue<string>();
       return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
@@ -38,10 +42,18 @@ const columns: CustomColumnDef<O5DeployerV1DeploymentState>[] = [
   },
   {
     header: 'App',
+    id: 'spec.appName',
+    size: 120,
+    minSize: 120,
+    maxSize: 140,
     accessorFn: (row) => row.spec?.appName || '',
   },
   {
     header: 'Environment',
+    id: 'spec.environmentName',
+    size: 120,
+    minSize: 120,
+    maxSize: 140,
     accessorFn: (row) => row.spec?.environmentName || '',
     cell: ({ getValue, row }) => {
       const value = getValue<string>();
@@ -50,11 +62,22 @@ const columns: CustomColumnDef<O5DeployerV1DeploymentState>[] = [
   },
   {
     header: 'Version',
+    id: 'spec.version',
+    size: 110,
+    minSize: 110,
+    maxSize: 110,
     accessorFn: (row) => row.spec?.version || '',
+    cell: ({ getValue }) => {
+      const value = getValue<string>();
+      return value ? <UUID canCopy short uuid={value} /> : null;
+    },
   },
   {
     header: 'Status',
     id: 'status',
+    size: 120,
+    minSize: 120,
+    maxSize: 150,
     accessorFn: (row) => deploymentStatusLabels[row.status!] || '',
     filter: {
       type: {
@@ -68,6 +91,7 @@ const columns: CustomColumnDef<O5DeployerV1DeploymentState>[] = [
   {
     header: 'Stack',
     accessorKey: 'stackName',
+    id: 'stackName',
     cell: ({ getValue, row }) => {
       const value = getValue<string>();
       return row.original.stackId ? <Link to={`/stack/${row.original.stackId}`}>{value}</Link> : value;
@@ -79,6 +103,9 @@ const columns: CustomColumnDef<O5DeployerV1DeploymentState>[] = [
     },
     align: 'right',
     id: 'actions',
+    size: 65,
+    minSize: 65,
+    maxSize: 65,
     accessorFn: (row) => row.deploymentId,
     cell: ({ getValue, row }) => {
       const value = getValue<string>();
@@ -242,7 +269,7 @@ function DeploymentManagement() {
   }, [data?.pages]);
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-auto">
       <div className="flex items-end place-content-between w-full pb-4">
         <h1 className="text-2xl">Deployment Management</h1>
         <TriggerDeploymentDialog />

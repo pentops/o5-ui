@@ -8,11 +8,17 @@ import { environmentStatusLabels } from '@/data/types/ui/environment.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { buildEnvironmentCustomVariables, buildEnvironmentProvider } from '@/pages/environment/build-facts.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
+import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 
 const columns: CustomColumnDef<O5DeployerV1EnvironmentState>[] = [
+  getRowExpander(),
   {
     header: 'ID',
+    id: 'environmentId',
     accessorKey: 'environmentId',
+    size: 110,
+    minSize: 110,
+    maxSize: 110,
     cell: ({ getValue }) => {
       const value = getValue<string>();
       return value ? <UUID canCopy short to={`/environment/${value}`} uuid={value} /> : null;
@@ -20,12 +26,18 @@ const columns: CustomColumnDef<O5DeployerV1EnvironmentState>[] = [
   },
   {
     header: 'Full Name',
+    id: 'fullName',
+    size: 150,
+    minSize: 150,
     accessorFn: (row) => row.config?.fullName,
   },
   {
     header: 'Status',
     align: 'right',
     id: 'status',
+    size: 120,
+    minSize: 120,
+    maxSize: 150,
     accessorFn: (row) => environmentStatusLabels[row.status!] || '',
     filter: {
       type: {

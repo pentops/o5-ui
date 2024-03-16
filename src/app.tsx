@@ -5,10 +5,12 @@ import { Toaster } from '@/components/ui/toaster.tsx';
 
 function App() {
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col h-full w-full" style={{ '--o5ui-header-height': '58px' } as React.CSSProperties}>
       <Header />
-      <main className="w-full h-full p-4 lg:px-8 flex-grow">
-        <Outlet />
+      <main className="w-full h-full flex-grow overflow-hidden">
+        <div className="overflow-auto h-full w-full p-4 lg:px-8">
+          <Outlet />
+        </div>
       </main>
       <Toaster />
     </div>
