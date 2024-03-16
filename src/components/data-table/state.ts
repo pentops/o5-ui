@@ -9,6 +9,7 @@ import {
 } from '@pentops/react-table-state-psm';
 import { match, P } from 'ts-pattern';
 import { OnChangeFn } from '@tanstack/react-table';
+import { endOfDay, startOfDay } from 'date-fns';
 
 export interface TableFilterValueExact {
   exact: string | undefined;
@@ -85,6 +86,24 @@ function mapTableFiltersToPSM(filters: Record<string, TableFilterValueType>): Fi
               }
 
               if (dv.date.exact) {
+                // For an exact date, if the date is not a date-time, we actually need to send it as a range from the beginning of the
+                // target date to the end of the target date.
+                if (!dv.date.exact.includes('T')) {
+                  try {
+                    const tzOffset = new Date().getTimezoneOffset() * 60000;
+                    const rawDate = new Date(dv.date.exact);
+                    const start = startOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
+                    const end = endOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
+
+                    return {
+                      range: {
+                        min: start,
+                        max: end,
+                      },
+                    };
+                  } catch {}
+                }
+
                 return { exact: dv.date.exact.toString() };
               }
 
