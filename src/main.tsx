@@ -13,7 +13,7 @@ export const queryClient = new QueryClient({ defaultOptions: defaultQueryClientO
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="dante-theme">
+      <ThemeProvider defaultTheme="dark" storageKey="o5-theme">
         <RouterProvider router={router} />
       </ThemeProvider>
     </QueryClientProvider>
