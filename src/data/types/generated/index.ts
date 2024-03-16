@@ -60,7 +60,7 @@ export interface O5DanteV1DeadMessageEventTypeUpdated {
 
 export interface O5DanteV1DeadMessageSpec {
   // format: date-time
-  createdAt?: string;
+  createdAt: string;
   grpcName?: string;
   infraMessageId?: string;
   payload?: O5DanteV1Any;
@@ -645,6 +645,38 @@ export interface O5AuthV1WhoamiResponse {
   realmAccess?: O5AuthV1RealmAccess[];
 }
 
+export interface O5DanteV1GetDeadMessageResponse {
+  events?: O5DanteV1DeadMessageEvent[];
+  message: O5DanteV1DeadMessageState;
+}
+
+export interface O5DanteV1GetDeadMessageRequest {
+  // format: uuid
+  messageId?: string;
+}
+
+export interface O5DanteV1ListDeadMessagesResponse {
+  messages?: O5DanteV1DeadMessageState[];
+  page?: PsmListV1PageResponse;
+}
+
+export interface O5DanteV1ListDeadMessagesRequest {
+  page?: PsmListV1PageRequest;
+  query?: PsmListV1QueryRequest;
+}
+
+export interface O5DanteV1ListDeadMessageEventsResponse {
+  events?: O5DanteV1DeadMessageEvent[];
+  page?: PsmListV1PageResponse;
+}
+
+export interface O5DanteV1ListDeadMessageEventsRequest {
+  // format: uuid
+  messageId?: string;
+  page?: PsmListV1PageRequest;
+  query?: PsmListV1QueryRequest;
+}
+
 export interface O5DanteV1UpdateDeadMessageResponse {
   message: O5DanteV1DeadMessageState;
 }
@@ -676,38 +708,6 @@ export interface O5DanteV1RejectDeadMessageRequest {
   reason?: string;
   // format: uuid
   messageId?: string;
-}
-
-export interface O5DanteV1GetDeadMessageResponse {
-  events?: O5DanteV1DeadMessageEvent[];
-  message: O5DanteV1DeadMessageState;
-}
-
-export interface O5DanteV1GetDeadMessageRequest {
-  // format: uuid
-  messageId?: string;
-}
-
-export interface O5DanteV1ListDeadMessagesResponse {
-  messages?: O5DanteV1DeadMessageState[];
-  page?: PsmListV1PageResponse;
-}
-
-export interface O5DanteV1ListDeadMessagesRequest {
-  page?: PsmListV1PageRequest;
-  query?: PsmListV1QueryRequest;
-}
-
-export interface O5DanteV1ListDeadMessageEventsResponse {
-  events?: O5DanteV1DeadMessageEvent[];
-  page?: PsmListV1PageResponse;
-}
-
-export interface O5DanteV1ListDeadMessageEventsRequest {
-  // format: uuid
-  messageId?: string;
-  page?: PsmListV1PageRequest;
-  query?: PsmListV1QueryRequest;
 }
 
 export interface O5DeployerV1TriggerDeploymentResponse {
