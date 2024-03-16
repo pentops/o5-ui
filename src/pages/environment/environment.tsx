@@ -14,6 +14,8 @@ import { match, P } from 'ts-pattern';
 import { buildEnvironmentCustomVariables, buildEnvironmentProvider } from '@/pages/environment/build-facts.tsx';
 import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
+import { CaretDownIcon } from '@radix-ui/react-icons';
 
 const eventColumns: CustomColumnDef<O5DeployerV1EnvironmentEvent>[] = [
   getRowExpander(),
@@ -74,8 +76,17 @@ function renderSubRow({ row }: TableRow<O5DeployerV1EnvironmentEvent>) {
               <NutritionFact vertical label="CORS Origins" value={e.configured.config?.corsOrigins?.join('\n')} />
               <NutritionFact vertical label="Trust JWKS" value={e.configured.config?.trustJwks?.join('\n')} />
 
-              <h4>Provider</h4>
-              {buildEnvironmentProvider(e.configured.config?.provider)}
+              {e.configured.config?.provider && (
+                <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+                  <CollapsibleTrigger asChild>
+                    <button className="w-full flex items-center justify-start gap-1" type="button">
+                      <CaretDownIcon />
+                      <h4 className="text-lg">Provider</h4>
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>{buildEnvironmentProvider(e.configured.config.provider)}</CollapsibleContent>
+                </Collapsible>
+              )}
 
               <h4>Variables</h4>
               {buildEnvironmentCustomVariables(e.configured.config?.vars)}
@@ -144,8 +155,17 @@ export function Environment() {
                 <NutritionFact renderWhenEmpty="-" label="CORS Origins" value={data?.state?.config?.corsOrigins?.join('\n')} />
                 <NutritionFact renderWhenEmpty="-" label="Trust JWKS" value={data?.state?.config?.trustJwks?.join('\n')} />
 
-                <h4>Provider</h4>
-                {buildEnvironmentProvider(data?.state?.config?.provider)}
+                {data?.state?.config?.provider && (
+                  <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+                    <CollapsibleTrigger asChild>
+                      <button className="w-full flex items-center justify-start gap-1" type="button">
+                        <CaretDownIcon />
+                        <h4 className="text-lg">Provider</h4>
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>{buildEnvironmentProvider(data.state.config.provider)}</CollapsibleContent>
+                  </Collapsible>
+                )}
 
                 <h4>Variables</h4>
                 {buildEnvironmentCustomVariables(data?.state?.config?.vars)}

@@ -24,6 +24,8 @@ import { ConfirmTerminateDeploymentAlert } from '@/pages/deployment/confirm-term
 import { buildDeploymentSpecFacts } from '@/pages/deployment/build-facts.tsx';
 import { buildCFStackOutput } from '@/pages/stack/build-facts.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
+import { CaretDownIcon } from '@radix-ui/react-icons';
 
 const eventColumns: CustomColumnDef<O5DeployerV1DeploymentEvent>[] = [
   getRowExpander(),
@@ -82,22 +84,34 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentEvent>) {
 
       {match(row.original.event?.type)
         .with({ created: P.not(P.nullish) }, (e) => buildDeploymentSpecFacts(e.created.spec))
-        .with({ error: P.not(P.nullish) }, (e) => <NutritionFact label="Error" value={e.error?.error} />)
+        .with({ error: P.not(P.nullish) }, (e) => <NutritionFact renderWhenEmpty="-" label="Error" value={e.error?.error} />)
         .with({ stackAvailable: P.not(P.nullish) }, (e) => buildCFStackOutput(e.stackAvailable.stackOutput))
-        .with({ stackWaitFailure: P.not(P.nullish) }, (e) => <NutritionFact label="Error" value={e.stackWaitFailure.error} />)
+        .with({ stackWaitFailure: P.not(P.nullish) }, (e) => <NutritionFact renderWhenEmpty="-" label="Error" value={e.stackWaitFailure.error} />)
         .with({ stepResult: P.not(P.nullish) }, (e) => (
           <>
-            <NutritionFact label="Step ID" value={<UUID canCopy short uuid={e.stepResult.stepId} />} />
-            <NutritionFact label="Status" value={deploymentStepStatusLabels[e.stepResult.status!]} />
-            <NutritionFact label="Error" value={e.stepResult.error} />
+            <div className="grid grid-cols-3 gap-2">
+              <NutritionFact renderWhenEmpty="-" label="Step ID" value={<UUID canCopy short uuid={e.stepResult.stepId} />} />
+              <NutritionFact renderWhenEmpty="-" label="Status" value={deploymentStepStatusLabels[e.stepResult.status!]} />
+              <NutritionFact renderWhenEmpty="-" label="Error" value={e.stepResult.error} />
+            </div>
 
-            <h4>Output</h4>
+            {e.stepResult.output && (
+              <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+                <CollapsibleTrigger asChild>
+                  <button className="w-full flex items-center justify-start gap-1" type="button">
+                    <CaretDownIcon />
+                    <h4 className="text-lg">Output</h4>
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <h5>{deploymentStepOutputTypeLabels[getDeploymentStepOutputType(e.stepResult.output)]}</h5>
 
-            <h5>{deploymentStepOutputTypeLabels[getDeploymentStepOutputType(e.stepResult.output)]}</h5>
-
-            {match(e.stepResult.output?.type)
-              .with({ cfStatus: P.not(P.nullish) }, (o) => buildCFStackOutput(o.cfStatus.output))
-              .otherwise(() => null)}
+                  {match(e.stepResult.output?.type)
+                    .with({ cfStatus: P.not(P.nullish) }, (o) => buildCFStackOutput(o.cfStatus.output))
+                    .otherwise(() => null)}
+                </CollapsibleContent>
+              </Collapsible>
+            )}
           </>
         ))
         .otherwise(() => null)}

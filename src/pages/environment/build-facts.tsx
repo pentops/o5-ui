@@ -32,11 +32,11 @@ export function buildEnvironmentCustomVariables(vars: O5EnvironmentV1CustomVaria
 
 export function buildEnvironmentProvider(provider: O5EnvironmentV1Environment['provider'] | undefined) {
   return (
-    <div className="flex flex-col gap-4 p-2 border border-slate-900/10 lg:px-8 lg:border-1 dark:border-slate-300/10">
+    <div className="p-2 flex flex-col gap-2">
       {match(provider)
         .with({ aws: P.not(P.nullish) }, (p) => (
           <>
-            <NutritionFact label="Provider" value="AWS" />
+            <strong>AWS</strong>
 
             <div className="grid grid-cols-2 gap-2">
               <NutritionFact renderWhenEmpty="-" label="Region" value={p.aws.region} />
@@ -54,49 +54,64 @@ export function buildEnvironmentProvider(provider: O5EnvironmentV1Environment['p
               <NutritionFact renderWhenEmpty="-" label="o5 Deployer Grant Roles" value={p.aws.o5DeployerGrantRoles?.join('\n')} />
             </div>
 
-            <h3>SES Identity</h3>
-            <div className="grid grid-cols-2 gap-2 py-2 px-1 border border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+            <h3 className="text-lg">SES Identity</h3>
+            <div className="grid grid-cols-2 gap-2 py-2 px-1 rounded-md border border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
               <div className="grid grid-cols-2 gap-2">
                 <NutritionFact renderWhenEmpty="-" label="Recipients" value={p.aws.sesIdentity?.recipients?.join('\n')} />
                 <NutritionFact renderWhenEmpty="-" label="Senders" value={p.aws.sesIdentity?.senders?.join('\n')} />
               </div>
             </div>
 
-            <h3>Environment Links</h3>
-            <div className="grid grid-cols-2 gap-2 py-2 px-1 border border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
-              {p.aws.environmentLinks?.map((l) => (
-                <div
-                  className="grid grid-cols-2 gap-2 py-2 px-1 border border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10"
-                  key={l.fullName || l.snsPrefix}
-                >
-                  <NutritionFact renderWhenEmpty="-" label="Full Name" value={l.fullName} />
-                  <NutritionFact renderWhenEmpty="-" label="SNS Prefix" value={l.snsPrefix} />
+            {(p.aws.environmentLinks?.length || 0) > 0 && (
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg">Environment Links</h3>
+                <div className="grid grid-cols-2 gap-2 py-2 px-1 rounded-md border border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+                  {p.aws.environmentLinks?.map((l) => (
+                    <div
+                      className="grid grid-cols-2 gap-3 p-2 [&:not(:last-child)]:border-b border-slate-900/10 lg:border-1 dark:border-slate-300/10"
+                      key={l.fullName || l.snsPrefix}
+                    >
+                      <NutritionFact renderWhenEmpty="-" label="Full Name" value={l.fullName} />
+                      <NutritionFact renderWhenEmpty="-" label="SNS Prefix" value={l.snsPrefix} />
+                    </div>
+                  )) || '-'}
                 </div>
-              )) || '-'}
-            </div>
+              </div>
+            )}
 
-            <h3>Grant Principals</h3>
-            <div className="grid grid-cols-2 gap-2 py-2 px-1 border border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
-              {p.aws.grantPrincipals?.map((g) => (
-                <div
-                  className="grid grid-cols-2 gap-2 py-2 px-1 border border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10"
-                  key={g.name || g.roleArn}
-                >
-                  <NutritionFact renderWhenEmpty="-" label="Name" value={g.name} />
-                  <NutritionFact renderWhenEmpty="-" label="Role ARN" value={g.roleArn} />
+            {(p.aws.grantPrincipals?.length || 0) > 0 && (
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg">Grant Principals</h3>
+                <div className="grid grid-cols-2 gap-2 py-2 px-1 rounded-md border border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+                  {p.aws.grantPrincipals?.map((g) => (
+                    <div
+                      className="grid grid-cols-2 gap-3 p-2 [&:not(:last-child)]:border-b border-slate-900/10 lg:border-1 dark:border-slate-300/10"
+                      key={g.name || g.roleArn}
+                    >
+                      <NutritionFact renderWhenEmpty="-" label="Name" value={g.name} />
+                      <NutritionFact renderWhenEmpty="-" label="Role ARN" value={g.roleArn} />
+                    </div>
+                  )) || '-'}
                 </div>
-              )) || '-'}
-            </div>
+              </div>
+            )}
 
-            <h3>RDS Hosts</h3>
-            <div className="grid grid-cols-2 gap-2 py-2 px-1 border border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
-              {p.aws.rdsHosts?.map((r) => (
-                <div className="grid grid-cols-2 gap-2 p-2" key={r.serverGroup}>
-                  <NutritionFact renderWhenEmpty="-" label="Server Group" value={r.serverGroup} />
-                  <NutritionFact renderWhenEmpty="-" label="Secret Name" value={r.secretName} />
+            {(p.aws.rdsHosts?.length || 0) > 0 && (
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg">RDS Hosts</h3>
+                <div className="grid grid-cols-2 gap-2 py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+                  {p.aws.rdsHosts?.map((r) => (
+                    <div
+                      className="grid grid-cols-2 gap-3 p-2 [&:not(:last-child)]:border-b border-slate-900/10 lg:border-1 dark:border-slate-300/10"
+                      key={r.serverGroup}
+                    >
+                      <NutritionFact renderWhenEmpty="-" label="Server Group" value={r.serverGroup} />
+                      <NutritionFact renderWhenEmpty="-" label="Secret Name" value={r.secretName} />
+                    </div>
+                  )) || '-'}
                 </div>
-              )) || '-'}
-            </div>
+              </div>
+            )}
           </>
         ))
         .otherwise(() => '-')}

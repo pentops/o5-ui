@@ -91,7 +91,11 @@ function renderSubRow({ row }: TableRow<O5DeployerV1StackEvent>) {
                 ) : undefined
               }
             />
-            <NutritionFact label="Deployment Version" renderWhenEmpty="-" value={e.triggered.deployment?.version} />
+            <NutritionFact
+              label="Deployment Version"
+              renderWhenEmpty="-"
+              value={e.triggered.deployment?.version ? <UUID canCopy uuid={e.triggered.deployment.version} /> : undefined}
+            />
           </>
         ))
         .with({ configured: P.not(P.nullish) }, (e) => (
@@ -103,7 +107,7 @@ function renderSubRow({ row }: TableRow<O5DeployerV1StackEvent>) {
               renderWhenEmpty="-"
               value={
                 e.configured.environmentId ? (
-                  <UUID short to={`/environment/${e.configured.environmentId}`} uuid={e.configured.environmentId} />
+                  <UUID canCopy to={`/environment/${e.configured.environmentId}`} uuid={e.configured.environmentId} />
                 ) : undefined
               }
             />
@@ -122,11 +126,19 @@ function renderSubRow({ row }: TableRow<O5DeployerV1StackEvent>) {
               renderWhenEmpty="-"
               value={
                 e.deploymentCompleted.deployment?.deploymentId ? (
-                  <UUID to={`/deployment/${e.deploymentCompleted.deployment.deploymentId}`} uuid={e.deploymentCompleted.deployment.deploymentId} />
+                  <UUID
+                    canCopy
+                    to={`/deployment/${e.deploymentCompleted.deployment.deploymentId}`}
+                    uuid={e.deploymentCompleted.deployment.deploymentId}
+                  />
                 ) : undefined
               }
             />
-            <NutritionFact label="Deployment Version" renderWhenEmpty="-" value={e.deploymentCompleted.deployment?.version} />
+            <NutritionFact
+              label="Deployment Version"
+              renderWhenEmpty="-"
+              value={e.deploymentCompleted.deployment?.version ? <UUID canCopy uuid={e.deploymentCompleted.deployment.version} /> : undefined}
+            />
           </>
         ))
         .with({ deploymentFailed: P.not(P.nullish) }, (e) => (
@@ -141,7 +153,11 @@ function renderSubRow({ row }: TableRow<O5DeployerV1StackEvent>) {
                 ) : undefined
               }
             />
-            <NutritionFact label="Deployment Version" renderWhenEmpty="-" value={e.deploymentFailed.deployment?.version} />
+            <NutritionFact
+              label="Deployment Version"
+              renderWhenEmpty="-"
+              value={e.deploymentFailed.deployment?.version ? <UUID canCopy uuid={e.deploymentFailed.deployment.version} /> : undefined}
+            />
           </>
         ))
         .otherwise(() => null)}
