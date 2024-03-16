@@ -13,7 +13,6 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
-import { GitHubLogoIcon } from '@radix-ui/react-icons';
 import { buildCodeSourceFact } from '@/pages/stack/build-facts.tsx';
 
 const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
