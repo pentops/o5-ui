@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useDeployment, useListDeploymentEvents } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
@@ -21,7 +21,7 @@ import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { match, P } from 'ts-pattern';
 import { TriggerDeploymentDialog } from '@/pages/deployment/trigger-deployment-dialog/trigger-deployment-dialog.tsx';
 import { ConfirmTerminateDeploymentAlert } from '@/pages/deployment/confirm-terminate-deployment-alert/confirm-terminate-deployment-alert.tsx';
-import { buildDeploymentSpecFacts } from '@/pages/deployment/build-facts.tsx';
+import { buildDeploymentSpecFacts, buildDeploymentStepFacts } from '@/pages/deployment/build-facts.tsx';
 import { buildCFStackOutput } from '@/pages/stack/build-facts.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
@@ -136,7 +136,7 @@ function canTerminateDeployment(status: O5DeployerV1DeploymentStatus | undefined
 
 export function Deployment() {
   const { deploymentId } = useParams();
-  const { data, isLoading, error } = useDeployment({ deploymentId });
+  const { data, error } = useDeployment({ deploymentId });
   useErrorHandler(error, 'Failed to load deployment');
 
   const eventTableState = useTableState();
@@ -175,20 +175,16 @@ export function Deployment() {
         )}
       </div>
 
-      <div className="w-full inline-flex gap-4 flex-wrap lg:flex-nowrap">
-        <Card className="flex-grow lg:flex-grow-0 w-[325px] h-fit">
+      <div className="flex-grow h-fit flex flex-col gap-4">
+        <Card className="flex-grow h-fit">
           <CardHeader className="text-lg font-semibold">Details</CardHeader>
-          <CardContent className="w-full flex flex-col gap-4">
-            <NutritionFact
-              isLoading={isLoading}
-              label="Stack"
-              renderWhenEmpty="-"
-              value={data?.state?.stackName ? <Link to={`/stack/${data.state.stackId}`}>{data.state.stackName}</Link> : undefined}
-            />
+          <CardContent className="flex flex-col gap-2">
+            {buildDeploymentSpecFacts(data?.state?.spec)}
+            {buildDeploymentStepFacts(data?.state?.steps)}
           </CardContent>
         </Card>
 
-        <Card className="flex-grow h-fit basis-5/6">
+        <Card className="flex-grow h-fit">
           <CardHeader className="text-lg font-semibold">Events</CardHeader>
           <CardContent>
             <DataTable

@@ -1,7 +1,13 @@
 import {
+  deploymentStepOutputTypeLabels,
+  deploymentStepRequestTypeLabels,
+  deploymentStepStatusLabels,
+  getDeploymentStepOutputType,
+  getDeploymentStepRequestType,
   O5DeployerV1CFStackInput,
   O5DeployerV1CloudFormationStackParameter,
   O5DeployerV1DeploymentSpec,
+  O5DeployerV1DeploymentStep,
   O5DeployerV1PostgresSpec,
 } from '@/data/types';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
@@ -10,6 +16,8 @@ import React from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import { NumberFormat } from '@/components/format/number/number-format.tsx';
+import { UUID } from '@/components/uuid/uuid.tsx';
+import { buildCFStackOutput } from '@/pages/stack/build-facts.tsx';
 
 export function getStackParameterSourceValue(source: O5DeployerV1CloudFormationStackParameter['source'] | undefined) {
   return match(source)
@@ -167,5 +175,130 @@ export function buildDeploymentSpecFacts(spec: O5DeployerV1DeploymentSpec | unde
         </Collapsible>
       )}
     </div>
+  );
+}
+
+export function buildDeploymentStepFacts(steps: O5DeployerV1DeploymentStep[] | undefined) {
+  return (
+    ((steps?.length || 0) > 0 && (
+      <div className="flex flex-col gap-2">
+        <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+          <CollapsibleTrigger asChild>
+            <button className="w-full flex items-center justify-start gap-1" type="button">
+              <CaretDownIcon />
+              <h4 className="text-lg">Steps</h4>
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            {steps?.map((step) => (
+              <div
+                key={step.id}
+                className="flex flex-col gap-3 p-2 [&:not(:last-child)]:border-b border-slate-900/10 lg:border-1 dark:border-slate-300/10"
+              >
+                <div className="grid grid-cols-2 gap-2">
+                  <NutritionFact renderWhenEmpty="-" label="ID" value={step.id ? <UUID short canCopy uuid={step.id} /> : undefined} />
+                  <NutritionFact renderWhenEmpty="-" label="Name" value={step.name} />
+                  <NutritionFact renderWhenEmpty="-" label="Depends On" value={step.dependsOn?.join(', ')} />
+                  <NutritionFact renderWhenEmpty="-" label="Status" value={deploymentStepStatusLabels[step.status!]} />
+                  <NutritionFact renderWhenEmpty="-" label="Error" value={step.error} />
+                </div>
+
+                {step.request && (
+                  <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+                    <CollapsibleTrigger asChild>
+                      <button className="w-full flex items-center justify-start gap-1" type="button">
+                        <CaretDownIcon />
+                        <h4 className="text-lg">Request</h4>
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="flex flex-col gap-2 p-2">
+                        <span>{deploymentStepRequestTypeLabels[getDeploymentStepRequestType(step.request)]}</span>
+
+                        {match(step.request?.type)
+                          .with({ cfCreate: P.not(P.nullish) }, (t) => (
+                            <div className="flex flex-col gap-3">
+                              {buildCFStackInput(t.cfCreate.spec)}
+
+                              {buildCFStackOutput(t.cfCreate.output)}
+                            </div>
+                          ))
+                          .with({ cfPlan: P.not(P.nullish) }, (t) => buildCFStackInput(t.cfPlan.spec))
+                          .with({ cfScale: P.not(P.nullish) }, (t) => (
+                            <div className="grid grid-cols-2 gap-2">
+                              <NutritionFact renderWhenEmpty="-" label="Stack Name" value={t.cfScale.stackName} />
+                              <NutritionFact
+                                renderWhenEmpty="-"
+                                label="Desired Count"
+                                value={t.cfScale.desiredCount !== undefined ? <NumberFormat value={t.cfScale.desiredCount} /> : undefined}
+                              />
+                            </div>
+                          ))
+                          .with({ cfUpdate: P.not(P.nullish) }, (t) => (
+                            <div className="flex flex-col gap-3">
+                              {buildCFStackInput(t.cfUpdate.spec)}
+
+                              {buildCFStackOutput(t.cfUpdate.output)}
+                            </div>
+                          ))
+                          .with({ pgEvaluate: P.not(P.nullish) }, (t) => (
+                            <div className="grid grid-cols-2 gap-2">
+                              <NutritionFact renderWhenEmpty="-" label="Database Name" value={t.pgEvaluate.dbName} />
+                            </div>
+                          ))
+                          .with({ pgCleanup: P.not(P.nullish) }, (t) => buildPostgresSpecFacts(t.pgCleanup.spec))
+
+                          .with({ pgMigrate: P.not(P.nullish) }, (t) => (
+                            <div className="grid grid-cols-2 gap-2">
+                              <NutritionFact
+                                renderWhenEmpty="-"
+                                label="Infrastructure Output Step ID"
+                                value={t.pgMigrate.infraOutputStepId ? <UUID canCopy uuid={t.pgMigrate.infraOutputStepId} /> : undefined}
+                              />
+                              {buildPostgresSpecFacts(t.pgMigrate.spec)}
+                            </div>
+                          ))
+                          .with({ pgUpsert: P.not(P.nullish) }, (t) => (
+                            <div className="grid grid-cols-2 gap-2">
+                              <NutritionFact
+                                renderWhenEmpty="-"
+                                label="Infrastructure Output Step ID"
+                                value={t.pgUpsert.infraOutputStepId ? <UUID canCopy uuid={t.pgUpsert.infraOutputStepId} /> : undefined}
+                              />
+                              {buildPostgresSpecFacts(t.pgUpsert.spec)}
+                            </div>
+                          ))
+                          .otherwise(() => null)}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+
+                {step.output && (
+                  <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+                    <CollapsibleTrigger asChild>
+                      <button className="w-full flex items-center justify-start gap-1" type="button">
+                        <CaretDownIcon />
+                        <h4 className="text-lg">Output</h4>
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="flex flex-col gap-2 p-2">
+                        <span>{deploymentStepOutputTypeLabels[getDeploymentStepOutputType(step.output)]}</span>
+
+                        {match(step.output?.type)
+                          .with({ cfStatus: P.not(P.nullish) }, (t) => buildCFStackOutput(t.cfStatus.output))
+                          .otherwise(() => null)}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+              </div>
+            )) || '-'}
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+    )) ||
+    null
   );
 }
