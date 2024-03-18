@@ -58,8 +58,8 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
       source: {
         type: {
           gitHub: {
-            owner: '',
-            repo: data?.state?.spec?.appName || '',
+            owner: data?.state?.spec?.source?.type?.gitHub?.owner || '',
+            repo: data?.state?.spec?.source?.type?.gitHub?.repo || '',
             ref: {
               commit: data?.state?.spec?.version || '',
             },
