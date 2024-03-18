@@ -10,10 +10,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { useErrorHandler } from '@/lib/error.ts';
-import { useDeployment } from '@/data/api';
+import { useDeployment, useListEnvironments } from '@/data/api';
 import { useTriggerDeployment } from '@/data/api/mutation';
 import { Input } from '@/components/ui/input.tsx';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
+import { Combobox } from '@/components/combobox/combobox.tsx';
 
 const schema = z.object({
   environment: z.string().min(1, { message: 'Environment is required (ID or full name)' }),
@@ -52,9 +53,32 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
   const { data, error: messageError } = useDeployment(isOpen && deploymentId ? { deploymentId } : undefined);
   useErrorHandler(messageError, 'Failed to load deployment');
 
+  const {
+    data: environmentData,
+    hasNextPage: hasMoreEnvironments,
+    fetchNextPage: fetchMoreEnvironments,
+    isFetchingNextPage: isFetchingMoreEnvironments,
+  } = useListEnvironments();
+  const environmentOptions = useMemo(
+    () =>
+      (environmentData?.pages || []).reduce(
+        (accum, curr) => {
+          return [
+            ...accum,
+            ...(curr?.environments?.map((environment) => ({
+              label: environment?.config?.fullName || 'UNKNOWN ENVIRONMENT',
+              value: environment?.environmentId || '',
+            })) || []),
+          ];
+        },
+        [] as { label: string; value: string }[],
+      ),
+    [environmentData?.pages],
+  );
+
   const defaultValues = useMemo(
     () => ({
-      environment: data?.state?.spec?.environmentName || data?.state?.spec?.environmentId || '',
+      environment: data?.state?.spec?.environmentId || '',
       source: {
         type: {
           gitHub: {
@@ -123,9 +147,17 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
               name="environment"
               render={({ field }) => (
                 <FormItem className="py-2">
-                  <FormLabel>Environment Name</FormLabel>
+                  <FormLabel>Environment</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Combobox
+                      {...field}
+                      options={environmentOptions}
+                      pagination={{
+                        hasNextPage: hasMoreEnvironments,
+                        fetchNextPage: fetchMoreEnvironments,
+                        isFetchingNextPage: isFetchingMoreEnvironments,
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

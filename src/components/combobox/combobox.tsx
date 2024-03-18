@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button.tsx';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command.tsx';
+import { useIntersectionObserverAction } from '@/lib/intersection-observer.ts';
+
+interface ComboboxPagination {
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  fetchNextPage: () => Promise<any>;
+}
 
 interface ComboboxProps {
   isMulti?: boolean;
@@ -12,6 +19,7 @@ interface ComboboxProps {
   noMatchesMessage?: string;
   onChange: React.ChangeEventHandler<HTMLSelectElement>;
   options: { label: string; value: string }[];
+  pagination?: ComboboxPagination;
   placeholder?: string;
   searchPlaceholder?: string;
   value: string | string[];
@@ -23,10 +31,15 @@ export function Combobox({
   noMatchesMessage = 'No matches found.',
   onChange,
   options,
+  pagination,
   placeholder = 'Select Option',
   searchPlaceholder = 'Search options...',
   value,
 }: ComboboxProps) {
+  const { fetchNextPage, hasNextPage, isFetchingNextPage } = pagination || {};
+  const [setObservedItemRef] = useIntersectionObserverAction(fetchNextPage, {
+    disabled: !hasNextPage || isFetchingNextPage || !fetchNextPage,
+  });
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -49,9 +62,9 @@ export function Combobox({
           <CommandInput placeholder={searchPlaceholder} className="h-9" />
           <CommandEmpty>{noMatchesMessage}</CommandEmpty>
           <CommandGroup>
-            {options.map((option) => (
+            {options.map((option, i) => (
               <CommandItem
-                value={option.value}
+                value={option.label}
                 key={option.value}
                 onSelect={() => {
                   onChange({
@@ -75,6 +88,7 @@ export function Combobox({
                     setIsOpen(false);
                   }
                 }}
+                ref={i === options.length - 1 ? setObservedItemRef : undefined}
               >
                 {option.label}
                 <CheckIcon
