@@ -8,6 +8,8 @@ import { useTableState } from '@/components/data-table/state.ts';
 import { buildCodeSourceFact } from '@/pages/stack/build-facts.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
+import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
+import { RocketIcon } from '@radix-ui/react-icons';
 
 const columns: CustomColumnDef<O5DeployerV1StackState>[] = [
   getRowExpander(),
@@ -135,6 +137,7 @@ export function StackManagement() {
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
         <h1 className="text-2xl">Stack Management</h1>
+        <UpsertStackDialog activator={<RocketIcon aria-hidden />} />
       </div>
 
       <DataTable

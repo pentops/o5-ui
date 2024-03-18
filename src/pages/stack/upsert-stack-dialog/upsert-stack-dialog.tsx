@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Pencil1Icon } from '@radix-ui/react-icons';
 import { useForm } from 'react-hook-form';
+import { v4 as uuid } from 'uuid';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -30,10 +31,11 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 interface UpsertStackDialogProps {
+  activator?: React.ReactNode;
   stackId?: string;
 }
 
-export function UpsertStackDialog({ stackId }: UpsertStackDialogProps) {
+export function UpsertStackDialog({ activator = <Pencil1Icon aria-hidden />, stackId }: UpsertStackDialogProps) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const { mutateAsync, isPending, error } = useUpsertStack();
@@ -63,14 +65,16 @@ export function UpsertStackDialog({ stackId }: UpsertStackDialogProps) {
 
   async function handleEdit(values: Values) {
     try {
+      const usableStackId = stackId || uuid();
+
       await mutateAsync({
-        stackId,
+        stackId: usableStackId,
         ...values,
       });
 
       toast({
         title: 'Stack upserted',
-        description: `Stack ${stackId} has been upserted.`,
+        description: `Stack ${usableStackId} has been upserted.`,
       });
 
       setIsOpen(false);
@@ -80,9 +84,7 @@ export function UpsertStackDialog({ stackId }: UpsertStackDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Form {...form}>
-        <DialogTrigger aria-label="Upsert stack">
-          <Pencil1Icon aria-hidden />
-        </DialogTrigger>
+        <DialogTrigger aria-label="Upsert stack">{activator}</DialogTrigger>
         <DialogContent>
           <form className="w-100 overflow-auto" onSubmit={form.handleSubmit(handleEdit)}>
             <DialogHeader>

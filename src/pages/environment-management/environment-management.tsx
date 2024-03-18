@@ -9,6 +9,8 @@ import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { buildEnvironmentCustomVariables, buildEnvironmentProvider } from '@/pages/environment/build-facts.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
+import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
+import { RocketIcon } from '@radix-ui/react-icons';
 
 const columns: CustomColumnDef<O5DeployerV1EnvironmentState>[] = [
   getRowExpander(),
@@ -89,6 +91,7 @@ export function EnvironmentManagement() {
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
         <h1 className="text-2xl">Environment Management</h1>
+        <UpsertEnvironmentDialog activator={<RocketIcon aria-hidden />} />
       </div>
 
       <DataTable
