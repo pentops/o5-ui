@@ -330,8 +330,8 @@ export function DataTable<TData extends Object, TValue>({
                 );
               })
             ) : (
-              <TableRow className="flex w-full">
-                <TableCell colSpan={columns.length} className="h-24 text-center flex w-full">
+              <TableRow className="flex w-full items-center justify-center">
+                <TableCell colSpan={columns.length} className="h-24 text-center flex w-full items-center justify-center">
                   No results.
                 </TableCell>
               </TableRow>
