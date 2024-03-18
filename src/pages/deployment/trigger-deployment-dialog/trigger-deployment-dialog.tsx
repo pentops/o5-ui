@@ -18,10 +18,14 @@ import { Checkbox } from '@/components/ui/checkbox.tsx';
 const schema = z.object({
   environment: z.string().min(1, { message: 'Environment is required (ID or full name)' }),
   source: z.object({
-    github: z.object({
-      owner: z.string().min(1, { message: 'Owner is required' }),
-      repo: z.string().min(1, { message: 'Repo is required' }),
-      commit: z.string().min(1, { message: 'Commit is required' }),
+    type: z.object({
+      gitHub: z.object({
+        owner: z.string().min(1, { message: 'Owner is required' }),
+        repo: z.string().min(1, { message: 'Repo is required' }),
+        ref: z.object({
+          commit: z.string().min(1, { message: 'Commit is required' }),
+        }),
+      }),
     }),
   }),
   flags: z.object({
@@ -52,10 +56,14 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
     () => ({
       environment: data?.state?.spec?.environmentName || data?.state?.spec?.environmentId || '',
       source: {
-        github: {
-          owner: '',
-          repo: data?.state?.spec?.appName || '',
-          commit: data?.state?.spec?.version || '',
+        type: {
+          gitHub: {
+            owner: '',
+            repo: data?.state?.spec?.appName || '',
+            ref: {
+              commit: data?.state?.spec?.version || '',
+            },
+          },
         },
       },
       flags: {
@@ -86,7 +94,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
 
       toast({
         title: 'Deployment triggered',
-        description: `Deployment ${values.source.github.owner}/${values.source.github.repo}:${values.source.github.commit} has been triggered.`,
+        description: `Deployment ${values.source.type.gitHub.owner}/${values.source.type.gitHub.repo}:${values.source.type.gitHub.ref.commit} has been triggered.`,
       });
 
       setIsOpen(false);
@@ -127,7 +135,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <FormField
                 control={form.control}
-                name="source.github.owner"
+                name="source.type.gitHub.owner"
                 render={({ field }) => (
                   <FormItem className="py-2">
                     <FormLabel>GitHub Owner</FormLabel>
@@ -141,7 +149,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
 
               <FormField
                 control={form.control}
-                name="source.github.repo"
+                name="source.type.gitHub.repo"
                 render={({ field }) => (
                   <FormItem className="py-2">
                     <FormLabel>Repository</FormLabel>
@@ -156,7 +164,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
 
             <FormField
               control={form.control}
-              name="source.github.commit"
+              name="source.type.gitHub.ref.commit"
               render={({ field }) => (
                 <FormItem className="py-2">
                   <FormLabel>Commit</FormLabel>

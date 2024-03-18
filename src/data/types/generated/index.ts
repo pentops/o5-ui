@@ -174,14 +174,19 @@ export interface O5DeployerV1CloudFormationStackParameterTypeRulePriority {
 export interface O5DeployerV1CodeSourceType {
   type?: {
     // start oneOf
-    github?: O5DeployerV1CodeSourceTypeGithub;
+    gitHub?: O5DeployerV1CodeSourceTypeGitHub;
     // end oneOf
   };
 }
 
-export interface O5DeployerV1CodeSourceTypeGithub {
-  branch?: string;
+export interface O5DeployerV1CodeSourceTypeGitHub {
   owner?: string;
+  ref?: {
+    // start oneOf
+    branch?: string;
+    commit?: string;
+    // end oneOf
+  };
   repo?: string;
 }
 
@@ -260,6 +265,7 @@ export interface O5DeployerV1DeploymentSpec {
   flags?: O5DeployerV1DeploymentFlags;
   parameters?: O5DeployerV1CloudFormationStackParameter[];
   snsTopics?: string[];
+  source?: O5DeployerV1CodeSourceType;
   templateUrl?: string;
   version?: string;
 }
@@ -508,12 +514,6 @@ export enum O5DeployerV1StepStatus {
   Failed = 'FAILED',
 }
 
-export interface O5DeployerV1TriggerDeploymentRequestGithubSource {
-  commit: string;
-  owner: string;
-  repo: string;
-}
-
 export interface O5EnvironmentV1AWS {
   ecsClusterName?: string;
   ecsRepo?: string;
@@ -710,59 +710,6 @@ export interface O5DanteV1RejectDeadMessageRequest {
   messageId?: string;
 }
 
-export interface O5DeployerV1TriggerDeploymentResponse {
-  // format: uuid
-  deploymentId?: string;
-  // format: uuid
-  environmentId?: string;
-  environmentName?: string;
-}
-
-export interface O5DeployerV1TriggerDeploymentRequest {
-  environment?: string;
-  flags?: O5DeployerV1DeploymentFlags;
-  source?: {
-    // start oneOf
-    github?: O5DeployerV1TriggerDeploymentRequestGithubSource;
-    // end oneOf
-  };
-  // format: uuid
-  deploymentId?: string;
-}
-
-export interface O5DeployerV1TerminateDeploymentResponse {}
-
-export interface O5DeployerV1TerminateDeploymentRequest {
-  // format: uuid
-  deploymentId?: string;
-}
-
-export interface O5DeployerV1UpsertEnvironmentResponse {
-  state: O5DeployerV1EnvironmentState;
-}
-
-export interface O5DeployerV1UpsertEnvironmentRequest {
-  src?: {
-    // start oneOf
-    config?: O5EnvironmentV1Environment;
-    // format: byte
-    configJson?: string;
-    // format: byte
-    configYaml?: string;
-    // end oneOf
-  };
-  environmentId?: string;
-}
-
-export interface O5DeployerV1UpsertStackResponse {
-  state: O5DeployerV1StackState;
-}
-
-export interface O5DeployerV1UpsertStackRequest {
-  config: O5DeployerV1StackConfig;
-  stackId?: string;
-}
-
 export interface O5DeployerV1GetDeploymentResponse {
   events?: O5DeployerV1DeploymentEvent[];
   state?: O5DeployerV1DeploymentState;
@@ -851,4 +798,53 @@ export interface O5DeployerV1ListEnvironmentEventsRequest {
   page?: PsmListV1PageRequest;
   query?: PsmListV1QueryRequest;
   environmentId?: string;
+}
+
+export interface O5DeployerV1TriggerDeploymentResponse {
+  // format: uuid
+  deploymentId?: string;
+  // format: uuid
+  environmentId?: string;
+  environmentName?: string;
+}
+
+export interface O5DeployerV1TriggerDeploymentRequest {
+  environment?: string;
+  flags?: O5DeployerV1DeploymentFlags;
+  source?: O5DeployerV1CodeSourceType;
+  // format: uuid
+  deploymentId?: string;
+}
+
+export interface O5DeployerV1TerminateDeploymentResponse {}
+
+export interface O5DeployerV1TerminateDeploymentRequest {
+  // format: uuid
+  deploymentId?: string;
+}
+
+export interface O5DeployerV1UpsertEnvironmentResponse {
+  state: O5DeployerV1EnvironmentState;
+}
+
+export interface O5DeployerV1UpsertEnvironmentRequest {
+  src?: {
+    // start oneOf
+    config?: O5EnvironmentV1Environment;
+    // format: byte
+    configJson?: string;
+    // format: byte
+    configYaml?: string;
+    // end oneOf
+  };
+  environmentId?: string;
+}
+
+export interface O5DeployerV1UpsertStackResponse {
+  state: O5DeployerV1StackState;
+}
+
+export interface O5DeployerV1UpsertStackRequest {
+  config: O5DeployerV1StackConfig;
+  stackId?: string;
 }

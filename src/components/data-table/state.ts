@@ -69,17 +69,31 @@ function mapTableFiltersToPSM(filters: Record<string, TableFilterValueType>): Fi
       inclusion: 'and',
       type: {
         filters: Object.entries(filters).reduce<FilterValue[]>((accum, [k, v]) => {
+          const tzOffset = new Date().getTimezoneOffset() * 60000;
+
           const valueType = match(v)
             .with({ date: P.not(P.nullish) }, (dv) => {
               if (dv.date.start || dv.date.end) {
                 const range: RangeFilter = {};
 
                 if (dv.date.start) {
-                  range.min = dv.date.start.toString();
+                  if (dv.date.start.includes('T')) {
+                    range.min = dv.date.start.toString();
+                  } else {
+                    const rawDate = new Date(dv.date.start);
+                    const start = startOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
+                    range.min = start.toString();
+                  }
                 }
 
                 if (dv.date.end) {
-                  range.max = dv.date.end.toString();
+                  if (dv.date.end.includes('T')) {
+                    range.max = dv.date.end.toString();
+                  } else {
+                    const rawDate = new Date(dv.date.end);
+                    const end = endOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
+                    range.max = end.toString();
+                  }
                 }
 
                 return { range };
@@ -90,7 +104,6 @@ function mapTableFiltersToPSM(filters: Record<string, TableFilterValueType>): Fi
                 // target date to the end of the target date.
                 if (!dv.date.exact.includes('T')) {
                   try {
-                    const tzOffset = new Date().getTimezoneOffset() * 60000;
                     const rawDate = new Date(dv.date.exact);
                     const start = startOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
                     const end = endOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
@@ -130,13 +143,35 @@ function mapTableFiltersToPSM(filters: Record<string, TableFilterValueType>): Fi
   ];
 }
 
+// function buildInitialState(
+//   searchString: string | undefined,
+//   initialFilters: Record<string, TableFilterValueType> | undefined,
+//   initialSearch: SearchState | undefined,
+//   initialSort: SortingState | undefined,
+// ) {
+//   const fromSearchString = searchString ? qs.parse(searchString) : {};
+//
+//   return {
+//     initialFilters: { ...(fromSearchString as any)?.filter, ...initialFilters } as Record<string, TableFilterValueType>,
+//     initialSearch: (initialSearch || fromSearchString?.search) as SearchState,
+//     initialSort: (initialSort || fromSearchString?.sort) as SortingState,
+//   };
+// }
+
 export interface TableStateOptions extends Omit<PSMTableStateOptions, 'initialFilters'> {
   initialFilters?: Record<string, TableFilterValueType>;
   searchFields?: string[];
 }
 
 export function useTableState(options?: TableStateOptions) {
+  // const [searchParams, setSearchParams] = useSearchParams();
   const { initialFilters, initialSearch, initialSort, onFilter, onSearch, onSort, searchFields } = options || {};
+  // const { initialFilters, initialSearch, initialSort } = buildInitialState(
+  //   searchParams.toString(),
+  //   options?.initialFilters,
+  //   options?.initialSearch,
+  //   options?.initialSort,
+  // );
   const [basicFilters, setBasicFilters] = useState<Record<string, TableFilterValueType>>(initialFilters || {});
   // Only using one search field for the time being
   const [singleSearchValue, setSingleSearchValue] = useState('');
@@ -172,6 +207,11 @@ export function useTableState(options?: TableStateOptions) {
     },
     [setFilterValues, basicFilters],
   );
+
+  // useEffect(() => {
+  //   setSearchParams(qs.stringify({ sort: sortValues, filter: basicFilters, search: singleSearchValue || undefined }));
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [sortValues, basicFilters, singleSearchValue]);
 
   return {
     filterValues: basicFilters,

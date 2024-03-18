@@ -18,10 +18,12 @@ const schema = z.object({
   config: z.object({
     codeSource: z.object({
       type: z.object({
-        github: z.object({
+        gitHub: z.object({
           owner: z.string(),
           repo: z.string(),
-          branch: z.string(),
+          ref: z.object({
+            branch: z.string(),
+          }),
         }),
       }),
     }),
@@ -49,10 +51,10 @@ export function UpsertStackDialog({ activator = <Pencil1Icon aria-hidden />, sta
         ...data?.state?.config,
         codeSource: {
           type: {
-            github: {
-              owner: data?.state?.config?.codeSource?.type?.github?.owner,
-              repo: data?.state?.config?.codeSource?.type?.github?.repo,
-              branch: data?.state?.config?.codeSource?.type?.github?.branch,
+            gitHub: {
+              owner: data?.state?.config?.codeSource?.type?.gitHub?.owner,
+              repo: data?.state?.config?.codeSource?.type?.gitHub?.repo,
+              branch: data?.state?.config?.codeSource?.type?.gitHub?.ref?.branch,
             },
           },
         },
@@ -93,7 +95,7 @@ export function UpsertStackDialog({ activator = <Pencil1Icon aria-hidden />, sta
 
             <FormField
               control={form.control}
-              name="config.codeSource.type.github.owner"
+              name="config.codeSource.type.gitHub.owner"
               render={({ field }) => (
                 <FormItem className="py-2">
                   <FormLabel>GitHub Owner</FormLabel>
@@ -107,7 +109,7 @@ export function UpsertStackDialog({ activator = <Pencil1Icon aria-hidden />, sta
 
             <FormField
               control={form.control}
-              name="config.codeSource.type.github.repo"
+              name="config.codeSource.type.gitHub.repo"
               render={({ field }) => (
                 <FormItem className="py-2">
                   <FormLabel>GitHub Repository</FormLabel>
@@ -121,7 +123,7 @@ export function UpsertStackDialog({ activator = <Pencil1Icon aria-hidden />, sta
 
             <FormField
               control={form.control}
-              name="config.codeSource.type.github.branch"
+              name="config.codeSource.type.gitHub.ref.branch"
               render={({ field }) => (
                 <FormItem className="py-2">
                   <FormLabel>Branch</FormLabel>
