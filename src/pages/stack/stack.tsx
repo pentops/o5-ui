@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getStackEventType, O5DeployerV1StackEvent, stackEventTypeLabels, stackStatusLabels } from '@/data/types';
-import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
+import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
