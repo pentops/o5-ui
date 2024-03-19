@@ -160,12 +160,13 @@ function mapTableFiltersToPSM(filters: Record<string, TableFilterValueType>): Fi
 
 export interface TableStateOptions extends Omit<PSMTableStateOptions, 'initialFilters'> {
   initialFilters?: Record<string, TableFilterValueType>;
-  searchFields?: string[];
+  initialSearchFields?: string[];
 }
 
 export function useTableState(options?: TableStateOptions) {
   // const [searchParams, setSearchParams] = useSearchParams();
-  const { initialFilters, initialSearch, initialSort, onFilter, onSearch, onSort, searchFields } = options || {};
+  const { initialFilters, initialSearch, initialSort, onFilter, onSearch, onSort, initialSearchFields } = options || {};
+  const [searchFields, setSearchFields] = useState<string[]>(initialSearchFields || []);
   // const { initialFilters, initialSearch, initialSort } = buildInitialState(
   //   searchParams.toString(),
   //   options?.initialFilters,
@@ -184,18 +185,19 @@ export function useTableState(options?: TableStateOptions) {
     onSort,
   });
 
-  const handleSetSearchValue = useCallback(
-    (value: string) => {
-      setSingleSearchValue(value);
+  const handleSetSearchValue: OnChangeFn<string> = useCallback(
+    (updater: Updater<string>) => {
+      const newValue = typeof updater === 'function' ? updater(singleSearchValue) : updater;
+      setSingleSearchValue(newValue);
 
       setSearchValue(
         searchFields?.map((field) => ({
           id: field,
-          value,
+          value: newValue,
         })) || [],
       );
     },
-    [searchFields, setSearchValue],
+    [searchFields, setSearchValue, singleSearchValue],
   );
 
   const handleSetFilterValues: OnChangeFn<Record<string, TableFilterValueType>> = useCallback(
@@ -220,6 +222,8 @@ export function useTableState(options?: TableStateOptions) {
     setSortValues,
     searchValue: singleSearchValue,
     setSearchValue: handleSetSearchValue,
+    searchFields,
+    setSearchFields,
     psmQuery,
   } as const;
 }

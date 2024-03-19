@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
+import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { deadMessageStatusLabels, O5DanteV1DeadMessageState } from '@/data/types';
 import { useListMessages } from '@/data/api';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
@@ -12,6 +12,7 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { formatJSONString } from '@/lib/json.ts';
 import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { buildDeadMessageProblemFacts } from '@/pages/dead-letter/build-facts.tsx';
+import { TableRowType } from '@/components/data-table/body.tsx';
 
 const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   getRowExpander(),
@@ -125,7 +126,7 @@ const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   },
 ];
 
-function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageState>) {
+function renderSubRow({ row }: TableRowType<O5DanteV1DeadMessageState>) {
   return (
     <div className="flex flex-col gap-4">
       {buildDeadMessageProblemFacts(row.original.currentSpec?.problem)}

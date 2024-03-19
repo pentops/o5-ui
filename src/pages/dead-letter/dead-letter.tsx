@@ -7,7 +7,7 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
-import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
+import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { deadMessageEventTypeLabels, deadMessageStatusLabels, getDeadMessageEventType, O5DanteV1DeadMessageEvent } from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { DeadMessageProblem, deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui/dante.ts';
@@ -17,6 +17,7 @@ import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { formatJSONString } from '@/lib/json.ts';
 import { useTableState } from '@/components/data-table/state.ts';
 import { buildDeadMessageProblemFacts } from './build-facts';
+import { TableRowType } from '@/components/data-table/body.tsx';
 
 const eventColumns: CustomColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
   getRowExpander(),
@@ -72,7 +73,7 @@ const eventColumns: CustomColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
   },
 ];
 
-function renderSubRow({ row }: TableRow<O5DanteV1DeadMessageEvent>) {
+function renderSubRow({ row }: TableRowType<O5DanteV1DeadMessageEvent>) {
   const problemType = getDeadMessageProblem(row.original.event?.type?.created?.spec);
 
   return (

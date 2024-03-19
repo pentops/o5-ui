@@ -16,12 +16,13 @@ import { SelectFilter } from '@/components/data-table/filter/select-filter.tsx';
 
 interface TableFilterProps extends TableFilterType {
   id: string;
+  initialValue: TableFilterValueType | undefined;
   onChange: OnChangeFn<Record<string, TableFilterValueType>>;
   onClose: () => void;
 }
 
-export function TableFilter({ id, onChange, onClose, type }: TableFilterProps) {
-  const [prospectiveValue, setProspectiveValue] = useState<TableFilterValueType | undefined>();
+export const TableFilter = React.memo(({ id, initialValue, onChange, onClose, type }: TableFilterProps) => {
+  const [prospectiveValue, setProspectiveValue] = useState<TableFilterValueType | undefined>(initialValue);
 
   return (
     <div className="flex flex-col gap-2">
@@ -83,4 +84,4 @@ export function TableFilter({ id, onChange, onClose, type }: TableFilterProps) {
       </div>
     </div>
   );
-}
+});

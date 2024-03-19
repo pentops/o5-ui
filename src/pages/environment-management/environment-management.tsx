@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useListEnvironments } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { O5DeployerV1EnvironmentState } from '@/data/types';
-import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
+import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { environmentStatusLabels } from '@/data/types/ui/environment.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
@@ -11,6 +11,7 @@ import { useTableState } from '@/components/data-table/state.ts';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
 import { RocketIcon } from '@radix-ui/react-icons';
+import { TableRowType } from '@/components/data-table/body.tsx';
 
 const columns: CustomColumnDef<O5DeployerV1EnvironmentState>[] = [
   getRowExpander(),
@@ -52,7 +53,7 @@ const columns: CustomColumnDef<O5DeployerV1EnvironmentState>[] = [
   },
 ];
 
-function renderSubRow({ row }: TableRow<O5DeployerV1EnvironmentState>) {
+function renderSubRow({ row }: TableRowType<O5DeployerV1EnvironmentState>) {
   return (
     <div className="flex flex-col gap-4">
       <NutritionFact vertical label="Full Name" value={row.original.config?.fullName} />

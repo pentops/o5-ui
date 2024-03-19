@@ -5,7 +5,7 @@ import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
-import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
+import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { environmentEventTypeLabels, environmentStatusLabels, getEnvironmentEventType, O5DeployerV1EnvironmentEvent } from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
@@ -16,6 +16,7 @@ import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-
 import { useTableState } from '@/components/data-table/state.ts';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
 import { CaretDownIcon } from '@radix-ui/react-icons';
+import { TableRowType } from '@/components/data-table/body.tsx';
 
 const eventColumns: CustomColumnDef<O5DeployerV1EnvironmentEvent>[] = [
   getRowExpander(),
@@ -71,7 +72,7 @@ const eventColumns: CustomColumnDef<O5DeployerV1EnvironmentEvent>[] = [
   },
 ];
 
-function renderSubRow({ row }: TableRow<O5DeployerV1EnvironmentEvent>) {
+function renderSubRow({ row }: TableRowType<O5DeployerV1EnvironmentEvent>) {
   return (
     <div className="flex flex-col gap-4">
       <NutritionFact vertical label="Actor" value="-" />

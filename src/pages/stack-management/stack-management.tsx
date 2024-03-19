@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useListStacks } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { O5DeployerV1StackState, stackStatusLabels } from '@/data/types';
-import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
+import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 import { buildCodeSourceFact } from '@/pages/stack/build-facts.tsx';
@@ -10,6 +10,7 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 import { RocketIcon } from '@radix-ui/react-icons';
+import { TableRowType } from '@/components/data-table/body.tsx';
 
 const columns: CustomColumnDef<O5DeployerV1StackState>[] = [
   getRowExpander(),
@@ -96,7 +97,7 @@ const columns: CustomColumnDef<O5DeployerV1StackState>[] = [
   },
 ];
 
-function renderSubRow({ row }: TableRow<O5DeployerV1StackState>) {
+function renderSubRow({ row }: TableRowType<O5DeployerV1StackState>) {
   return (
     <div className="flex flex-col gap-4">
       <NutritionFact

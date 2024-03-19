@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useListDeployments } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { O5DeployerV1DeploymentState, O5DeployerV1DeploymentStatus } from '@/data/types';
-import { CustomColumnDef, DataTable, TableRow } from '@/components/data-table/data-table.tsx';
+import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { deploymentStatusLabels } from '@/data/types/ui/deployer.ts';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
@@ -12,6 +12,7 @@ import { ConfirmTerminateDeploymentAlert } from '@/pages/deployment/confirm-term
 import { buildDeploymentSpecFacts, buildDeploymentStepFacts } from '@/pages/deployment/build-facts.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
+import { TableRowType } from '@/components/data-table/body.tsx';
 
 const columns: CustomColumnDef<O5DeployerV1DeploymentState>[] = [
   getRowExpander(),
@@ -139,7 +140,14 @@ const columns: CustomColumnDef<O5DeployerV1DeploymentState>[] = [
   },
 ];
 
-function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentState>) {
+const searchableFields = [
+  { value: 'spec.appName', label: 'App' },
+  { value: 'spec.environmentName', label: 'Environment' },
+  { value: 'spec.version', label: 'Version' },
+  { value: 'spec.templateUrl', label: 'Template URL' },
+];
+
+function renderSubRow({ row }: TableRowType<O5DeployerV1DeploymentState>) {
   return (
     <div className="flex flex-col gap-4">
       {buildDeploymentSpecFacts(row.original.spec)}
@@ -149,7 +157,8 @@ function renderSubRow({ row }: TableRow<O5DeployerV1DeploymentState>) {
 }
 
 function DeploymentManagement() {
-  const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
+    useTableState();
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListDeployments({ query: psmQuery });
   useErrorHandler(error, 'Failed to load deployments');
   const flatData = useMemo(() => {
@@ -181,8 +190,13 @@ function DeploymentManagement() {
         filterValues={filterValues}
         onColumnSort={setSortValues}
         onFilter={setFilterValues}
+        onSearch={setSearchValue}
+        onSearchFieldChange={setSearchFields}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         renderSubComponent={renderSubRow}
+        searchValue={searchValue}
+        searchFields={searchableFields}
+        searchFieldSelections={searchFields}
         showSkeleton={Boolean(data === undefined || isLoading || error)}
       />
     </div>

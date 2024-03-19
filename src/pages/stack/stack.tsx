@@ -14,6 +14,7 @@ import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 import { buildCodeSourceFact } from '@/pages/stack/build-facts.tsx';
+import { TableRowType } from '@/components/data-table/body.tsx';
 
 const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
   getRowExpander(),
@@ -73,7 +74,7 @@ const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
   },
 ];
 
-function renderSubRow({ row }: TableRow<O5DeployerV1StackEvent>) {
+function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
   return (
     <div className="flex flex-col gap-4">
       <NutritionFact label="Actor" value="-" />

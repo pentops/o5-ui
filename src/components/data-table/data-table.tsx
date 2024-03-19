@@ -1,33 +1,27 @@
 'use client';
 
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { TriangleUpIcon, TriangleDownIcon, CaretSortIcon, MixerVerticalIcon } from '@radix-ui/react-icons';
+import React, { useLayoutEffect, useMemo, useRef } from 'react';
 import {
   ColumnDef,
-  flexRender,
   getCoreRowModel,
   Header,
+  HeaderGroup,
   OnChangeFn,
   Row,
   RowSelectionState,
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { useIntersectionObserverAction } from '@/lib/intersection-observer.ts';
 import { TableFilter as TableFilterType, TableFilterValueType } from '@/components/data-table/state.ts';
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
-import { TableFilter } from './filter/table-filter';
-import { cn } from '@/lib/utils.ts';
+import { DataTableHeader } from '@/components/data-table/header.tsx';
+import { getSafeColumnId } from '@/components/data-table/util.ts';
+import { DataTableSearch } from '@/components/data-table/search.tsx';
+import { DataTableBody, TableRowType } from '@/components/data-table/body.tsx';
 
 const LOADING_ROWS = 20;
-
-export type TableRow<T> = { row: Row<T> };
-
-function getSafeColumnId(id: string) {
-  return id.replace(/[^a-zA-Z0-9]/g, '');
-}
 
 function allRowsCanExpand() {
   return true;
@@ -133,9 +127,14 @@ interface DataTableProps<TData extends Object, TValue> {
   onColumnSort?: OnChangeFn<SortingState>;
   onFilter?: OnChangeFn<Record<string, TableFilterValueType>>;
   onRowSelect?: OnChangeFn<RowSelectionState>;
+  onSearch?: OnChangeFn<string>;
+  onSearchFieldChange?: (fields: string[]) => void;
   pagination?: TablePagination;
-  renderSubComponent?: (props: TableRow<TData>) => React.ReactElement;
+  renderSubComponent?: (props: TableRowType<TData>) => React.ReactElement;
   rowSelections?: RowSelectionState;
+  searchFields?: { value: string; label: string }[];
+  searchFieldSelections?: string[];
+  searchValue?: string;
   showSkeleton?: boolean;
 }
 
@@ -148,9 +147,14 @@ export function DataTable<TData extends Object, TValue>({
   onColumnSort,
   onFilter,
   onRowSelect,
+  onSearch,
+  onSearchFieldChange,
   pagination,
   renderSubComponent,
   rowSelections,
+  searchFields,
+  searchFieldSelections,
+  searchValue,
   showSkeleton,
 }: DataTableProps<TData, TValue>) {
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -193,150 +197,25 @@ export function DataTable<TData extends Object, TValue>({
   }, []);
 
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col">
+      {onSearch && (
+        <DataTableSearch
+          fields={searchFields}
+          fieldSelections={searchFieldSelections}
+          onSearch={onSearch}
+          onSearchFieldChange={onSearchFieldChange}
+          searchValue={searchValue || ''}
+        />
+      )}
+
       <div className="rounded-md border overflow-x-auto relative scrollbars" ref={tableContainerRef}>
         <Table className="relative block" style={styleVariables}>
-          <TableHeader
-            className="sticky top-0 left-0 block z-10"
-            style={{ top: 'var(--o5ui-table-header-top-offset, 0)', background: 'hsl(var(--background))' }}
-          >
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow className="flex flex-nowrap" key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  // eslint-disable-next-line react-hooks/rules-of-hooks
-                  const [isOpen, setIsOpen] = useState(false);
-                  const customColumnDef = header.column.columnDef as CustomColumnDef<TData, TValue>;
-                  const canSort = header.column.getCanSort();
-                  const filter = customColumnDef.filter;
-                  const sort = header.column.getIsSorted();
-                  const content = header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext());
-                  const hasFilter = header.column?.columnDef?.id && filter && onFilter;
-                  const hasFilterValue = filterValues?.[header.column.columnDef.id!];
-                  const id = getSafeColumnId(header.column.columnDef.id || header.id);
-
-                  const base = (
-                    <TableHead
-                      aria-sort={canSort ? (sort ? (sort === 'desc' ? 'descending' : 'ascending') : 'none') : undefined}
-                      className="flex gap-2 items-center flex-nowrap"
-                      style={{
-                        flex: `var(--o5ui-table-column-${id}-size)`,
-                        maxWidth: `var(--o5ui-table-column-${id}-max-size)`,
-                        minWidth: `var(--o5ui-table-column-${id}-min-size)`,
-                      }}
-                      key={id}
-                    >
-                      <div
-                        className={cn(
-                          'flex gap-2 items-center flex-nowrap flex-1',
-                          customColumnDef.align === 'right' && 'justify-end',
-                          customColumnDef.align === 'center' && 'justify-center',
-                          customColumnDef.align === 'left' && 'justify-start',
-                        )}
-                      >
-                        {canSort ? (
-                          <button
-                            aria-label="Toggle sort order"
-                            className="flex gap-1 items-center flex-nowrap"
-                            onClick={header.column.getToggleSortingHandler()}
-                            type="button"
-                          >
-                            {sort === false ? <CaretSortIcon /> : sort === 'asc' ? <TriangleUpIcon /> : <TriangleDownIcon />}
-                            {content}
-                          </button>
-                        ) : (
-                          content
-                        )}
-
-                        {hasFilter && (
-                          <PopoverTrigger asChild>
-                            <button aria-label="Apply filter" className="flex gap-1 items-center" type="button">
-                              <MixerVerticalIcon className={cn(hasFilterValue && 'text-sky-400')} width={12} />
-                            </button>
-                          </PopoverTrigger>
-                        )}
-                      </div>
-                    </TableHead>
-                  );
-
-                  return hasFilter ? (
-                    <Popover key={header.id} open={isOpen} onOpenChange={setIsOpen}>
-                      <PopoverAnchor asChild>{base}</PopoverAnchor>
-                      <PopoverContent
-                        className="w-auto p-4 border bg-background shadow-lg"
-                        style={{ width: 'var(--radix-popper-anchor-width)', minWidth: 250 }}
-                      >
-                        <TableFilter
-                          id={header.column.columnDef.id!}
-                          onChange={onFilter}
-                          onClose={() => {
-                            setIsOpen(false);
-                          }}
-                          {...filter}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  ) : (
-                    base
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody className="block">
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => {
-                const isExpanded = row.getIsExpanded();
-
-                return (
-                  <React.Fragment key={row.id}>
-                    <TableRow data-state={row.getIsSelected() && 'selected'} className={cn('flex flex-nowrap', isExpanded && 'border-0')}>
-                      {row.getVisibleCells().map((cell) => {
-                        const customColumnDef = cell.column.columnDef as CustomColumnDef<TData, TValue>;
-                        const id = getSafeColumnId(cell.column.columnDef.id || cell.column.id || cell.id);
-
-                        return (
-                          <TableCell
-                            className="flex flex-nowrap"
-                            style={{
-                              flex: `var(--o5ui-table-column-${id}-size)`,
-                              maxWidth: `var(--o5ui-table-column-${id}-max-size)`,
-                              minWidth: `var(--o5ui-table-column-${id}-min-size)`,
-                            }}
-                            key={cell.id}
-                          >
-                            <div
-                              className={cn(
-                                'flex gap-2 items-center flex-nowrap flex-1 whitespace-pre-wrap break-all',
-                                customColumnDef.className,
-                                customColumnDef.align === 'right' && 'justify-end',
-                                customColumnDef.align === 'center' && 'justify-center',
-                                customColumnDef.align === 'left' && 'justify-start',
-                              )}
-                            >
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </div>
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                    {renderSubComponent && isExpanded && (
-                      <TableRow data-state="expanded" className="flex flex-nowrap w-full">
-                        <TableCell className="flex w-full px-3" colSpan={columns.length}>
-                          <div className="w-full">{renderSubComponent({ row })}</div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
-                );
-              })
-            ) : (
-              <TableRow className="flex w-full items-center justify-center">
-                <TableCell colSpan={columns.length} className="h-24 text-center flex w-full items-center justify-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+          <DataTableHeader filterValues={filterValues} headerGroups={table.getHeaderGroups() as HeaderGroup<any>[]} onFilter={onFilter} />
+          <DataTableBody
+            columnCount={columns.length}
+            rows={table.getRowModel().rows as Row<TData>[]}
+            renderSubComponent={renderSubComponent as any}
+          />
           <tfoot className="flex w-full" ref={setObservedItemRef} />
         </Table>
       </div>
