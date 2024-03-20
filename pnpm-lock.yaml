@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.3.4
     version: 3.3.4(react-hook-form@7.51.1)
   '@pentops/jsonapi-request':
-    specifier: ^0.0.2
-    version: 0.0.2(uuid@9.0.1)
+    specifier: ^0.0.3
+    version: 0.0.3(uuid@9.0.1)
   '@pentops/react-table-state-psm':
     specifier: ^0.0.3
     version: 0.0.3(react-dom@18.2.0)(react@18.2.0)
@@ -123,7 +123,7 @@ dependencies:
 devDependencies:
   '@pentops/jsonapi-jdef-ts-generator':
     specifier: ^0.0.2
-    version: 0.0.2(@pentops/jsonapi-request@0.0.2)
+    version: 0.0.2(@pentops/jsonapi-request@0.0.3)
   '@types/node':
     specifier: ^20.11.30
     version: 20.11.30
@@ -799,20 +799,20 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  /@pentops/jsonapi-jdef-ts-generator@0.0.2(@pentops/jsonapi-request@0.0.2):
+  /@pentops/jsonapi-jdef-ts-generator@0.0.2(@pentops/jsonapi-request@0.0.3):
     resolution: {integrity: sha512-gArJkqrEJFl5ak7g4J017f2hRe6tqP9bva7Wek9QkzPqkfRocmW37uovTlHElHx/SDHeNENPltIufqfq5LIukg==}
     hasBin: true
     peerDependencies:
       '@pentops/jsonapi-request': ^0.0.1
     dependencies:
-      '@pentops/jsonapi-request': 0.0.2(uuid@9.0.1)
+      '@pentops/jsonapi-request': 0.0.3(uuid@9.0.1)
       change-case: 5.4.2
       find-up: 7.0.0
       typescript: 5.4.2
     dev: true
 
-  /@pentops/jsonapi-request@0.0.2(uuid@9.0.1):
-    resolution: {integrity: sha512-i8xrwdPa1X0qheX2yBPOmEFAi1nHd3nknUboiNIr8kqiIjrksEL+dQsHXXlCBYr7DR4jcV7Gq8KufRaDB6c4Hw==}
+  /@pentops/jsonapi-request@0.0.3(uuid@9.0.1):
+    resolution: {integrity: sha512-q3brbIsDDnviQsAJSEBKoYjFwSkyvOW4bPN4mua26gSP+sgKwvq/4MdE9XhHrNn+Epij+tmkOQSIzmS8wvCGMg==}
     peerDependencies:
       uuid: ^9.0.1
     peerDependenciesMeta:
