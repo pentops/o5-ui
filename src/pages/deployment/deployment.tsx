@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import {
+  DeploymentEventType,
   deploymentEventTypeLabels,
   deploymentStepOutputTypeLabels,
   deploymentStepStatusLabels,
@@ -50,6 +51,14 @@ const eventColumns: CustomColumnDef<O5DeployerV1DeploymentEvent>[] = [
     accessorFn: (row) => {
       const type = getDeploymentEventType(row);
       return row.event ? deploymentEventTypeLabels[type] : '';
+    },
+    filter: {
+      type: {
+        select: {
+          isMultiple: true,
+          options: Object.values(DeploymentEventType).map((value) => ({ label: deploymentEventTypeLabels[value], value })),
+        },
+      },
     },
   },
   {

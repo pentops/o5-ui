@@ -5,10 +5,11 @@ import React from 'react';
 import { match, P } from 'ts-pattern';
 import { GitHubLogoIcon } from '@radix-ui/react-icons';
 
-export function buildCodeSourceFact(codeSource: O5DeployerV1CodeSourceType | undefined) {
+export function buildCodeSourceFact(codeSource: O5DeployerV1CodeSourceType | undefined, isLoading?: boolean) {
   return (
     <NutritionFact
       label="Code Source"
+      isLoading={isLoading}
       renderWhenEmpty="-"
       value={match(codeSource?.type)
         .with({ gitHub: P.not(P.nullish) }, (t) => {

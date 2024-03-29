@@ -7,7 +7,7 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
-import { getStackEventType, O5DeployerV1StackEvent, stackEventTypeLabels, stackStatusLabels } from '@/data/types';
+import { getStackEventType, O5DeployerV1StackEvent, StackEventType, stackEventTypeLabels, stackStatusLabels } from '@/data/types';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
@@ -39,6 +39,14 @@ const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
     accessorFn: (row) => {
       const type = getStackEventType(row);
       return row.event ? stackEventTypeLabels[type] : '';
+    },
+    filter: {
+      type: {
+        select: {
+          isMultiple: true,
+          options: Object.values(StackEventType).map((value) => ({ label: stackEventTypeLabels[value], value })),
+        },
+      },
     },
   },
   {
@@ -231,7 +239,7 @@ export function Stack() {
               }
             />
 
-            {buildCodeSourceFact(data?.state?.config?.codeSource)}
+            {buildCodeSourceFact(data?.state?.config?.codeSource, isLoading)}
 
             <NutritionFact
               isLoading={isLoading}

@@ -7,8 +7,8 @@ export const environmentStatusLabels: Record<O5DeployerV1EnvironmentStatus, stri
 };
 
 export enum EnvironmentEventType {
-  Unspecified = 'UNSPECIFIED',
-  Configured = 'CONFIGURED',
+  Unspecified = 'unspecified',
+  Configured = 'configured',
 }
 
 export function getEnvironmentEventType(event: O5DeployerV1EnvironmentEventType | undefined): EnvironmentEventType {

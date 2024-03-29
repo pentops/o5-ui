@@ -21,17 +21,17 @@ export const deploymentStatusLabels: Record<O5DeployerV1DeploymentStatus, string
 };
 
 export enum DeploymentEventType {
-  Unspecified = 'UNSPECIFIED',
-  Created = 'CREATED',
-  Done = 'DONE',
-  Error = 'ERROR',
-  RunSteps = 'RUN_STEPS',
-  StackAvailable = 'STACK_AVAILABLE',
-  StackWait = 'STACK_WAIT',
-  StackWaitFailure = 'STACK_WAIT_FAILURE',
-  StepResult = 'STEP_RESULT',
-  Terminated = 'TERMINATED',
-  Triggered = 'TRIGGERED',
+  Unspecified = 'unspecified',
+  Created = 'created',
+  Done = 'done',
+  Error = 'error',
+  RunSteps = 'runSteps',
+  StackAvailable = 'stackAvailable',
+  StackWait = 'stackWait',
+  StackWaitFailure = 'stackWaitFailure',
+  StepResult = 'stepResult',
+  Terminated = 'terminated',
+  Triggered = 'triggered',
 }
 
 export const deploymentEventTypeLabels: Record<DeploymentEventType, string> = {

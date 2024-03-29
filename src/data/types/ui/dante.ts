@@ -35,11 +35,11 @@ export const urgencyLabels: Record<O5DanteV1Urgency, string> = {
 
 // ui-only enum to help with rendering dead message event type names from oneOf
 export enum DeadMessageEventType {
-  Unspecified = 'DEAD_MESSAGE_EVENT_TYPE_UNSPECIFIED',
-  Created = 'DEAD_MESSAGE_EVENT_TYPE_CREATED',
-  Updated = 'DEAD_MESSAGE_EVENT_TYPE_UPDATED',
-  Replayed = 'DEAD_MESSAGE_EVENT_TYPE_REPLAYED',
-  Rejected = 'DEAD_MESSAGE_EVENT_TYPE_REJECTED',
+  Unspecified = 'unspecified',
+  Created = 'created',
+  Updated = 'updated',
+  Replayed = 'replayed',
+  Rejected = 'rejected',
 }
 
 export function getDeadMessageEventType(event: O5DanteV1DeadMessageEventType | undefined): DeadMessageEventType {

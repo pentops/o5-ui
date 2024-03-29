@@ -6,7 +6,13 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
-import { environmentEventTypeLabels, environmentStatusLabels, getEnvironmentEventType, O5DeployerV1EnvironmentEvent } from '@/data/types';
+import {
+  EnvironmentEventType,
+  environmentEventTypeLabels,
+  environmentStatusLabels,
+  getEnvironmentEventType,
+  O5DeployerV1EnvironmentEvent,
+} from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
@@ -38,6 +44,14 @@ const eventColumns: CustomColumnDef<O5DeployerV1EnvironmentEvent>[] = [
     minSize: 100,
     maxSize: 150,
     accessorFn: (row) => environmentEventTypeLabels[getEnvironmentEventType(row.event)],
+    filter: {
+      type: {
+        select: {
+          isMultiple: true,
+          options: Object.values(EnvironmentEventType).map((value) => ({ label: environmentEventTypeLabels[value], value })),
+        },
+      },
+    },
   },
   {
     header: 'Timestamp',

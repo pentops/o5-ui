@@ -2,12 +2,12 @@ import { match, P } from 'ts-pattern';
 import { O5DeployerV1StackEvent, O5DeployerV1StackStatus } from '@/data/types';
 
 export enum StackEventType {
-  Unspecified = 'Unspecified',
-  Available = 'Available',
-  Configured = 'Configured',
-  DeploymentCompleted = 'DeploymentCompleted',
-  DeploymentFailed = 'DeploymentFailed',
-  Triggered = 'Triggered',
+  Unspecified = 'unspecified',
+  Available = 'available',
+  Configured = 'configured',
+  DeploymentCompleted = 'deploymentCompleted',
+  DeploymentFailed = 'deploymentFailed',
+  Triggered = 'triggered',
 }
 
 export const stackEventTypeLabels: Record<StackEventType, string> = {

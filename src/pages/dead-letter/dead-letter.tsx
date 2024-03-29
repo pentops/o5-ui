@@ -8,7 +8,13 @@ import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
-import { deadMessageEventTypeLabels, deadMessageStatusLabels, getDeadMessageEventType, O5DanteV1DeadMessageEvent } from '@/data/types';
+import {
+  DeadMessageEventType,
+  deadMessageEventTypeLabels,
+  deadMessageStatusLabels,
+  getDeadMessageEventType,
+  O5DanteV1DeadMessageEvent,
+} from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { DeadMessageProblem, deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui/dante.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
@@ -39,6 +45,14 @@ const eventColumns: CustomColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
     minSize: 100,
     maxSize: 150,
     accessorFn: (row) => deadMessageEventTypeLabels[getDeadMessageEventType(row.event)],
+    filter: {
+      type: {
+        select: {
+          isMultiple: true,
+          options: Object.values(DeadMessageEventType).map((value) => ({ label: deadMessageEventTypeLabels[value], value })),
+        },
+      },
+    },
   },
   {
     header: 'Timestamp',
