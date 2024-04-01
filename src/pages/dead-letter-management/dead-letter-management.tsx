@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
-import { deadMessageStatusLabels, O5DanteV1DeadMessageState } from '@/data/types';
+import { DeadMessageProblem, deadMessageStatusLabels, O5DanteV1DeadMessageState, O5DanteV1Urgency, urgencyLabels } from '@/data/types';
 import { useListMessages } from '@/data/api';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
@@ -57,6 +57,22 @@ const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
     },
   },
   {
+    header: 'Urgency',
+    minSize: 120,
+    size: 120,
+    maxSize: 150,
+    id: 'currentSpec.problem.type.invariantViolation.urgency',
+    accessorFn: (row) => urgencyLabels[row.currentSpec?.problem?.type?.invariantViolation?.urgency as O5DanteV1Urgency] || '',
+    filter: {
+      type: {
+        select: {
+          isMultiple: true,
+          options: Object.entries(urgencyLabels).map(([value, label]) => ({ value, label })),
+        },
+      },
+    },
+  },
+  {
     header: 'Queue',
     id: 'currentSpec.queueName',
     accessorFn: (row) => row.currentSpec?.queueName,
@@ -71,11 +87,19 @@ const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   },
   {
     header: 'Problem',
-    id: 'currentSpec.problem',
+    id: 'currentSpec.problem.type',
     accessorFn: (row) => deadMessageProblemLabels[getDeadMessageProblem(row.currentSpec)],
     size: 225,
     maxSize: 225,
     minSize: 225,
+    filter: {
+      type: {
+        select: {
+          isMultiple: true,
+          options: Object.values(DeadMessageProblem).map((value) => ({ label: deadMessageProblemLabels[value], value })),
+        },
+      },
+    },
   },
   {
     header: 'Created At',
@@ -137,8 +161,18 @@ function renderSubRow({ row }: TableRowType<O5DanteV1DeadMessageState>) {
   );
 }
 
+const searchableFields = [
+  { value: 'currentSpec.queueName', label: 'Queue Name' },
+  { value: 'currentSpec.grpcName', label: 'gRPC Name' },
+  { value: 'currentSpec.payload.json', label: 'Payload' },
+  { value: 'currentSpec.problem.type.invariantViolation.description', label: 'Invariant Violation Description' },
+  { value: 'currentSpec.problem.type.invariantViolation.error.json', label: 'Invariant Violation Error' },
+  { value: 'currentSpec.problem.type.unhandledError.error', label: 'Unhandled Error' },
+];
+
 function DeadLetterManagement() {
-  const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
+    useTableState();
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListMessages({ query: psmQuery });
   useErrorHandler(error, 'Failed to load dead letter messages');
   const flatData = useMemo(() => {
@@ -169,8 +203,13 @@ function DeadLetterManagement() {
         filterValues={filterValues}
         onColumnSort={setSortValues}
         onFilter={setFilterValues}
+        onSearch={setSearchValue}
+        onSearchFieldChange={setSearchFields}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         renderSubComponent={renderSubRow}
+        searchValue={searchValue}
+        searchFields={searchableFields}
+        searchFieldSelections={searchFields}
         showSkeleton={Boolean(data === undefined || isLoading || error)}
       />
     </div>

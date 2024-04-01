@@ -3,9 +3,9 @@ import { O5DanteV1Urgency } from '@/data/types';
 
 // ui-only enum to help with dead message problem oneOf
 export enum DeadMessageProblem {
-  Unspecified = 'DEAD_MESSAGE_PROBLEM_UNSPECIFIED',
-  InvariantViolation = 'DEAD_MESSAGE_PROBLEM_INVARIANT_VIOLATION',
-  UnhandledError = 'DEAD_MESSAGE_PROBLEM_UNHANDLED_ERROR',
+  Unspecified = 'unspecified',
+  InvariantViolation = 'invariantViolation',
+  UnhandledError = 'unhandledError',
 }
 
 export function getDeadMessageProblem(capturedMessage: O5DanteV1DeadMessageSpec | undefined): DeadMessageProblem {

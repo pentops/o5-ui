@@ -27,6 +27,14 @@ const columns: CustomColumnDef<O5DeployerV1StackState>[] = [
     },
   },
   {
+    header: 'Name',
+    id: 'stackName',
+    accessorKey: 'stackName',
+    size: 120,
+    minSize: 120,
+    maxSize: 140,
+  },
+  {
     header: 'App',
     id: 'applicationName',
     accessorKey: 'applicationName',
@@ -115,8 +123,15 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackState>) {
   );
 }
 
+const searchableFields = [
+  { value: 'applicationName', label: 'App' },
+  { value: 'environmentName', label: 'Environment' },
+  { value: 'stackName', label: 'Stack Name' },
+];
+
 export function StackManagement() {
-  const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
+    useTableState();
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListStacks({ query: psmQuery });
   useErrorHandler(error, 'Failed to load stacks');
 
@@ -147,10 +162,15 @@ export function StackManagement() {
         controlledColumnSort={sortValues}
         data={flatData}
         filterValues={filterValues}
+        onSearch={setSearchValue}
+        onSearchFieldChange={setSearchFields}
         onColumnSort={setSortValues}
         onFilter={setFilterValues}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         renderSubComponent={renderSubRow}
+        searchValue={searchValue}
+        searchFields={searchableFields}
+        searchFieldSelections={searchFields}
         showSkeleton={Boolean(data === undefined || isLoading || error)}
       />
     </div>

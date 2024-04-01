@@ -69,8 +69,11 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1EnvironmentState>) {
   );
 }
 
+const searchableFields = [{ value: 'fullName', label: 'Full Name' }];
+
 export function EnvironmentManagement() {
-  const { sortValues, setSortValues, psmQuery, setFilterValues, filterValues } = useTableState();
+  const { sortValues, setSortValues, psmQuery, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields } =
+    useTableState();
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListEnvironments({ query: psmQuery });
   useErrorHandler(error, 'Failed to load environments');
 
@@ -103,8 +106,13 @@ export function EnvironmentManagement() {
         filterValues={filterValues}
         onColumnSort={setSortValues}
         onFilter={setFilterValues}
+        onSearch={setSearchValue}
+        onSearchFieldChange={setSearchFields}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         renderSubComponent={renderSubRow}
+        searchValue={searchValue}
+        searchFields={searchableFields}
+        searchFieldSelections={searchFields}
         showSkeleton={Boolean(data === undefined || isLoading || error)}
       />
     </div>
