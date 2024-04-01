@@ -17,7 +17,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import { NumberFormat } from '@/components/format/number/number-format.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
-import { buildCFStackOutput } from '@/pages/stack/build-facts.tsx';
+import { buildCFStackOutput, buildCodeSourceFact } from '@/pages/stack/build-facts.tsx';
+import { Link } from 'react-router-dom';
 
 export function getStackParameterSourceValue(source: O5DeployerV1CloudFormationStackParameter['source'] | undefined) {
   return match(source)
@@ -95,33 +96,60 @@ export function buildPostgresSpecFacts(spec: O5DeployerV1PostgresSpec | undefine
   );
 }
 
-export function buildDeploymentSpecFacts(spec: O5DeployerV1DeploymentSpec | undefined) {
+export function buildDeploymentSpecFacts(
+  spec: O5DeployerV1DeploymentSpec | undefined,
+  exclude?: (keyof O5DeployerV1DeploymentSpec)[],
+  isLoading?: boolean,
+) {
   return (
     <div className="flex flex-col gap-2">
       <h3 className="text-xl">Spec</h3>
 
       <div className="grid grid-cols-2 gap-2">
-        <NutritionFact
-          label="Template URL"
-          value={
-            spec?.templateUrl ? (
-              <a href={spec.templateUrl} target="_blank">
-                {spec.templateUrl}
-              </a>
-            ) : undefined
-          }
-        />
-        <NutritionFact label="ECS Cluster" value={spec?.ecsCluster} />
+        {!exclude?.includes('appName') && <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="App Name" value={spec?.appName} />}
+        {!exclude?.includes('environmentName') && (
+          <NutritionFact
+            renderWhenEmpty="-"
+            isLoading={isLoading}
+            label="Environment"
+            value={
+              spec?.environmentId ? (
+                <Link to={`/environment/${spec.environmentId}`}>{spec.environmentName || spec.environmentId}</Link>
+              ) : (
+                spec?.environmentName
+              )
+            }
+          />
+        )}
+        {!exclude?.includes('version') && (
+          <NutritionFact renderWhenEmpty="-" label="Version" value={spec?.version ? <UUID canCopy short uuid={spec.version} /> : undefined} />
+        )}
+        {!exclude?.includes('templateUrl') && (
+          <NutritionFact
+            renderWhenEmpty="-"
+            isLoading={isLoading}
+            label="Template URL"
+            value={
+              spec?.templateUrl ? (
+                <a href={spec.templateUrl} target="_blank">
+                  {spec.templateUrl}
+                </a>
+              ) : undefined
+            }
+          />
+        )}
+        {!exclude?.includes('ecsCluster') && <NutritionFact renderWhenEmpty="-" label="ECS Cluster" value={spec?.ecsCluster} />}
+        {!exclude?.includes('source') && buildCodeSourceFact(spec?.source, isLoading)}
       </div>
 
       <h4 className="text-lg">Flags</h4>
 
       <div className="grid grid-cols-2 gap-2">
-        <NutritionFact label="Cancel Updates" value={spec?.flags?.cancelUpdates ? 'Yes' : 'No'} />
-        <NutritionFact label="Rotate Credentials" value={spec?.flags?.rotateCredentials ? 'Yes' : 'No'} />
-        <NutritionFact label="Quick Mode" value={spec?.flags?.quickMode ? 'Yes' : 'No'} />
-        <NutritionFact label="Infra Only" value={spec?.flags?.infraOnly ? 'Yes' : 'No'} />
-        <NutritionFact label="Database Only" value={spec?.flags?.dbOnly ? 'Yes' : 'No'} />
+        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Cancel Updates" value={spec?.flags?.cancelUpdates ? 'Yes' : 'No'} />
+        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Rotate Credentials" value={spec?.flags?.rotateCredentials ? 'Yes' : 'No'} />
+        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Quick Mode" value={spec?.flags?.quickMode ? 'Yes' : 'No'} />
+        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Infra Only" value={spec?.flags?.infraOnly ? 'Yes' : 'No'} />
+        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Database Only" value={spec?.flags?.dbOnly ? 'Yes' : 'No'} />
       </div>
 
       {(spec?.snsTopics?.length || 0) > 0 && (

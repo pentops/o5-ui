@@ -153,7 +153,7 @@ export function Environment() {
   return (
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
-        <h1 className="text-2xl">Environment: {environmentId ? <UUID uuid={environmentId} /> : <Skeleton />}</h1>
+        <h1 className="text-2xl">Environment: {environmentId ? <UUID canCopy uuid={environmentId} /> : <Skeleton />}</h1>
         {environmentId && <UpsertEnvironmentDialog environmentId={environmentId} />}
       </div>
       <div className="w-full inline-flex gap-4 flex-wrap lg:flex-nowrap">

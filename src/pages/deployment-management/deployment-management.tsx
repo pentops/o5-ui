@@ -150,7 +150,7 @@ const searchableFields = [
 function renderSubRow({ row }: TableRowType<O5DeployerV1DeploymentState>) {
   return (
     <div className="flex flex-col gap-4">
-      {buildDeploymentSpecFacts(row.original.spec)}
+      {buildDeploymentSpecFacts(row.original.spec, ['appName', 'environmentName', 'version'])}
       {buildDeploymentStepFacts(row.original.steps)}
     </div>
   );

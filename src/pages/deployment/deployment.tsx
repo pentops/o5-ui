@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useDeployment, useListDeploymentEvents } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
@@ -10,6 +10,7 @@ import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.t
 import {
   DeploymentEventType,
   deploymentEventTypeLabels,
+  deploymentStatusLabels,
   deploymentStepOutputTypeLabels,
   deploymentStepStatusLabels,
   getDeploymentEventType,
@@ -146,7 +147,7 @@ function canTerminateDeployment(status: O5DeployerV1DeploymentStatus | undefined
 
 export function Deployment() {
   const { deploymentId } = useParams();
-  const { data, error } = useDeployment({ deploymentId });
+  const { data, error, isPending } = useDeployment({ deploymentId });
   useErrorHandler(error, 'Failed to load deployment');
 
   const eventTableState = useTableState();
@@ -176,7 +177,7 @@ export function Deployment() {
   return (
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
-        <h1 className="text-2xl">Deployment: {deploymentId ? <UUID uuid={deploymentId} /> : <Skeleton />}</h1>
+        <h1 className="text-2xl">Deployment: {deploymentId ? <UUID canCopy uuid={deploymentId} /> : <Skeleton />}</h1>
         {deploymentId && (
           <div className="flex items-center justify-end gap-2">
             <TriggerDeploymentDialog deploymentId={deploymentId} />
@@ -188,8 +189,36 @@ export function Deployment() {
       <div className="flex-grow h-fit flex flex-col gap-4">
         <Card className="flex-grow h-fit">
           <CardHeader className="text-lg font-semibold">Details</CardHeader>
+
           <CardContent className="flex flex-col gap-2">
-            {buildDeploymentSpecFacts(data?.state?.spec)}
+            <NutritionFact
+              isLoading={isPending}
+              renderWhenEmpty="-"
+              label="Stack"
+              value={
+                data?.state?.stackId ? (
+                  <Link to={`/stack/${data.state.stackId}`}>{data?.state?.stackName || data.state.stackId}</Link>
+                ) : (
+                  data?.state?.stackName
+                )
+              }
+            />
+            <NutritionFact
+              isLoading={isPending}
+              renderWhenEmpty="-"
+              label="Status"
+              value={data?.state?.status ? deploymentStatusLabels[data.state.status] : undefined}
+            />
+            <NutritionFact
+              isLoading={isPending}
+              renderWhenEmpty="-"
+              label="Created At"
+              value={data?.state?.createdAt ? <DateFormat value={data.state.createdAt} /> : undefined}
+            />
+          </CardContent>
+
+          <CardContent className="flex flex-col gap-2">
+            {buildDeploymentSpecFacts(data?.state?.spec, [], isPending)}
             {buildDeploymentStepFacts(data?.state?.steps)}
           </CardContent>
         </Card>

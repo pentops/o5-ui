@@ -217,7 +217,7 @@ export function Stack() {
   return (
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
-        <h1 className="text-2xl">Stack: {stackId ? <UUID uuid={stackId} /> : <Skeleton />}</h1>
+        <h1 className="text-2xl">Stack: {stackId ? <UUID canCopy uuid={stackId} /> : <Skeleton />}</h1>
         {stackId && <UpsertStackDialog stackId={stackId} />}
       </div>
       <div className="w-full inline-flex gap-4 flex-wrap lg:flex-nowrap">

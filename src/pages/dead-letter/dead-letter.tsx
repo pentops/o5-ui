@@ -213,7 +213,7 @@ export function DeadLetter() {
   return (
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
-        <h1 className="text-2xl">Dead Letter: {messageId ? <UUID uuid={messageId} /> : <Skeleton />}</h1>
+        <h1 className="text-2xl">Dead Letter: {messageId ? <UUID canCopy uuid={messageId} /> : <Skeleton />}</h1>
         {messageId && <ActionActivator messageId={messageId} />}
       </div>
       <div className="w-full inline-flex gap-4 flex-wrap lg:flex-nowrap">
