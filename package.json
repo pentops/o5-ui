@@ -45,14 +45,14 @@
     "react-simple-code-editor": "^0.13.1",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
-    "ts-pattern": "^5.0.8",
+    "ts-pattern": "^5.1.0",
     "uuid": "^9.0.1",
     "zod": "^3.22.4",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@pentops/jsonapi-jdef-ts-generator": "^0.0.2",
-    "@types/node": "^20.11.30",
+    "@types/node": "^20.12.2",
     "@types/prismjs": "^1.26.3",
     "@types/qs": "^6.9.14",
     "@types/react": "^18.2.73",
