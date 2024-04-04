@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Pencil1Icon } from '@radix-ui/react-icons';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import yaml from 'js-yaml';
 import { v4 as uuid } from 'uuid';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -13,6 +14,7 @@ import { useErrorHandler } from '@/lib/error.ts';
 import { useUpsertEnvironment } from '@/data/api/mutation';
 import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+import { useEnvironment } from '@/data/api';
 
 const schema = z.object({
   type: z.enum(['json', 'yaml']),
@@ -20,11 +22,6 @@ const schema = z.object({
 });
 
 type Values = z.infer<typeof schema>;
-
-const defaultValues: Values = {
-  type: 'json',
-  config: '',
-};
 
 interface UpsertEnvironmentDialogProps {
   activator?: React.ReactNode;
@@ -34,11 +31,29 @@ interface UpsertEnvironmentDialogProps {
 export function UpsertEnvironmentDialog({ activator = <Pencil1Icon aria-hidden />, environmentId }: UpsertEnvironmentDialogProps) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const { data: environment, error: environmentError } = useEnvironment({ environmentId });
+  useErrorHandler(environmentError, 'Failed to load environment');
+
   const { mutateAsync, isPending, error } = useUpsertEnvironment();
   useErrorHandler(error, 'Error upserting environment');
 
+  const defaultValues: Values = useMemo(
+    () => ({
+      type: 'json',
+      config: environment?.state?.config ? JSON.stringify(environment.state.config, null, 2) : '',
+    }),
+    [environment?.state?.config],
+  );
+
   const form = useForm<Values>({ defaultValues, resetOptions: { keepDefaultValues: false, keepDirtyValues: false }, resolver: zodResolver(schema) });
   const language = form.watch('type');
+  const config = form.watch('config');
+
+  useEffect(() => {
+    if (isOpen) {
+      form.reset(defaultValues);
+    }
+  }, [defaultValues, form, isOpen]);
 
   async function handleEdit(values: Values) {
     try {
@@ -64,7 +79,7 @@ export function UpsertEnvironmentDialog({ activator = <Pencil1Icon aria-hidden /
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Form {...form}>
         <DialogTrigger aria-label="Upsert environment">{activator}</DialogTrigger>
-        <DialogContent>
+        <DialogContent className="min-w-[800px]">
           <form className="w-100 overflow-auto" onSubmit={form.handleSubmit(handleEdit)}>
             <DialogHeader>
               <DialogTitle>Upsert Environment</DialogTitle>
@@ -77,7 +92,22 @@ export function UpsertEnvironmentDialog({ activator = <Pencil1Icon aria-hidden /
                 <FormItem className="py-2">
                   <FormLabel>Config Type</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+
+                        try {
+                          if (value === 'json') {
+                            form.setValue('config', JSON.stringify(yaml.load(config || ''), null, 2));
+                          } else if (value === 'yaml') {
+                            form.setValue('config', yaml.dump(JSON.parse(config || ''), { indent: 2 }));
+                          }
+                        } catch {
+                          form.setValue('config', '');
+                        }
+                      }}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a config type" />
