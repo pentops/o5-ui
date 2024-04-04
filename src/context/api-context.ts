@@ -22,9 +22,9 @@ export function useSetRealmId() {
 
 export function useSelectedRealm(): [O5AuthV1RealmAccess | undefined, boolean] {
   const realmId = useSelectedRealmId();
-  const { data, isLoading } = useWhoAmI();
+  const { data, isPending } = useWhoAmI();
 
-  return [data?.realmAccess?.find((realm) => realm.realmId === realmId), isLoading];
+  return [data?.realmAccess?.find((realm) => realm.realmId === realmId), isPending];
 }
 
 export function useSelectedRealmBaseUrl(): [string, boolean] {

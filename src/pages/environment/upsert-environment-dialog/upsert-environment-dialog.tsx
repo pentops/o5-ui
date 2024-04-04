@@ -61,8 +61,7 @@ export function UpsertEnvironmentDialog({ activator = <Pencil1Icon aria-hidden /
       await mutateAsync({
         environmentId: usableEnvironmentId,
         src: {
-          configJson: values.type === 'json' ? values.config : undefined,
-          configYaml: values.type === 'yaml' ? values.config : undefined,
+          config: values.type === 'json' ? JSON.parse(values.config) : yaml.load(values.config),
         },
       });
 
