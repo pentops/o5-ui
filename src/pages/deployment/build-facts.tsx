@@ -232,7 +232,7 @@ export function buildDeploymentStepFacts(steps: O5DeployerV1DeploymentStep[] | u
                     value={
                       step.dependsOn ? (
                         <ul>
-                          {step.dependsOn?.reduce<React.ReactNode[]>((acc, curr, i) => {
+                          {step.dependsOn?.reduce<React.ReactNode[]>((acc, curr) => {
                             const match = steps.find((s) => s.id === curr);
 
                             return [
