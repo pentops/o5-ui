@@ -248,7 +248,7 @@ export function buildDeploymentStepFacts(steps: O5DeployerV1DeploymentStep[] | u
                     }
                   />
                   <NutritionFact renderWhenEmpty="-" label="Status" value={deploymentStepStatusLabels[step.status!]} />
-                  <NutritionFact renderWhenEmpty="-" label="Error" value={step.error} />
+                  {step.error && <NutritionFact renderWhenEmpty="-" label="Error" value={step.error} />}
                 </div>
 
                 {step.request && (
@@ -296,26 +296,48 @@ export function buildDeploymentStepFacts(steps: O5DeployerV1DeploymentStep[] | u
                           ))
                           .with({ pgCleanup: P.not(P.nullish) }, (t) => buildPostgresSpecFacts(t.pgCleanup.spec))
 
-                          .with({ pgMigrate: P.not(P.nullish) }, (t) => (
-                            <div className="grid grid-cols-2 gap-2">
-                              <NutritionFact
-                                renderWhenEmpty="-"
-                                label="Infrastructure Output Step ID"
-                                value={t.pgMigrate.infraOutputStepId ? <UUID canCopy uuid={t.pgMigrate.infraOutputStepId} /> : undefined}
-                              />
-                              {buildPostgresSpecFacts(t.pgMigrate.spec)}
-                            </div>
-                          ))
-                          .with({ pgUpsert: P.not(P.nullish) }, (t) => (
-                            <div className="grid grid-cols-2 gap-2">
-                              <NutritionFact
-                                renderWhenEmpty="-"
-                                label="Infrastructure Output Step ID"
-                                value={t.pgUpsert.infraOutputStepId ? <UUID canCopy uuid={t.pgUpsert.infraOutputStepId} /> : undefined}
-                              />
-                              {buildPostgresSpecFacts(t.pgUpsert.spec)}
-                            </div>
-                          ))
+                          .with({ pgMigrate: P.not(P.nullish) }, (t) => {
+                            const matchingInfraOutputStep = steps.find((s) => s.id === t.pgMigrate.infraOutputStepId)?.name;
+
+                            return (
+                              <div className="grid grid-cols-2 gap-2">
+                                <NutritionFact
+                                  renderWhenEmpty="-"
+                                  label="Infrastructure Output Step ID"
+                                  value={
+                                    t.pgMigrate.infraOutputStepId ? (
+                                      <>
+                                        <UUID canCopy short uuid={t.pgMigrate.infraOutputStepId} />
+                                        {matchingInfraOutputStep ? ` (${matchingInfraOutputStep})` : null}
+                                      </>
+                                    ) : undefined
+                                  }
+                                />
+                                {buildPostgresSpecFacts(t.pgMigrate.spec)}
+                              </div>
+                            );
+                          })
+                          .with({ pgUpsert: P.not(P.nullish) }, (t) => {
+                            const matchingInfraOutputStep = steps.find((s) => s.id === t.pgUpsert.infraOutputStepId)?.name;
+
+                            return (
+                              <div className="grid grid-cols-2 gap-2">
+                                <NutritionFact
+                                  renderWhenEmpty="-"
+                                  label="Infrastructure Output Step ID"
+                                  value={
+                                    t.pgUpsert.infraOutputStepId ? (
+                                      <>
+                                        <UUID canCopy short uuid={t.pgUpsert.infraOutputStepId} />
+                                        {matchingInfraOutputStep ? ` (${matchingInfraOutputStep})` : null}
+                                      </>
+                                    ) : undefined
+                                  }
+                                />
+                                {buildPostgresSpecFacts(t.pgUpsert.spec)}
+                              </div>
+                            );
+                          })
                           .otherwise(() => null)}
                       </div>
                     </CollapsibleContent>
