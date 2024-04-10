@@ -226,7 +226,27 @@ export function buildDeploymentStepFacts(steps: O5DeployerV1DeploymentStep[] | u
                 <div className="grid grid-cols-2 gap-2">
                   <NutritionFact renderWhenEmpty="-" label="ID" value={step.id ? <UUID short canCopy uuid={step.id} /> : undefined} />
                   <NutritionFact renderWhenEmpty="-" label="Name" value={step.name} />
-                  <NutritionFact renderWhenEmpty="-" label="Depends On" value={step.dependsOn?.join(', ')} />
+                  <NutritionFact
+                    renderWhenEmpty="-"
+                    label="Depends On"
+                    value={
+                      step.dependsOn ? (
+                        <ul>
+                          {step.dependsOn?.reduce<React.ReactNode[]>((acc, curr, i) => {
+                            const match = steps.find((s) => s.id === curr);
+
+                            return [
+                              ...acc,
+                              <li key={curr}>
+                                <UUID canCopy short uuid={curr} />
+                                {match?.name ? ` (${match.name})` : null}
+                              </li>,
+                            ];
+                          }, [])}
+                        </ul>
+                      ) : undefined
+                    }
+                  />
                   <NutritionFact renderWhenEmpty="-" label="Status" value={deploymentStepStatusLabels[step.status!]} />
                   <NutritionFact renderWhenEmpty="-" label="Error" value={step.error} />
                 </div>
