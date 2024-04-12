@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Editor from 'react-simple-code-editor';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -8,6 +8,9 @@ import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-yaml';
 import 'prismjs/themes/prism-tomorrow.css';
+import { useCopyToClipboard } from '@/lib/copy.ts';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip.tsx';
+import { CopyIcon } from '@radix-ui/react-icons';
 
 type SupportedLanguage = 'json' | 'yaml';
 
@@ -52,11 +55,38 @@ export type CodeEditorProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 export const CodeEditor = React.forwardRef((props: CodeEditorProps, ref: React.Ref<HTMLDivElement>) => {
+  const [isShowingCopiedNotice, setIsShowingCopiedNotice] = useState(false);
+  const [copied, copy] = useCopyToClipboard();
+
+  useEffect(() => {
+    let timeout: number;
+
+    if (copied) {
+      setIsShowingCopiedNotice(true);
+      timeout = window.setTimeout(() => setIsShowingCopiedNotice(false), 1000);
+    }
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [copied]);
+
   return (
     <div
-      className="scrollbars max-h-96 overflow-auto rounded-md border border-input bg-transparent shadow-sm focus-visible:outline-none focus-within:ring-1 focus-within:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+      className="relative scrollbars max-h-96 overflow-auto rounded-md border border-input bg-transparent shadow-sm focus-visible:outline-none focus-within:ring-1 focus-within:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
       ref={ref}
     >
+      <TooltipProvider>
+        <Tooltip open={isShowingCopiedNotice}>
+          <TooltipTrigger asChild>
+            <button aria-label="Copy" className="absolute top-2 right-2 z-20" onClick={() => copy(props.value || '')} type="button">
+              <CopyIcon />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Copied!</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       <Editor
         {...props}
         className="font-mono text-xs bg-transparent whitespace-pre break-words"

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { DeadMessageProblem, deadMessageStatusLabels, O5DanteV1DeadMessageState, O5DanteV1Urgency, urgencyLabels } from '@/data/types';
 import { useListMessages } from '@/data/api';
@@ -9,10 +9,11 @@ import { deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui
 import { useErrorHandler } from '@/lib/error.ts';
 import { useTableState } from '@/components/data-table/state.ts';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
-import { formatJSONString } from '@/lib/json.ts';
+import { formatJSONString, hasBase64Strings } from '@/lib/json.ts';
 import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { buildDeadMessageProblemFacts } from '@/pages/dead-letter/build-facts.tsx';
 import { TableRowType } from '@/components/data-table/body.tsx';
+import { MagicWandIcon } from '@radix-ui/react-icons';
 
 const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   getRowExpander(),
@@ -150,15 +151,38 @@ const columns: CustomColumnDef<O5DanteV1DeadMessageState>[] = [
   },
 ];
 
-function renderSubRow({ row }: TableRowType<O5DanteV1DeadMessageState>) {
-  return (
-    <div className="flex flex-col gap-4">
-      {buildDeadMessageProblemFacts(row.original.currentSpec?.problem)}
+function getSubRowRenderer(decodeB64: boolean, setDecodeB64: (value: boolean) => void) {
+  return function renderSubRow({ row }: TableRowType<O5DanteV1DeadMessageState>) {
+    let hasEncodedB64 = false;
 
-      <h3 className="text-lg">Payload</h3>
-      <CodeEditor disabled value={formatJSONString(row.original?.currentSpec?.payload?.json || '')} />
-    </div>
-  );
+    try {
+      const parsed = JSON.parse(row.original?.currentSpec?.payload?.json || '');
+      hasEncodedB64 = hasBase64Strings(parsed);
+    } catch {}
+
+    return (
+      <div className="flex flex-col gap-4">
+        {buildDeadMessageProblemFacts(row.original.currentSpec?.problem)}
+
+        <div className="flex gap-2 items-center">
+          <h3 className="text-lg">Payload</h3>
+          {hasEncodedB64 && (
+            <button
+              className="bg-background border border-r-2 hover:bg-slate-900 text-white font-bold py-1 px-2 rounded flex gap-2 items-center text-sm w-fit"
+              onClick={() => {
+                setDecodeB64(!decodeB64);
+              }}
+              type="button"
+            >
+              <MagicWandIcon />
+              {decodeB64 ? 'Encode' : 'Decode'}
+            </button>
+          )}
+        </div>
+        <CodeEditor disabled value={formatJSONString(row.original?.currentSpec?.payload?.json || '', decodeB64)} />
+      </div>
+    );
+  };
 }
 
 const searchableFields = [
@@ -171,6 +195,7 @@ const searchableFields = [
 ];
 
 function DeadLetterManagement() {
+  const [decodeB64, setDecodeB64] = useState<boolean>(false);
   const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
     useTableState();
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListMessages({ query: psmQuery });
@@ -188,6 +213,8 @@ function DeadLetterManagement() {
       return acc;
     }, [] as O5DanteV1DeadMessageState[]);
   }, [data?.pages]);
+
+  const renderSubRow = useMemo(() => getSubRowRenderer(decodeB64, setDecodeB64), [decodeB64]);
 
   return (
     <div className="w-full">

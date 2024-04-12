@@ -33,9 +33,9 @@ const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
   {
     header: 'Type',
     id: 'event.type',
-    size: 100,
-    minSize: 100,
-    maxSize: 100,
+    size: 175,
+    minSize: 175,
+    maxSize: 175,
     accessorFn: (row) => {
       const type = getStackEventType(row);
       return row.event ? stackEventTypeLabels[type] : '';
@@ -91,12 +91,22 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
         .with({ triggered: P.not(P.nullish) }, (e) => (
           <>
             <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.triggered.applicationName} />
-            <NutritionFact label="Environment Name" renderWhenEmpty="-" value={e.triggered.environmentName} />
             <NutritionFact
-              label="Environment ID"
+              label="Environment"
               renderWhenEmpty="-"
               value={
-                e.triggered.environmentId ? <UUID to={`/environment/${e.triggered.environmentId}`} uuid={e.triggered.environmentId} /> : undefined
+                e.triggered.environmentName ? (
+                  e.triggered.environmentId ? (
+                    <span>
+                      <Link to={`/environment/${e.triggered.environmentId}`}>{e.triggered.environmentName}</Link> (
+                      <UUID canCopy to={`/environment/${e.triggered.environmentId}`} uuid={e.triggered.environmentId} />)
+                    </span>
+                  ) : (
+                    e.triggered.environmentName
+                  )
+                ) : e.triggered.environmentId ? (
+                  <UUID canCopy to={`/environment/${e.triggered.environmentId}`} uuid={e.triggered.environmentId} />
+                ) : undefined
               }
             />
             <NutritionFact
@@ -104,7 +114,7 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
               renderWhenEmpty="-"
               value={
                 e.triggered.deployment?.deploymentId ? (
-                  <UUID to={`/deployment/${e.triggered.deployment.deploymentId}`} uuid={e.triggered.deployment.deploymentId} />
+                  <UUID canCopy to={`/deployment/${e.triggered.deployment.deploymentId}`} uuid={e.triggered.deployment.deploymentId} />
                 ) : undefined
               }
             />
@@ -118,12 +128,20 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
         .with({ configured: P.not(P.nullish) }, (e) => (
           <>
             <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.configured.applicationName} />
-            <NutritionFact label="Environment Name" renderWhenEmpty="-" value={e.configured.environmentName} />
             <NutritionFact
-              label="Environment ID"
+              label="Environment"
               renderWhenEmpty="-"
               value={
-                e.configured.environmentId ? (
+                e.configured.environmentName ? (
+                  e.configured.environmentId ? (
+                    <span>
+                      <Link to={`/environment/${e.configured.environmentId}`}>{e.configured.environmentName}</Link> (
+                      <UUID canCopy to={`/environment/${e.configured.environmentId}`} uuid={e.configured.environmentId} />)
+                    </span>
+                  ) : (
+                    e.configured.environmentName
+                  )
+                ) : e.configured.environmentId ? (
                   <UUID canCopy to={`/environment/${e.configured.environmentId}`} uuid={e.configured.environmentId} />
                 ) : undefined
               }

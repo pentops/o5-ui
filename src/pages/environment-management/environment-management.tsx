@@ -56,9 +56,9 @@ const columns: CustomColumnDef<O5DeployerV1EnvironmentState>[] = [
 function renderSubRow({ row }: TableRowType<O5DeployerV1EnvironmentState>) {
   return (
     <div className="flex flex-col gap-4">
-      <NutritionFact vertical label="Full Name" value={row.original.config?.fullName} />
-      <NutritionFact label="CORS Origins" value={row.original.config?.corsOrigins?.join('\n')} />
-      <NutritionFact label="Trust JWKS" value={row.original.config?.trustJwks?.join('\n')} />
+      <NutritionFact vertical label="Full Name" renderWhenEmpty="-" value={row.original.config?.fullName} />
+      <NutritionFact label="CORS Origins" renderWhenEmpty="-" value={row.original.config?.corsOrigins?.join('\n')} />
+      <NutritionFact label="Trust JWKS" renderWhenEmpty="-" value={row.original.config?.trustJwks?.join('\n')} />
 
       <h4>Provider</h4>
       {buildEnvironmentProvider(row.original.config?.provider)}

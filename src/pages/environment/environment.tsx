@@ -95,9 +95,9 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1EnvironmentEvent>) {
         .with({ configured: P.not(P.nullish) }, (e) => {
           return (
             <>
-              <NutritionFact vertical label="Full Name" value={e.configured.config?.fullName} />
-              <NutritionFact vertical label="CORS Origins" value={e.configured.config?.corsOrigins?.join('\n')} />
-              <NutritionFact vertical label="Trust JWKS" value={e.configured.config?.trustJwks?.join('\n')} />
+              <NutritionFact vertical label="Full Name" renderWhenEmpty="-" value={e.configured.config?.fullName} />
+              <NutritionFact vertical label="CORS Origins" renderWhenEmpty="-" value={e.configured.config?.corsOrigins?.join('\n')} />
+              <NutritionFact vertical label="Trust JWKS" renderWhenEmpty="-" value={e.configured.config?.trustJwks?.join('\n')} />
 
               {e.configured.config?.provider && (
                 <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
