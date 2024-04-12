@@ -59,7 +59,9 @@ export const DataTableSearch = React.memo(({ fields, fieldSelections, onSearch, 
           <Combobox
             isMulti
             name="searchFields"
-            onChange={(e) => onSearchFieldChange(e.target.value as unknown as string[])}
+            onChange={(e) => {
+              onSearchFieldChange(e.target.value as unknown as string[]);
+            }}
             options={fields}
             value={fieldSelections || []}
           />

@@ -200,6 +200,20 @@ export function useTableState(options?: TableStateOptions) {
     [searchFields, setSearchValue, singleSearchValue],
   );
 
+  const handleSetSearchFields = useCallback(
+    (newSearchFields: string[]) => {
+      setSearchFields(newSearchFields);
+
+      setSearchValue(
+        newSearchFields?.map((field) => ({
+          id: field,
+          value: singleSearchValue,
+        })),
+      );
+    },
+    [singleSearchValue, setSearchValue],
+  );
+
   const handleSetFilterValues: OnChangeFn<Record<string, TableFilterValueType>> = useCallback(
     (updater: Updater<Record<string, TableFilterValueType>>) => {
       const newValues = typeof updater === 'function' ? updater(basicFilters) : updater;
@@ -223,7 +237,7 @@ export function useTableState(options?: TableStateOptions) {
     searchValue: singleSearchValue,
     setSearchValue: handleSetSearchValue,
     searchFields,
-    setSearchFields,
+    setSearchFields: handleSetSearchFields,
     psmQuery,
   } as const;
 }
