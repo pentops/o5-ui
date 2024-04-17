@@ -128,10 +128,11 @@ const searchableFields = [
   { value: 'environmentName', label: 'Environment' },
   { value: 'stackName', label: 'Stack Name' },
 ];
+const initialSearchFields = searchableFields.map((field) => field.value);
 
 export function StackManagement() {
   const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
-    useTableState();
+    useTableState({ initialSearchFields });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListStacks({ query: psmQuery });
   useErrorHandler(error, 'Failed to load stacks');
 

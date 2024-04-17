@@ -147,6 +147,8 @@ const searchableFields = [
   { value: 'spec.templateUrl', label: 'Template URL' },
 ];
 
+const initialSearchFields = searchableFields.map((field) => field.value);
+
 function renderSubRow({ row }: TableRowType<O5DeployerV1DeploymentState>) {
   return (
     <div className="flex flex-col gap-4">
@@ -158,7 +160,7 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1DeploymentState>) {
 
 function DeploymentManagement() {
   const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
-    useTableState();
+    useTableState({ initialSearchFields });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListDeployments({ query: psmQuery });
   useErrorHandler(error, 'Failed to load deployments');
   const flatData = useMemo(() => {

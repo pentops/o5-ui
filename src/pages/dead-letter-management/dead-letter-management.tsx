@@ -193,11 +193,12 @@ const searchableFields = [
   { value: 'currentSpec.problem.type.invariantViolation.error.json', label: 'Invariant Violation Error' },
   { value: 'currentSpec.problem.type.unhandledError.error', label: 'Unhandled Error' },
 ];
+const initialSearchFields = searchableFields.map((field) => field.value);
 
 function DeadLetterManagement() {
   const [decodeB64, setDecodeB64] = useState<boolean>(false);
   const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
-    useTableState();
+    useTableState({ initialSearchFields });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListMessages({ query: psmQuery });
   useErrorHandler(error, 'Failed to load dead letter messages');
   const flatData = useMemo(() => {

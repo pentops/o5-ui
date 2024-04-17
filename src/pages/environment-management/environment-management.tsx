@@ -70,10 +70,11 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1EnvironmentState>) {
 }
 
 const searchableFields = [{ value: 'fullName', label: 'Full Name' }];
+const initialSearchFields = searchableFields.map((field) => field.value);
 
 export function EnvironmentManagement() {
   const { sortValues, setSortValues, psmQuery, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields } =
-    useTableState();
+    useTableState({ initialSearchFields });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListEnvironments({ query: psmQuery });
   useErrorHandler(error, 'Failed to load environments');
 
