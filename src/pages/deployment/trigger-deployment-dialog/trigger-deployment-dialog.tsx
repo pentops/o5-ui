@@ -15,18 +15,31 @@ import { useTriggerDeployment } from '@/data/api/mutation';
 import { Input } from '@/components/ui/input.tsx';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { Combobox } from '@/components/combobox/combobox.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+
+const refTypeOptions = [
+  {
+    value: 'branch',
+    label: 'Branch',
+  },
+  {
+    value: 'commit',
+    label: 'Commit',
+  },
+  {
+    value: 'tag',
+    label: 'Tag',
+  },
+] as const;
 
 const schema = z.object({
   environment: z.string().min(1, { message: 'Environment is required (ID or full name)' }),
   source: z.object({
-    type: z.object({
-      gitHub: z.object({
-        owner: z.string().min(1, { message: 'Owner is required' }),
-        repo: z.string().min(1, { message: 'Repo is required' }),
-        ref: z.object({
-          commit: z.string().min(1, { message: 'Commit is required' }),
-        }),
-      }),
+    github: z.object({
+      owner: z.string().min(1, { message: 'Owner is required' }),
+      repo: z.string().min(1, { message: 'Repo is required' }),
+      ref: z.string().min(1, { message: 'Ref is required' }),
+      refType: z.string(),
     }),
   }),
   flags: z.object({
@@ -80,14 +93,11 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
     () => ({
       environment: data?.state?.spec?.environmentId || '',
       source: {
-        type: {
-          gitHub: {
-            owner: data?.state?.spec?.source?.type?.gitHub?.owner || '',
-            repo: data?.state?.spec?.source?.type?.gitHub?.repo || '',
-            ref: {
-              commit: data?.state?.spec?.version || '',
-            },
-          },
+        github: {
+          owner: data?.state?.spec?.source?.type?.github?.owner || '',
+          repo: data?.state?.spec?.source?.type?.github?.repo || '',
+          ref: data?.state?.spec?.version || '',
+          refType: 'commit',
         },
       },
       flags: {
@@ -102,6 +112,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
   );
 
   const form = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
+  const refType = form.watch('source.github.refType');
 
   useEffect(() => {
     if (isOpen) {
@@ -114,11 +125,20 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
       await mutateAsync({
         deploymentId: uuid(),
         ...values,
+        source: {
+          github: {
+            owner: values.source.github.owner,
+            repo: values.source.github.repo,
+            ref: {
+              [values.source.github.refType]: values.source.github.ref,
+            },
+          },
+        },
       });
 
       toast({
         title: 'Deployment triggered',
-        description: `Deployment ${values.source.type.gitHub.owner}/${values.source.type.gitHub.repo}:${values.source.type.gitHub.ref.commit} has been triggered.`,
+        description: `Deployment ${values.source.github.owner}/${values.source.github.repo}:${values.source.github.ref} has been triggered.`,
       });
 
       setIsOpen(false);
@@ -167,7 +187,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <FormField
                 control={form.control}
-                name="source.type.gitHub.owner"
+                name="source.github.owner"
                 render={({ field }) => (
                   <FormItem className="py-2">
                     <FormLabel>GitHub Owner</FormLabel>
@@ -181,7 +201,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
 
               <FormField
                 control={form.control}
-                name="source.type.gitHub.repo"
+                name="source.github.repo"
                 render={({ field }) => (
                   <FormItem className="py-2">
                     <FormLabel>Repository</FormLabel>
@@ -194,19 +214,48 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="source.type.gitHub.ref.commit"
-              render={({ field }) => (
-                <FormItem className="py-2">
-                  <FormLabel>Commit</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <FormField
+                control={form.control}
+                name="source.github.refType"
+                render={({ field }) => (
+                  <FormItem className="py-2">
+                    <FormLabel>Ref Type</FormLabel>
+                    <FormControl>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a ref type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {refTypeOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="source.github.ref"
+                render={({ field }) => (
+                  <FormItem className="py-2">
+                    <FormLabel>{refTypeOptions.find((t) => t.value === refType)?.label || 'Ref'}</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <legend className="flex flex-col gap-2 items-start space-x-0 space-y-0">
               <h3>Flags</h3>

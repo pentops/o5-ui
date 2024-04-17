@@ -12,20 +12,17 @@ export function buildCodeSourceFact(codeSource: O5DeployerV1CodeSourceType | und
       isLoading={isLoading}
       renderWhenEmpty="-"
       value={match(codeSource?.type)
-        .with({ gitHub: P.not(P.nullish) }, (t) => {
-          let linkTo = `https://gitHub.com/`;
+        .with({ github: P.not(P.nullish) }, (t) => {
+          let linkTo = `https://github.com/`;
           let sourceDetail = '';
 
-          if (t.gitHub.owner && t.gitHub.repo) {
-            linkTo += `${t.gitHub.owner}/${t.gitHub.repo}`;
-            sourceDetail = `${t.gitHub.owner}/${t.gitHub.repo}`;
+          if (t.github.owner && t.github.repo) {
+            linkTo += `${t.github.owner}/${t.github.repo}`;
+            sourceDetail = `${t.github.owner}/${t.github.repo}`;
 
-            if (t.gitHub.ref?.branch) {
-              linkTo += `/tree/${t.gitHub.ref.branch}`;
-              sourceDetail = `${sourceDetail}:${t.gitHub.ref.branch}`;
-            } else if (t.gitHub?.ref?.commit) {
-              linkTo += `/commit/${t.gitHub.ref.commit}`;
-              sourceDetail = `${sourceDetail}@${t.gitHub.ref.commit}`;
+            if (t.github.commit) {
+              linkTo += `/commit/${t.github.commit}`;
+              sourceDetail = `${sourceDetail}@${t.github.commit}`;
             }
           }
 

@@ -4,18 +4,18 @@
 import { buildMergedRequestInit, makeRequest } from '@pentops/jsonapi-request';
 import type {
   O5AuthV1WhoamiResponse,
-  O5DanteV1GetDeadMessageResponse,
-  O5DanteV1GetDeadMessageRequest,
-  O5DanteV1ListDeadMessagesResponse,
-  O5DanteV1ListDeadMessagesRequest,
-  O5DanteV1ListDeadMessageEventsResponse,
-  O5DanteV1ListDeadMessageEventsRequest,
   O5DanteV1UpdateDeadMessageResponse,
   O5DanteV1UpdateDeadMessageRequest,
   O5DanteV1ReplayDeadMessageResponse,
   O5DanteV1ReplayDeadMessageRequest,
   O5DanteV1RejectDeadMessageResponse,
   O5DanteV1RejectDeadMessageRequest,
+  O5DanteV1GetDeadMessageResponse,
+  O5DanteV1GetDeadMessageRequest,
+  O5DanteV1ListDeadMessagesResponse,
+  O5DanteV1ListDeadMessagesRequest,
+  O5DanteV1ListDeadMessageEventsResponse,
+  O5DanteV1ListDeadMessageEventsRequest,
   O5DeployerV1TriggerDeploymentResponse,
   O5DeployerV1TriggerDeploymentRequest,
   O5DeployerV1TerminateDeploymentResponse,
@@ -48,36 +48,6 @@ export async function o5AuthV1AuthServiceWhoami(baseUrl: string | undefined, req
   return makeRequest<O5AuthV1WhoamiResponse>(...buildMergedRequestInit('GET', baseUrl || '', '/o5-auth/v1/whoami', undefined, requestInit));
 }
 
-export async function o5DanteV1DeadMessageQueryServiceGetDeadMessage(
-  baseUrl: string | undefined,
-  request?: O5DanteV1GetDeadMessageRequest,
-  requestInit?: RequestInit,
-): Promise<O5DanteV1GetDeadMessageResponse | undefined> {
-  return makeRequest<O5DanteV1GetDeadMessageResponse, O5DanteV1GetDeadMessageRequest>(
-    ...buildMergedRequestInit('GET', baseUrl || '', '/dante/v1/q/message/:messageId', request, requestInit),
-  );
-}
-
-export async function o5DanteV1DeadMessageQueryServiceListDeadMessages(
-  baseUrl: string | undefined,
-  request?: O5DanteV1ListDeadMessagesRequest,
-  requestInit?: RequestInit,
-): Promise<O5DanteV1ListDeadMessagesResponse | undefined> {
-  return makeRequest<O5DanteV1ListDeadMessagesResponse, O5DanteV1ListDeadMessagesRequest>(
-    ...buildMergedRequestInit('GET', baseUrl || '', '/dante/v1/q/messages', request, requestInit),
-  );
-}
-
-export async function o5DanteV1DeadMessageQueryServiceListDeadMessageEvents(
-  baseUrl: string | undefined,
-  request?: O5DanteV1ListDeadMessageEventsRequest,
-  requestInit?: RequestInit,
-): Promise<O5DanteV1ListDeadMessageEventsResponse | undefined> {
-  return makeRequest<O5DanteV1ListDeadMessageEventsResponse, O5DanteV1ListDeadMessageEventsRequest>(
-    ...buildMergedRequestInit('GET', baseUrl || '', '/dante/v1/q/message/:messageId/events', request, requestInit),
-  );
-}
-
 export async function o5DanteV1DeadMessageCommandServiceUpdateDeadMessage(
   baseUrl: string | undefined,
   request?: O5DanteV1UpdateDeadMessageRequest,
@@ -105,6 +75,36 @@ export async function o5DanteV1DeadMessageCommandServiceRejectDeadMessage(
 ): Promise<O5DanteV1RejectDeadMessageResponse | undefined> {
   return makeRequest<O5DanteV1RejectDeadMessageResponse, O5DanteV1RejectDeadMessageRequest>(
     ...buildMergedRequestInit('POST', baseUrl || '', '/dante/v1/c/messages/:messageId/shelve', request, requestInit),
+  );
+}
+
+export async function o5DanteV1DeadMessageQueryServiceGetDeadMessage(
+  baseUrl: string | undefined,
+  request?: O5DanteV1GetDeadMessageRequest,
+  requestInit?: RequestInit,
+): Promise<O5DanteV1GetDeadMessageResponse | undefined> {
+  return makeRequest<O5DanteV1GetDeadMessageResponse, O5DanteV1GetDeadMessageRequest>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/dante/v1/q/message/:messageId', request, requestInit),
+  );
+}
+
+export async function o5DanteV1DeadMessageQueryServiceListDeadMessages(
+  baseUrl: string | undefined,
+  request?: O5DanteV1ListDeadMessagesRequest,
+  requestInit?: RequestInit,
+): Promise<O5DanteV1ListDeadMessagesResponse | undefined> {
+  return makeRequest<O5DanteV1ListDeadMessagesResponse, O5DanteV1ListDeadMessagesRequest>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/dante/v1/q/messages', request, requestInit),
+  );
+}
+
+export async function o5DanteV1DeadMessageQueryServiceListDeadMessageEvents(
+  baseUrl: string | undefined,
+  request?: O5DanteV1ListDeadMessageEventsRequest,
+  requestInit?: RequestInit,
+): Promise<O5DanteV1ListDeadMessageEventsResponse | undefined> {
+  return makeRequest<O5DanteV1ListDeadMessageEventsResponse, O5DanteV1ListDeadMessageEventsRequest>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/dante/v1/q/message/:messageId/events', request, requestInit),
   );
 }
 

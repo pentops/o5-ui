@@ -148,13 +148,10 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
             />
 
             <h4>Code Source</h4>
-            <NutritionFact label="Type" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.gitHub ? 'GitHub' : ''} />
-            <NutritionFact label="Owner" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.gitHub?.owner} />
-            <NutritionFact label="Repository" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.gitHub?.repo} />
-            {match(e.configured.config?.codeSource?.type?.gitHub?.ref)
-              .with({ branch: P.not(P.nullish) }, (r) => <NutritionFact label="Branch" renderWhenEmpty="-" value={r.branch} />)
-              .with({ commit: P.not(P.nullish) }, (r) => <NutritionFact label="Commit" renderWhenEmpty="-" value={r.commit} />)
-              .otherwise(() => null)}
+            <NutritionFact label="Type" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github ? 'GitHub' : ''} />
+            <NutritionFact label="Owner" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.owner} />
+            <NutritionFact label="Repository" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.repo} />
+            <NutritionFact label="Branch" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.branch} />
           </>
         ))
         .with({ deploymentCompleted: P.not(P.nullish) }, (e) => (

@@ -174,19 +174,14 @@ export interface O5DeployerV1CloudFormationStackParameterTypeRulePriority {
 export interface O5DeployerV1CodeSourceType {
   type?: {
     // start oneOf
-    gitHub?: O5DeployerV1CodeSourceTypeGitHub;
+    github?: O5DeployerV1CodeSourceTypeGithub;
     // end oneOf
   };
 }
 
-export interface O5DeployerV1CodeSourceTypeGitHub {
+export interface O5DeployerV1CodeSourceTypeGithub {
+  commit?: string;
   owner?: string;
-  ref?: {
-    // start oneOf
-    branch?: string;
-    commit?: string;
-    // end oneOf
-  };
   repo?: string;
 }
 
@@ -358,8 +353,22 @@ export interface O5DeployerV1PostgresSpec {
   secretOutputName?: string;
 }
 
+export interface O5DeployerV1SourceTriggerType {
+  type?: {
+    // start oneOf
+    github?: O5DeployerV1SourceTriggerTypeGithub;
+    // end oneOf
+  };
+}
+
+export interface O5DeployerV1SourceTriggerTypeGithub {
+  branch?: string;
+  owner?: string;
+  repo?: string;
+}
+
 export interface O5DeployerV1StackConfig {
-  codeSource?: O5DeployerV1CodeSourceType;
+  codeSource?: O5DeployerV1SourceTriggerType;
 }
 
 export interface O5DeployerV1StackDeployment {
@@ -514,6 +523,24 @@ export enum O5DeployerV1StepStatus {
   Failed = 'FAILED',
 }
 
+export interface O5DeployerV1TriggerSource {
+  // start oneOf
+  github?: O5DeployerV1TriggerSourceGithubSource;
+  // end oneOf
+}
+
+export interface O5DeployerV1TriggerSourceGithubSource {
+  owner: string;
+  ref?: {
+    // start oneOf
+    branch?: string;
+    commit?: string;
+    tag?: string;
+    // end oneOf
+  };
+  repo: string;
+}
+
 export interface O5EnvironmentV1AWS {
   ecsClusterName?: string;
   ecsRepo?: string;
@@ -645,38 +672,6 @@ export interface O5AuthV1WhoamiResponse {
   realmAccess?: O5AuthV1RealmAccess[];
 }
 
-export interface O5DanteV1GetDeadMessageResponse {
-  events?: O5DanteV1DeadMessageEvent[];
-  message: O5DanteV1DeadMessageState;
-}
-
-export interface O5DanteV1GetDeadMessageRequest {
-  // format: uuid
-  messageId?: string;
-}
-
-export interface O5DanteV1ListDeadMessagesResponse {
-  messages?: O5DanteV1DeadMessageState[];
-  page?: PsmListV1PageResponse;
-}
-
-export interface O5DanteV1ListDeadMessagesRequest {
-  page?: PsmListV1PageRequest;
-  query?: PsmListV1QueryRequest;
-}
-
-export interface O5DanteV1ListDeadMessageEventsResponse {
-  events?: O5DanteV1DeadMessageEvent[];
-  page?: PsmListV1PageResponse;
-}
-
-export interface O5DanteV1ListDeadMessageEventsRequest {
-  // format: uuid
-  messageId?: string;
-  page?: PsmListV1PageRequest;
-  query?: PsmListV1QueryRequest;
-}
-
 export interface O5DanteV1UpdateDeadMessageResponse {
   message: O5DanteV1DeadMessageState;
 }
@@ -710,6 +705,38 @@ export interface O5DanteV1RejectDeadMessageRequest {
   messageId?: string;
 }
 
+export interface O5DanteV1GetDeadMessageResponse {
+  events?: O5DanteV1DeadMessageEvent[];
+  message: O5DanteV1DeadMessageState;
+}
+
+export interface O5DanteV1GetDeadMessageRequest {
+  // format: uuid
+  messageId?: string;
+}
+
+export interface O5DanteV1ListDeadMessagesResponse {
+  messages?: O5DanteV1DeadMessageState[];
+  page?: PsmListV1PageResponse;
+}
+
+export interface O5DanteV1ListDeadMessagesRequest {
+  page?: PsmListV1PageRequest;
+  query?: PsmListV1QueryRequest;
+}
+
+export interface O5DanteV1ListDeadMessageEventsResponse {
+  events?: O5DanteV1DeadMessageEvent[];
+  page?: PsmListV1PageResponse;
+}
+
+export interface O5DanteV1ListDeadMessageEventsRequest {
+  // format: uuid
+  messageId?: string;
+  page?: PsmListV1PageRequest;
+  query?: PsmListV1QueryRequest;
+}
+
 export interface O5DeployerV1TriggerDeploymentResponse {
   // format: uuid
   deploymentId?: string;
@@ -721,7 +748,7 @@ export interface O5DeployerV1TriggerDeploymentResponse {
 export interface O5DeployerV1TriggerDeploymentRequest {
   environment?: string;
   flags?: O5DeployerV1DeploymentFlags;
-  source?: O5DeployerV1CodeSourceType;
+  source?: O5DeployerV1TriggerSource;
   // format: uuid
   deploymentId?: string;
 }
