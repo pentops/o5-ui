@@ -11,6 +11,7 @@ import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 import { RocketIcon } from '@radix-ui/react-icons';
 import { TableRowType } from '@/components/data-table/body.tsx';
+import { Link } from 'react-router-dom';
 
 const columns: CustomColumnDef<O5DeployerV1StackState>[] = [
   getRowExpander(),
@@ -49,6 +50,10 @@ const columns: CustomColumnDef<O5DeployerV1StackState>[] = [
     size: 120,
     minSize: 120,
     maxSize: 140,
+    cell: ({ getValue, row }) => {
+      const value = getValue<string>();
+      return value && row.original.environmentId ? <Link to={`/environment/${row.original.environmentId}`}>{value}</Link> : value;
+    },
   },
   {
     header: 'Status',
