@@ -16,6 +16,14 @@ import type {
   O5DanteV1ListDeadMessagesRequest,
   O5DanteV1ListDeadMessageEventsResponse,
   O5DanteV1ListDeadMessageEventsRequest,
+  O5DeployerV1TriggerDeploymentResponse,
+  O5DeployerV1TriggerDeploymentRequest,
+  O5DeployerV1TerminateDeploymentResponse,
+  O5DeployerV1TerminateDeploymentRequest,
+  O5DeployerV1UpsertEnvironmentResponse,
+  O5DeployerV1UpsertEnvironmentRequest,
+  O5DeployerV1UpsertStackResponse,
+  O5DeployerV1UpsertStackRequest,
   O5DeployerV1GetDeploymentResponse,
   O5DeployerV1GetDeploymentRequest,
   O5DeployerV1ListDeploymentEventsResponse,
@@ -34,14 +42,6 @@ import type {
   O5DeployerV1GetEnvironmentRequest,
   O5DeployerV1ListEnvironmentEventsResponse,
   O5DeployerV1ListEnvironmentEventsRequest,
-  O5DeployerV1TriggerDeploymentResponse,
-  O5DeployerV1TriggerDeploymentRequest,
-  O5DeployerV1TerminateDeploymentResponse,
-  O5DeployerV1TerminateDeploymentRequest,
-  O5DeployerV1UpsertEnvironmentResponse,
-  O5DeployerV1UpsertEnvironmentRequest,
-  O5DeployerV1UpsertStackResponse,
-  O5DeployerV1UpsertStackRequest,
 } from '../../types/generated';
 
 export async function o5AuthV1AuthServiceWhoami(baseUrl: string | undefined, requestInit?: RequestInit): Promise<O5AuthV1WhoamiResponse | undefined> {
@@ -105,6 +105,46 @@ export async function o5DanteV1DeadMessageQueryServiceListDeadMessageEvents(
 ): Promise<O5DanteV1ListDeadMessageEventsResponse | undefined> {
   return makeRequest<O5DanteV1ListDeadMessageEventsResponse, O5DanteV1ListDeadMessageEventsRequest>(
     ...buildMergedRequestInit('GET', baseUrl || '', '/dante/v1/q/message/:messageId/events', request, requestInit),
+  );
+}
+
+export async function o5DeployerV1DeploymentCommandServiceTriggerDeployment(
+  baseUrl: string | undefined,
+  request?: O5DeployerV1TriggerDeploymentRequest,
+  requestInit?: RequestInit,
+): Promise<O5DeployerV1TriggerDeploymentResponse | undefined> {
+  return makeRequest<O5DeployerV1TriggerDeploymentResponse, O5DeployerV1TriggerDeploymentRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/c/deployments/:deploymentId', request, requestInit),
+  );
+}
+
+export async function o5DeployerV1DeploymentCommandServiceTerminateDeployment(
+  baseUrl: string | undefined,
+  request?: O5DeployerV1TerminateDeploymentRequest,
+  requestInit?: RequestInit,
+): Promise<O5DeployerV1TerminateDeploymentResponse | undefined> {
+  return makeRequest<O5DeployerV1TerminateDeploymentResponse, O5DeployerV1TerminateDeploymentRequest>(
+    ...buildMergedRequestInit('DELETE', baseUrl || '', '/deployer/v1/c/deployments/:deploymentId', request, requestInit),
+  );
+}
+
+export async function o5DeployerV1DeploymentCommandServiceUpsertEnvironment(
+  baseUrl: string | undefined,
+  request?: O5DeployerV1UpsertEnvironmentRequest,
+  requestInit?: RequestInit,
+): Promise<O5DeployerV1UpsertEnvironmentResponse | undefined> {
+  return makeRequest<O5DeployerV1UpsertEnvironmentResponse, O5DeployerV1UpsertEnvironmentRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/c/environments/:environmentId/config', request, requestInit),
+  );
+}
+
+export async function o5DeployerV1DeploymentCommandServiceUpsertStack(
+  baseUrl: string | undefined,
+  request?: O5DeployerV1UpsertStackRequest,
+  requestInit?: RequestInit,
+): Promise<O5DeployerV1UpsertStackResponse | undefined> {
+  return makeRequest<O5DeployerV1UpsertStackResponse, O5DeployerV1UpsertStackRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/c/stacks/:stackId/config', request, requestInit),
   );
 }
 
@@ -195,45 +235,5 @@ export async function o5DeployerV1DeploymentQueryServiceListEnvironmentEvents(
 ): Promise<O5DeployerV1ListEnvironmentEventsResponse | undefined> {
   return makeRequest<O5DeployerV1ListEnvironmentEventsResponse, O5DeployerV1ListEnvironmentEventsRequest>(
     ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/environment/:environmentId/events', request, requestInit),
-  );
-}
-
-export async function o5DeployerV1DeploymentCommandServiceTriggerDeployment(
-  baseUrl: string | undefined,
-  request?: O5DeployerV1TriggerDeploymentRequest,
-  requestInit?: RequestInit,
-): Promise<O5DeployerV1TriggerDeploymentResponse | undefined> {
-  return makeRequest<O5DeployerV1TriggerDeploymentResponse, O5DeployerV1TriggerDeploymentRequest>(
-    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/c/deployments/:deploymentId', request, requestInit),
-  );
-}
-
-export async function o5DeployerV1DeploymentCommandServiceTerminateDeployment(
-  baseUrl: string | undefined,
-  request?: O5DeployerV1TerminateDeploymentRequest,
-  requestInit?: RequestInit,
-): Promise<O5DeployerV1TerminateDeploymentResponse | undefined> {
-  return makeRequest<O5DeployerV1TerminateDeploymentResponse, O5DeployerV1TerminateDeploymentRequest>(
-    ...buildMergedRequestInit('DELETE', baseUrl || '', '/deployer/v1/c/deployments/:deploymentId', request, requestInit),
-  );
-}
-
-export async function o5DeployerV1DeploymentCommandServiceUpsertEnvironment(
-  baseUrl: string | undefined,
-  request?: O5DeployerV1UpsertEnvironmentRequest,
-  requestInit?: RequestInit,
-): Promise<O5DeployerV1UpsertEnvironmentResponse | undefined> {
-  return makeRequest<O5DeployerV1UpsertEnvironmentResponse, O5DeployerV1UpsertEnvironmentRequest>(
-    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/c/environments/:environmentId/config', request, requestInit),
-  );
-}
-
-export async function o5DeployerV1DeploymentCommandServiceUpsertStack(
-  baseUrl: string | undefined,
-  request?: O5DeployerV1UpsertStackRequest,
-  requestInit?: RequestInit,
-): Promise<O5DeployerV1UpsertStackResponse | undefined> {
-  return makeRequest<O5DeployerV1UpsertStackResponse, O5DeployerV1UpsertStackRequest>(
-    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/c/stacks/:stackId/config', request, requestInit),
   );
 }
