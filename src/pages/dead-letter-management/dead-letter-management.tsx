@@ -9,7 +9,7 @@ import { deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui
 import { useErrorHandler } from '@/lib/error.ts';
 import { useTableState } from '@/components/data-table/state.ts';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
-import { formatJSONString, hasBase64Strings } from '@/lib/json.ts';
+import { formatJSONString, getBase64StringObjectPaths } from '@/lib/json.ts';
 import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { buildDeadMessageProblemFacts } from '@/pages/dead-letter/build-facts.tsx';
 import { TableRowType } from '@/components/data-table/body.tsx';
@@ -157,7 +157,7 @@ function getSubRowRenderer(decodeB64: boolean, setDecodeB64: (value: boolean) =>
 
     try {
       const parsed = JSON.parse(row.original?.currentSpec?.payload?.json || '');
-      hasEncodedB64 = hasBase64Strings(parsed);
+      hasEncodedB64 = (getBase64StringObjectPaths(parsed)?.length || 0) > 0;
     } catch {}
 
     return (
@@ -193,7 +193,7 @@ const searchableFields = [
   { value: 'currentSpec.problem.type.invariantViolation.error.json', label: 'Invariant Violation Error' },
   { value: 'currentSpec.problem.type.unhandledError.error', label: 'Unhandled Error' },
 ];
-const initialSearchFields = searchableFields.map((field) => field.value);
+const initialSearchFields = [searchableFields[0].value, searchableFields[1].value, searchableFields[2].value];
 
 function DeadLetterManagement() {
   const [decodeB64, setDecodeB64] = useState<boolean>(false);

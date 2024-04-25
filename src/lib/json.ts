@@ -55,24 +55,6 @@ export function getBase64StringObjectPaths(obj: any): string[] {
   return paths;
 }
 
-export function hasBase64Strings(obj: any): boolean {
-  if (typeof obj !== 'object' || obj === null || obj instanceof Date || obj instanceof RegExp) {
-    return typeof obj === 'string' && b64_regex.test(obj);
-  }
-
-  if (Array.isArray(obj)) {
-    return obj.some((element) => hasBase64Strings(element));
-  }
-
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key) && hasBase64Strings(obj[key])) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
 export function formatJSONString(jsonString: string, decode?: boolean) {
   let returnValue = jsonString;
 
