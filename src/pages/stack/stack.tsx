@@ -285,8 +285,11 @@ export function Stack() {
               isLoading={isLoading}
               label="Queued Deployments"
               renderWhenEmpty="-"
-              value={data?.state?.queuedDeployments?.map((d) => (
-                <UUID short key={d.deploymentId} to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />
+              value={data?.state?.queuedDeployments?.map((d, i) => (
+                <React.Fragment key={d.deploymentId}>
+                  <UUID short to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />
+                  {i !== (data?.state?.queuedDeployments?.length ?? 0) - 1 && <br />}
+                </React.Fragment>
               ))}
             />
           </CardContent>
