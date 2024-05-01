@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useListEnvironments } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
-import { O5DeployerV1EnvironmentState } from '@/data/types';
+import { EnvironmentProvider, environmentProviderLabels, getEnvironmentProvider, O5DeployerV1EnvironmentState } from '@/data/types';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { environmentStatusLabels } from '@/data/types/ui/environment.ts';
@@ -29,10 +29,26 @@ const columns: CustomColumnDef<O5DeployerV1EnvironmentState>[] = [
   },
   {
     header: 'Full Name',
-    id: 'fullName',
+    id: 'config.fullName',
     size: 150,
     minSize: 150,
     accessorFn: (row) => row.config?.fullName,
+  },
+  {
+    header: 'Provider',
+    id: 'config.provider',
+    size: 80,
+    minSize: 80,
+    maxSize: 80,
+    accessorFn: (row) => {
+      const provider = getEnvironmentProvider(row);
+
+      if (provider === EnvironmentProvider.Unspecified) {
+        return '';
+      }
+
+      return environmentProviderLabels[provider];
+    },
   },
   {
     header: 'Status',

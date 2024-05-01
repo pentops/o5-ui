@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -52,7 +52,7 @@ function buildTableColumnSizeVariables<T extends Object>(
   tableRef: React.RefObject<HTMLDivElement>,
   headers: Header<T, any>[],
 ) {
-  const tableWidth = tableRef.current?.clientWidth || tableStateSize || 0;
+  const tableWidth = Math.max(tableStateSize, tableRef.current?.clientWidth || 0, 0);
 
   return headers.reduce(
     (acc, header) => {
@@ -81,7 +81,7 @@ function buildTableColumnSizeVariables<T extends Object>(
 
       return acc;
     },
-    {} as Record<string, string>,
+    { width: tableWidth } as React.CSSProperties & Record<string, string>,
   );
 }
 
@@ -181,7 +181,20 @@ export function DataTable<TData extends Object, TValue>({
 
   const totalSize = table.getTotalSize();
   const flatHeaders = table.getFlatHeaders();
-  const styleVariables = useMemo(() => buildTableColumnSizeVariables(totalSize, tableContainerRef, flatHeaders), [totalSize, flatHeaders]);
+  const [styleVariables, setStyleVariables] = useState(buildTableColumnSizeVariables(totalSize, tableContainerRef, flatHeaders));
+
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      setStyleVariables(buildTableColumnSizeVariables(totalSize, tableContainerRef, flatHeaders));
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [flatHeaders, totalSize]);
 
   useLayoutEffect(() => {
     const handleUpdateStickyHeaderPosition = () => {

@@ -90,6 +90,9 @@ const columns: CustomColumnDef<O5DeployerV1DeploymentState>[] = [
     id: 'createdAt',
     accessorKey: 'createdAt',
     enableSorting: true,
+    minSize: 135,
+    maxSize: 215,
+    size: 215,
     cell: ({ getValue }) => {
       return (
         <DateFormat

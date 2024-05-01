@@ -86,8 +86,8 @@ const columns: CustomColumnDef<O5DeployerV1StackState>[] = [
   {
     header: 'Current Deployment Version',
     id: 'currentDeployment.version',
-    size: 150,
-    minSize: 150,
+    size: 200,
+    minSize: 200,
     maxSize: 200,
     accessorFn: (row) => row.currentDeployment?.version,
     cell: ({ getValue }) => {
@@ -98,6 +98,8 @@ const columns: CustomColumnDef<O5DeployerV1StackState>[] = [
   {
     header: 'Queued Deployments',
     id: 'queuedDeployments.deploymentId',
+    minSize: 160,
+    size: 160,
     align: 'right',
     accessorFn: (row) => row.queuedDeployments?.map((d) => d.deploymentId || '-'),
     cell: ({ row }) =>
