@@ -1,0 +1,104 @@
+{
+  "enum": {
+    "O5AwsDeployerV1CfChangesetLifecycle": {
+      "AVAILABLE": "Available",
+      "EXECUTION": "Execution",
+      "TERMINAL": "Terminal",
+      "UNAVAILABLE": "Unavailable",
+      "UNSPECIFIED": "Unspecified"
+    },
+    "O5AwsDeployerV1CfLifecycle": {
+      "COMPLETE": "Complete",
+      "CREATE_FAILED": "Create Failed",
+      "MISSING": "Missing",
+      "PROGRESS": "Progress",
+      "ROLLED_BACK": "Rolled Back",
+      "ROLLING_BACK": "Rolling Back",
+      "TERMINAL": "Terminal",
+      "UNSPECIFIED": "Unspecified"
+    },
+    "O5AwsDeployerV1ClusterStatus": {
+      "ACTIVE": "Active",
+      "UNSPECIFIED": "Unspecified"
+    },
+    "O5AwsDeployerV1DeploymentStatus": {
+      "AVAILABLE": "Available",
+      "DONE": "Done",
+      "FAILED": "Failed",
+      "QUEUED": "Queued",
+      "RUNNING": "Running",
+      "TERMINATED": "Terminated",
+      "TRIGGERED": "Triggered",
+      "UNSPECIFIED": "Unspecified",
+      "WAITING": "Waiting"
+    },
+    "O5AwsDeployerV1EnvironmentStatus": {
+      "ACTIVE": "Active",
+      "UNSPECIFIED": "Unspecified"
+    },
+    "O5AwsDeployerV1StackStatus": {
+      "AVAILABLE": "Available",
+      "MIGRATING": "Migrating",
+      "UNSPECIFIED": "Unspecified"
+    },
+    "O5AwsDeployerV1StepStatus": {
+      "ACTIVE": "Active",
+      "BLOCKED": "Blocked",
+      "DONE": "Done",
+      "FAILED": "Failed",
+      "READY": "Ready",
+      "UNSPECIFIED": "Unspecified"
+    }
+  },
+  "oneOf": {
+    "O5AwsDeployerV1CloudFormationStackParameterType": {
+      "desiredCount": "Desired Count",
+      "rulePriority": "Rule Priority"
+    },
+    "O5AwsDeployerV1ClusterEventType": {
+      "configured": "Configured"
+    },
+    "O5AwsDeployerV1DeploymentEventType": {
+      "created": "Created",
+      "done": "Done",
+      "error": "Error",
+      "runStep": "Run Step",
+      "runSteps": "Run Steps",
+      "stackAvailable": "Stack Available",
+      "stackWait": "Stack Wait",
+      "stackWaitFailure": "Stack Wait Failure",
+      "stepResult": "Step Result",
+      "terminated": "Terminated",
+      "triggered": "Triggered"
+    },
+    "O5AwsDeployerV1EnvironmentEventType": {
+      "configured": "Configured"
+    },
+    "O5AwsDeployerV1StackEventType": {
+      "configured": "Configured",
+      "deploymentCompleted": "Deployment Completed",
+      "deploymentFailed": "Deployment Failed",
+      "deploymentRequested": "Deployment Requested",
+      "runDeployment": "Run Deployment"
+    },
+    "O5AwsDeployerV1StepOutputType": {
+      "cfPlanStatus": "CF Plan Status",
+      "cfStatus": "CF Status"
+    },
+    "O5AwsDeployerV1StepRequestType": {
+      "cfCreate": "CF Create",
+      "cfPlan": "CF Plan",
+      "cfScale": "CF Scale",
+      "cfUpdate": "CF Update",
+      "evalJoin": "Eval Join",
+      "pgCleanup": "PG Cleanup",
+      "pgEvaluate": "PG Evaluate",
+      "pgMigrate": "PG Migrate",
+      "pgUpsert": "PG Upsert"
+    },
+    "O5AwsDeployerV1TriggerSource": {
+      "github": "GitHub",
+      "inline": "Inline"
+    }
+  }
+}

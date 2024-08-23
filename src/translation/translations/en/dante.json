@@ -1,0 +1,19 @@
+{
+  "enum": {
+    "O5DanteV1MessageStatus": {
+      "CREATED": "Created",
+      "REJECTED": "Rejected",
+      "REPLAYED": "Replayed",
+      "UNSPECIFIED": "Unspecified",
+      "UPDATED": "Updated"
+    }
+  },
+  "oneOf": {
+    "O5DanteV1DeadMessageEventType": {
+      "notified": "Notified",
+      "rejected": "Rejected",
+      "replayed": "Replayed",
+      "updated": "Updated"
+    }
+  }
+}

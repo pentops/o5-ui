@@ -7,7 +7,7 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
-import { getStackEventType, O5DeployerV1StackEvent, StackEventType, stackEventTypeLabels, stackStatusLabels } from '@/data/types';
+import { getStackEventType, O5AwsDeployerV1StackEvent, StackEventType, stackEventTypeLabels, stackStatusLabels } from '@/data/types';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
@@ -16,7 +16,7 @@ import { useTableState } from '@/components/data-table/state.ts';
 import { buildCodeSourceFact } from '@/pages/stack/build-facts.tsx';
 import { TableRowType } from '@/components/data-table/body.tsx';
 
-const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
+const eventColumns: CustomColumnDef<O5AwsDeployerV1StackEvent>[] = [
   getRowExpander(),
   {
     header: 'ID',
@@ -82,49 +82,13 @@ const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
   },
 ];
 
-function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
+function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackEvent>) {
   return (
     <div className="flex flex-col gap-4">
       <NutritionFact label="Actor" value="-" />
 
-      {match(row.original.event?.type)
-        .with({ triggered: P.not(P.nullish) }, (e) => (
-          <>
-            <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.triggered.applicationName} />
-            <NutritionFact
-              label="Environment"
-              renderWhenEmpty="-"
-              value={
-                e.triggered.environmentName ? (
-                  e.triggered.environmentId ? (
-                    <span>
-                      <Link to={`/environment/${e.triggered.environmentId}`}>{e.triggered.environmentName}</Link> (
-                      <UUID canCopy to={`/environment/${e.triggered.environmentId}`} uuid={e.triggered.environmentId} />)
-                    </span>
-                  ) : (
-                    e.triggered.environmentName
-                  )
-                ) : e.triggered.environmentId ? (
-                  <UUID canCopy to={`/environment/${e.triggered.environmentId}`} uuid={e.triggered.environmentId} />
-                ) : undefined
-              }
-            />
-            <NutritionFact
-              label="Deployment"
-              renderWhenEmpty="-"
-              value={
-                e.triggered.deployment?.deploymentId ? (
-                  <UUID canCopy to={`/deployment/${e.triggered.deployment.deploymentId}`} uuid={e.triggered.deployment.deploymentId} />
-                ) : undefined
-              }
-            />
-            <NutritionFact
-              label="Deployment Version"
-              renderWhenEmpty="-"
-              value={e.triggered.deployment?.version ? <UUID canCopy uuid={e.triggered.deployment.version} /> : undefined}
-            />
-          </>
-        ))
+      {/* TODO: add missing events */}
+      {match(row.original.event)
         .with({ configured: P.not(P.nullish) }, (e) => (
           <>
             <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.configured.applicationName} />
@@ -146,12 +110,6 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
                 ) : undefined
               }
             />
-
-            <h4>Code Source</h4>
-            <NutritionFact label="Type" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github ? 'GitHub' : ''} />
-            <NutritionFact label="Owner" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.owner} />
-            <NutritionFact label="Repository" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.repo} />
-            <NutritionFact label="Branch" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.branch} />
           </>
         ))
         .with({ deploymentCompleted: P.not(P.nullish) }, (e) => (
@@ -226,7 +184,7 @@ export function Stack() {
       }
 
       return acc;
-    }, [] as O5DeployerV1StackEvent[]);
+    }, [] as O5AwsDeployerV1StackEvent[]);
   }, [eventsData?.pages]);
 
   return (
@@ -304,7 +262,7 @@ export function Stack() {
               controlledColumnSort={sortValues}
               data={flattenedEvents}
               filterValues={filterValues}
-              onColumnSort={setSortValues}
+              // onColumnSort={setSortValues}
               onFilter={setFilterValues}
               pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
               renderSubComponent={renderSubRow}

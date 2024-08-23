@@ -1,0 +1,14 @@
+{
+  "enum": {
+    "O5MessagingV1WireEncoding": {
+      "PROTOJSON": "Protojson",
+      "RAW": "Raw",
+      "UNSPECIFIED": "Unspecified"
+    }
+  },
+  "oneOf": {
+    "O5MessagingV1Problem": {
+      "unhandledError": "Unhandled Error"
+    }
+  }
+}
