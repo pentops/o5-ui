@@ -1,5 +1,6 @@
 import { camelCase, pascalCase } from 'change-case';
 import i18nPlugin from './.codegen/jdef-i18n-plugin.js';
+import { psmTableConfigPlugin } from './.codegen/jdef-table-config-plugin.js';
 
 const EXCLUDED_NAMESPACES = ['service', 'topic'];
 
@@ -56,5 +57,5 @@ export default {
         }, [])
         .join(''),
   },
-  plugins: [i18nPlugin],
+  plugins: [i18nPlugin, psmTableConfigPlugin],
 };

@@ -1,6 +1,13 @@
 import { match, P } from 'ts-pattern';
 import { I18NEXT_IMPORT_PATH, I18nPlugin } from '@pentops/j5-ts-generator-i18n-plugin';
-import { CASE_OVERRIDES, getPackageFileName, getValidSchemaPackage, I18N_T_FUNCTION_TYPE_NAME, titleCaseName } from './shared.js';
+import {
+  CASE_OVERRIDES,
+  getPackageFileName,
+  getValidSchemaPackage,
+  I18N_T_FUNCTION_TYPE_NAME,
+  titleCaseName,
+  TRANSLATION_DIRECTORY,
+} from './shared.js';
 
 const REACT_I18NEXT_IMPORT_PATH = 'react-i18next';
 const REACT_I18NEXT_MIDDLEWARE_NAME = 'initReactI18next';
@@ -49,7 +56,7 @@ export default new I18nPlugin({
         typeOnlyExports: [I18N_T_FUNCTION_TYPE_NAME],
       });
     },
-    directory: './src/translation',
+    directory: TRANSLATION_DIRECTORY,
     fileName: 'index.ts',
     middleware: [{ importSpecifier: REACT_I18NEXT_MIDDLEWARE_NAME, importPath: REACT_I18NEXT_IMPORT_PATH }],
     addGeneratedResources: true,
@@ -62,7 +69,7 @@ export default new I18nPlugin({
     },
   },
   files: (generatedSchemas) => {
-    const directory = './src/translation/translations/en';
+    const directory = `${TRANSLATION_DIRECTORY}/translations/en`;
     const files = new Map();
 
     function getFilterFunction(fullGrpcPackageName) {

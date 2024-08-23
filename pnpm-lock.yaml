@@ -143,11 +143,14 @@ dependencies:
 
 devDependencies:
   '@pentops/j5-ts-generator-i18n-plugin':
-    specifier: ^0.0.9
-    version: 0.0.9(@pentops/jsonapi-jdef-ts-generator@0.0.72)(i18next@23.14.0)
+    specifier: ^0.0.10
+    version: 0.0.10(@pentops/jsonapi-jdef-ts-generator@0.0.75)(i18next@23.14.0)
+  '@pentops/j5-ts-generator-psm-table-config-plugin':
+    specifier: ^0.0.7
+    version: 0.0.7(@pentops/jsonapi-jdef-ts-generator@0.0.75)(@pentops/react-table-state-psm@0.0.6)
   '@pentops/jsonapi-jdef-ts-generator':
-    specifier: ^0.0.72
-    version: 0.0.72(@pentops/jsonapi-request@0.0.4)
+    specifier: ^0.0.75
+    version: 0.0.75(@pentops/jsonapi-request@0.0.4)
   '@types/js-yaml':
     specifier: ^4.0.9
     version: 4.0.9
@@ -790,13 +793,13 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  /@pentops/j5-ts-generator-i18n-plugin@0.0.9(@pentops/jsonapi-jdef-ts-generator@0.0.72)(i18next@23.14.0):
-    resolution: {integrity: sha512-8WbbRo6pkANXOkVhUx/R4lz1F0ktuzfgjeBSCagO+2DN5wplf3chKgkUsB0v9ee0OSOIdldMz+bkXEjlD1enCg==}
+  /@pentops/j5-ts-generator-i18n-plugin@0.0.10(@pentops/jsonapi-jdef-ts-generator@0.0.75)(i18next@23.14.0):
+    resolution: {integrity: sha512-Ym4jycyMTkalDIc4Lje04xB80i1wG+QHoiHprUBdZs5VUKiqqu44U/sepYlO555UqS/Xo+dvcF1Zpcewsbubww==}
     peerDependencies:
-      '@pentops/jsonapi-jdef-ts-generator': '>=0.0.71 < 0.1.0'
+      '@pentops/jsonapi-jdef-ts-generator': '>=0.0.73 < 0.1.0'
       i18next: '>=23.0.0 < 24.0.0'
     dependencies:
-      '@pentops/jsonapi-jdef-ts-generator': 0.0.72(@pentops/jsonapi-request@0.0.4)
+      '@pentops/jsonapi-jdef-ts-generator': 0.0.75(@pentops/jsonapi-request@0.0.4)
       '@pentops/sort-helpers': 0.0.1
       change-case: 5.4.4
       i18next: 23.14.0
@@ -804,8 +807,21 @@ packages:
       ts-pattern: 5.3.1
     dev: true
 
-  /@pentops/jsonapi-jdef-ts-generator@0.0.72(@pentops/jsonapi-request@0.0.4):
-    resolution: {integrity: sha512-mrlojqrVEX9gViz+I49Kokj0HJlz7JwFRDgrvEFjlAK1yEb9pYxWjGfqN/rzrEYo7ImLuuwiKOzKcAwafUpwyQ==}
+  /@pentops/j5-ts-generator-psm-table-config-plugin@0.0.7(@pentops/jsonapi-jdef-ts-generator@0.0.75)(@pentops/react-table-state-psm@0.0.6):
+    resolution: {integrity: sha512-ZgWFDjufM2X9j6GQ0MSlUH+JHTkZUHAVzRUNBxk0aSSQboGIM5orVcq/rB/xmv6zEV0fGKXvKQRvwMSHBCJ4Sw==}
+    peerDependencies:
+      '@pentops/jsonapi-jdef-ts-generator': '>=0.0.75 < 0.1.0'
+      '@pentops/react-table-state-psm': '>=0.0.6 < 0.1.0'
+    dependencies:
+      '@pentops/jsonapi-jdef-ts-generator': 0.0.75(@pentops/jsonapi-request@0.0.4)
+      '@pentops/react-table-state-psm': 0.0.6(react-dom@18.3.1)(react@18.3.1)
+      change-case: 5.4.4
+      ts-morph: 23.0.0
+      ts-pattern: 5.3.1
+    dev: true
+
+  /@pentops/jsonapi-jdef-ts-generator@0.0.75(@pentops/jsonapi-request@0.0.4):
+    resolution: {integrity: sha512-/rhe0SdrnBxQUrZCupoHCmexDs0zICV3KekJLGBdv47J3pGpf2PLcEn5IEGRWrCdKgTWUdKyrFcrlsVKHGrx/Q==}
     hasBin: true
     peerDependencies:
       '@pentops/jsonapi-request': '>=0.0.4'
@@ -853,7 +869,6 @@ packages:
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-    dev: false
 
   /@pentops/sort-helpers@0.0.1:
     resolution: {integrity: sha512-Hn2eLyvD9wB0maMqnmjDL53gdz93R6NtUnM2C06+3MKH58LD6IKVWjbSsgDsNfHbiTZLGWLL/x/cP9zVcAqN7Q==}
@@ -2035,6 +2050,15 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
+  /@ts-morph/common@0.24.0:
+    resolution: {integrity: sha512-c1xMmNHWpNselmpIqursHeOHHBTIsJLbB+NuovbTTRCNiTLEr/U9dbJ8qy0jd/O2x5pc3seWuOUN5R2IoOTp8A==}
+    dependencies:
+      fast-glob: 3.3.2
+      minimatch: 9.0.5
+      mkdirp: 3.0.1
+      path-browserify: 1.0.1
+    dev: true
+
   /@types/babel__core@7.20.5:
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
     dependencies:
@@ -2487,6 +2511,10 @@ packages:
     transitivePeerDependencies:
       - '@types/react'
     dev: false
+
+  /code-block-writer@13.0.2:
+    resolution: {integrity: sha512-XfXzAGiStXSmCIwrkdfvc7FS5Dtj8yelCtyOf2p2skCAfvLd6zu0rGzuS9NSCO3bq1JKpFZ7tbKdKlcd5occQA==}
+    dev: true
 
   /color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
@@ -3192,7 +3220,6 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
-    dev: false
 
   /lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
@@ -3243,6 +3270,12 @@ packages:
   /minipass@7.1.2:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
+
+  /mkdirp@3.0.1:
+    resolution: {integrity: sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==}
+    engines: {node: '>=10'}
+    hasBin: true
+    dev: true
 
   /ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
@@ -3352,6 +3385,10 @@ packages:
   /parse-ms@4.0.0:
     resolution: {integrity: sha512-TXfryirbmq34y8QBwgqCVLi+8oA3oWx2eAnSn62ITyEhEYaWRlVZ2DvMM9eZbMs/RfxPu/PK/aBLyGj4IrqMHw==}
     engines: {node: '>=18'}
+    dev: true
+
+  /path-browserify@1.0.1:
+    resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
     dev: true
 
   /path-exists@4.0.0:
@@ -3525,7 +3562,6 @@ packages:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
-    dev: false
 
   /react-hook-form@7.52.2(react@18.3.1):
     resolution: {integrity: sha512-pqfPEbERnxxiNMPd0bzmt1tuaPcVccywFDpyk2uV5xCIBphHV5T8SVnX9/o3kplPE1zzKt77+YIoq+EMwJp56A==}
@@ -3670,7 +3706,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       loose-envify: 1.4.0
-    dev: false
 
   /read-cache@1.0.0:
     resolution: {integrity: sha512-Owdv/Ft7IjOgm/i0xvNDZ1LrRANRfew4b2prF3OWMQLxLfu3bS8FVhCsrSCMK4lR56Y9ya+AThoTpDCTxCmpRA==}
@@ -3746,7 +3781,6 @@ packages:
     resolution: {integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==}
     dependencies:
       loose-envify: 1.4.0
-    dev: false
 
   /semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -3945,6 +3979,13 @@ packages:
 
   /ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
+
+  /ts-morph@23.0.0:
+    resolution: {integrity: sha512-FcvFx7a9E8TUe6T3ShihXJLiJOiqyafzFKUO4aqIHDUCIvADdGNShcbc2W5PMr3LerXRv7mafvFZ9lRENxJmug==}
+    dependencies:
+      '@ts-morph/common': 0.24.0
+      code-block-writer: 13.0.2
+    dev: true
 
   /ts-pattern@5.3.1:
     resolution: {integrity: sha512-1RUMKa8jYQdNfmnK4jyzBK3/PS/tnjcZ1CW0v1vWDeYe5RBklc/nquw03MEoB66hVBm4BnlCfmOqDVxHyT1DpA==}

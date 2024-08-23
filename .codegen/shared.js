@@ -1,6 +1,8 @@
 import { capitalCase, kebabCase } from 'change-case';
 import { match, P } from 'ts-pattern';
 
+export const TRANSLATION_DIRECTORY = './src/translation';
+
 export const DEFAULT_MINOR_WORDS = [
   'and',
   'as',
