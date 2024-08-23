@@ -1,5 +1,8 @@
 {
   "enum": {
+    "O5MessagingV1ProblemOneOfValue": {
+      "unhandledError": "Unhandled Error"
+    },
     "O5MessagingV1WireEncoding": {
       "PROTOJSON": "Protojson",
       "RAW": "Raw",

@@ -42,9 +42,9 @@ export function getPackageFileName(pkg) {
 export function getValidSchemaPackage(schema) {
   return match(schema)
     .with({ rawSchema: { enum: P.not(P.nullish) } }, (s) => {
-      if (s.rawSchema.enum.isDerivedHelperType) {
-        return undefined;
-      }
+      // if (s.rawSchema.enum.isDerivedHelperType) {
+      //   return undefined;
+      // }
 
       return s.parentPackage || s.rawSchema.enum.package;
     })
@@ -53,7 +53,8 @@ export function getValidSchemaPackage(schema) {
 }
 
 export function titleCaseName(name, forcedCaseWords = {}, minorWords = DEFAULT_MINOR_WORDS) {
-  const capitalCased = capitalCase(name);
+  const lastKeyPart = name.split('.').pop() || name;
+  const capitalCased = capitalCase(lastKeyPart);
   const split = capitalCased.split(' ');
 
   return split
@@ -79,6 +80,7 @@ export const CASE_OVERRIDES = {
   url: 'URL',
   psm: 'PSM',
   jwt: 'JWT',
+  jti: 'JTI',
   http: 'HTTP',
   github: 'GitHub',
   json: 'JSON',
@@ -87,4 +89,5 @@ export const CASE_OVERRIDES = {
   cf: 'CF',
   pg: 'PG',
   aws: 'AWS',
+  ecs: 'ECS',
 };

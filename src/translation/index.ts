@@ -9,19 +9,19 @@ import enAwsDeployerNs from './translations/en/aws-deployer.json';
 import { initReactI18next, useTranslation } from 'react-i18next';
 
 i18n.use(initReactI18next).init({
-    lng: 'en',
-    fallbackLng: 'en',
-    interpolation: {
-        escapeValue: false
+  lng: 'en',
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+  resources: {
+    en: {
+      dante: enDanteNs,
+      o5: enO5Ns,
+      j5: enJ5Ns,
+      awsDeployer: enAwsDeployerNs,
     },
-    resources: {
-        en: {
-            dante: enDanteNs,
-            o5: enO5Ns,
-            j5: enJ5Ns,
-            awsDeployer: enAwsDeployerNs
-        }
-    }
-})
+  },
+});
 
 export { i18n, type TFunction, useTranslation };

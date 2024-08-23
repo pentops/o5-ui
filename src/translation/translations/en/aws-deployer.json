@@ -17,9 +17,67 @@
       "TERMINAL": "Terminal",
       "UNSPECIFIED": "Unspecified"
     },
+    "O5AwsDeployerV1CloudFormationStackParameterTypeOneOfValue": {
+      "desiredCount": "Desired Count",
+      "rulePriority": "Rule Priority"
+    },
+    "O5AwsDeployerV1ClusterEventTypeOneOfValue": {
+      "configured": "Configured"
+    },
     "O5AwsDeployerV1ClusterStatus": {
       "ACTIVE": "Active",
       "UNSPECIFIED": "Unspecified"
+    },
+    "O5AwsDeployerV1DeploymentEventTypeOneOfValue": {
+      "created": "Created",
+      "done": "Done",
+      "error": "Error",
+      "runStep": "Run Step",
+      "runSteps": "Run Steps",
+      "stackAvailable": "Stack Available",
+      "stackWait": "Stack Wait",
+      "stackWaitFailure": "Stack Wait Failure",
+      "stepResult": "Step Result",
+      "terminated": "Terminated",
+      "triggered": "Triggered"
+    },
+    "O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsFilterableFields": {
+      "event": {
+        "created": {
+          "spec": {
+            "appName": "App Name",
+            "cfStackName": "CF Stack Name",
+            "ecsCluster": "ECS Cluster",
+            "environmentId": "Environment ID",
+            "environmentName": "Environment Name",
+            "version": "Version"
+          }
+        }
+      }
+    },
+    "O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsSortableFields": {
+      "metadata": {
+        "timestamp": "Timestamp"
+      }
+    },
+    "O5AwsDeployerV1DeploymentQueryServiceListDeploymentsFilterableFields": {
+      "data": {
+        "spec": {
+          "appName": "App Name",
+          "cfStackName": "CF Stack Name",
+          "ecsCluster": "ECS Cluster",
+          "environmentId": "Environment ID",
+          "environmentName": "Environment Name",
+          "version": "Version"
+        }
+      },
+      "status": "Status"
+    },
+    "O5AwsDeployerV1DeploymentQueryServiceListDeploymentsSortableFields": {
+      "metadata": {
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
+      }
     },
     "O5AwsDeployerV1DeploymentStatus": {
       "AVAILABLE": "Available",
@@ -32,14 +90,90 @@
       "UNSPECIFIED": "Unspecified",
       "WAITING": "Waiting"
     },
+    "O5AwsDeployerV1EnvironmentEventTypeOneOfValue": {
+      "configured": "Configured"
+    },
+    "O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEventsSearchableFields": {
+      "event": {
+        "configured": {
+          "config": {
+            "fullName": "Full Name"
+          }
+        }
+      }
+    },
+    "O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEventsSortableFields": {
+      "metadata": {
+        "timestamp": "Timestamp"
+      }
+    },
+    "O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilterableFields": {
+      "status": "Status"
+    },
+    "O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchableFields": {
+      "data": {
+        "config": {
+          "fullName": "Full Name"
+        }
+      }
+    },
+    "O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSortableFields": {
+      "metadata": {
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
+      }
+    },
     "O5AwsDeployerV1EnvironmentStatus": {
       "ACTIVE": "Active",
       "UNSPECIFIED": "Unspecified"
+    },
+    "O5AwsDeployerV1StackEventTypeOneOfValue": {
+      "configured": "Configured",
+      "deploymentCompleted": "Deployment Completed",
+      "deploymentFailed": "Deployment Failed",
+      "deploymentRequested": "Deployment Requested",
+      "runDeployment": "Run Deployment"
+    },
+    "O5AwsDeployerV1StackQueryServiceListStackEventsSortableFields": {
+      "metadata": {
+        "timestamp": "Timestamp"
+      }
+    },
+    "O5AwsDeployerV1StackQueryServiceListStacksFilterableFields": {
+      "status": "Status"
+    },
+    "O5AwsDeployerV1StackQueryServiceListStacksSearchableFields": {
+      "data": {
+        "applicationName": "Application Name",
+        "environmentName": "Environment Name",
+        "stackName": "Stack Name"
+      }
+    },
+    "O5AwsDeployerV1StackQueryServiceListStacksSortableFields": {
+      "metadata": {
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
+      }
     },
     "O5AwsDeployerV1StackStatus": {
       "AVAILABLE": "Available",
       "MIGRATING": "Migrating",
       "UNSPECIFIED": "Unspecified"
+    },
+    "O5AwsDeployerV1StepOutputTypeOneOfValue": {
+      "cfPlanStatus": "CF Plan Status",
+      "cfStatus": "CF Status"
+    },
+    "O5AwsDeployerV1StepRequestTypeOneOfValue": {
+      "cfCreate": "CF Create",
+      "cfPlan": "CF Plan",
+      "cfScale": "CF Scale",
+      "cfUpdate": "CF Update",
+      "evalJoin": "Eval Join",
+      "pgCleanup": "PG Cleanup",
+      "pgEvaluate": "PG Evaluate",
+      "pgMigrate": "PG Migrate",
+      "pgUpsert": "PG Upsert"
     },
     "O5AwsDeployerV1StepStatus": {
       "ACTIVE": "Active",
@@ -48,6 +182,10 @@
       "FAILED": "Failed",
       "READY": "Ready",
       "UNSPECIFIED": "Unspecified"
+    },
+    "O5AwsDeployerV1TriggerSourceOneOfValue": {
+      "github": "GitHub",
+      "inline": "Inline"
     }
   },
   "oneOf": {

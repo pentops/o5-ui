@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "generate:types": "jdef-ts-generator && prettier --write \"src/data/**/generated/*.ts\""
+    "generate:types": "jdef-ts-generator && prettier --write \"src/**/generated/*.ts\" \"src/translation/**/*.ts\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -58,8 +58,8 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
-    "@pentops/j5-ts-generator-i18n-plugin": "^0.0.8",
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.69",
+    "@pentops/j5-ts-generator-i18n-plugin": "^0.0.9",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.72",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash.get": "^4.4.9",
     "@types/lodash.set": "^4.3.9",

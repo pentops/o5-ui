@@ -1,4 +1,26 @@
 {
+  "enum": {
+    "J5AuthV1AuthenticationMethodOneOfValue": {
+      "external": "External",
+      "jwt": "JWT",
+      "session": "Session"
+    },
+    "J5ListV1FieldTypeOneOfValue": {
+      "range": "Range",
+      "value": "Value"
+    },
+    "J5ListV1FilterOneOfValue": {
+      "and": "And",
+      "field": "Field",
+      "or": "Or"
+    },
+    "J5StateV1CauseOneOfValue": {
+      "command": "Command",
+      "externalEvent": "External Event",
+      "psmEvent": "PSM Event",
+      "reply": "Reply"
+    }
+  },
   "oneOf": {
     "J5AuthV1AuthenticationMethod": {
       "external": "External",
