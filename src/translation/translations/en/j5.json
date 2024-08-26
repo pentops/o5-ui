@@ -5,6 +5,12 @@
       "jwt": "JWT",
       "session": "Session"
     },
+    "J5AuthV1MethodAuthTypeOneOfValue": {
+      "cookie": "Cookie",
+      "custom": "Custom",
+      "jwtBearer": "JWT Bearer",
+      "none": "None"
+    },
     "J5ListV1FieldTypeOneOfValue": {
       "range": "Range",
       "value": "Value"
@@ -26,6 +32,12 @@
       "external": "External",
       "jwt": "JWT",
       "session": "Session"
+    },
+    "J5AuthV1MethodAuthType": {
+      "cookie": "Cookie",
+      "custom": "Custom",
+      "jwtBearer": "JWT Bearer",
+      "none": "None"
     },
     "J5ListV1FieldType": {
       "range": "Range",

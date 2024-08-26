@@ -14,6 +14,14 @@ const projects = [
     name: 'o5-deploy',
     version: process.env.O5_DEPLOY_VERSION || 'main',
   },
+  {
+    name: 'realms',
+    version: process.env.O5_REALMS_VERSION || 'main',
+  },
+  {
+    name: 'registry',
+    version: process.env.O5_REGISTRY_VERSION || 'main',
+  },
 ];
 const version = process.env.O5_REGISTRY_IMAGE_VERSION || 'v1';
 

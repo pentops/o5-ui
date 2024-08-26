@@ -1,4 +1,4 @@
-import { factory, SyntaxKind } from 'typescript';
+import { factory } from 'typescript';
 import { getImportPath } from '@pentops/jsonapi-jdef-ts-generator';
 import { defaultTranslationPathOrGetter } from '@pentops/j5-ts-generator-i18n-plugin';
 import { PSMTableConfigPlugin } from '@pentops/j5-ts-generator-psm-table-config-plugin';
@@ -16,7 +16,7 @@ const T_FUNCTION_NAME = 't';
 export const psmTableConfigPlugin = new PSMTableConfigPlugin({
   files: [
     {
-      directory: './src/data/table-config',
+      directory: './src/data/table-config/generated',
       fileName: 'index.ts',
     },
   ],

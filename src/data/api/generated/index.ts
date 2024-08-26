@@ -15,12 +15,6 @@ import type {
   O5DanteV1DeadMessageCommandServiceReplayDeadMessageRequest,
   O5DanteV1DeadMessageCommandServiceRejectDeadMessageResponse,
   O5DanteV1DeadMessageCommandServiceRejectDeadMessageRequest,
-  O5AwsDeployerV1DeploymentQueryServiceGetDeploymentResponse,
-  O5AwsDeployerV1DeploymentQueryServiceGetDeploymentGetDeploymentRequest,
-  O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsResponse,
-  O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest,
-  O5AwsDeployerV1DeploymentQueryServiceListDeploymentsResponse,
-  O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest,
   O5AwsDeployerV1StackQueryServiceGetStackResponse,
   O5AwsDeployerV1StackQueryServiceGetStackGetStackRequest,
   O5AwsDeployerV1StackQueryServiceListStacksResponse,
@@ -33,6 +27,12 @@ import type {
   O5AwsDeployerV1EnvironmentQueryServiceGetEnvironmentGetEnvironmentRequest,
   O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEventsResponse,
   O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEventsRequest,
+  O5AwsDeployerV1DeploymentQueryServiceGetDeploymentResponse,
+  O5AwsDeployerV1DeploymentQueryServiceGetDeploymentGetDeploymentRequest,
+  O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsResponse,
+  O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest,
+  O5AwsDeployerV1DeploymentQueryServiceListDeploymentsResponse,
+  O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest,
   O5AwsDeployerV1DeploymentCommandServiceTriggerDeploymentResponse,
   O5AwsDeployerV1DeploymentCommandServiceTriggerDeploymentRequest,
   O5AwsDeployerV1DeploymentCommandServiceTerminateDeploymentResponse,
@@ -43,6 +43,22 @@ import type {
   O5AwsDeployerV1DeploymentCommandServiceUpsertEnvironmentRequest,
   O5AwsDeployerV1DeploymentCommandServiceUpsertStackResponse,
   O5AwsDeployerV1DeploymentCommandServiceUpsertStackRequest,
+  O5RealmV1AuthServiceWhoamiResponse,
+  J5RegistryRegistryV1DownloadServiceDownloadImageDownloadImageRequest,
+  J5RegistryRegistryV1DownloadServiceDownloadSwaggerDownloadSwaggerRequest,
+  J5RegistryRegistryV1DownloadServiceDownloadJDefDownloadJDefRequest,
+  J5RegistryRegistryV1DownloadServiceDownloadClientApiResponse,
+  J5RegistryRegistryV1DownloadServiceDownloadClientApiDownloadClientApiRequest,
+  J5RegistryGithubV1RepoQueryServiceGetRepoResponse,
+  J5RegistryGithubV1RepoQueryServiceGetRepoGetRepoRequest,
+  J5RegistryGithubV1RepoQueryServiceListReposResponse,
+  J5RegistryGithubV1RepoQueryServiceListReposListReposRequest,
+  J5RegistryGithubV1RepoQueryServiceListRepoEventsResponse,
+  J5RegistryGithubV1RepoQueryServiceListRepoEventsListRepoEventsRequest,
+  J5RegistryGithubV1RepoCommandServiceConfigureRepoResponse,
+  J5RegistryGithubV1RepoCommandServiceConfigureRepoRequest,
+  J5RegistryGithubV1RepoCommandServiceTriggerResponse,
+  J5RegistryGithubV1RepoCommandServiceTriggerRequest,
 } from '../../types/generated';
 
 export async function o5DanteV1DeadMessageQueryServiceGetDeadMessage(
@@ -104,38 +120,6 @@ export async function o5DanteV1DeadMessageCommandServiceRejectDeadMessage(
 ): Promise<O5DanteV1DeadMessageCommandServiceRejectDeadMessageResponse | undefined> {
   return makeRequest<O5DanteV1DeadMessageCommandServiceRejectDeadMessageResponse, O5DanteV1DeadMessageCommandServiceRejectDeadMessageRequest>(
     ...buildMergedRequestInit('POST', baseUrl || '', '/dante/v1/c/messages/:messageId/shelve', request, requestInit),
-  );
-}
-
-export async function o5AwsDeployerV1DeploymentQueryServiceGetDeployment(
-  baseUrl: string | undefined,
-  request?: O5AwsDeployerV1DeploymentQueryServiceGetDeploymentGetDeploymentRequest,
-  requestInit?: RequestInit,
-): Promise<O5AwsDeployerV1DeploymentQueryServiceGetDeploymentResponse | undefined> {
-  return makeRequest<
-    O5AwsDeployerV1DeploymentQueryServiceGetDeploymentResponse,
-    O5AwsDeployerV1DeploymentQueryServiceGetDeploymentGetDeploymentRequest
-  >(...buildMergedRequestInit('GET', baseUrl || '', '/deployer/v1/q/deployment/:deploymentId', request, requestInit));
-}
-
-export async function o5AwsDeployerV1DeploymentQueryServiceListDeploymentEvents(
-  baseUrl: string | undefined,
-  request?: O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest,
-  requestInit?: RequestInit,
-): Promise<O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsResponse | undefined> {
-  return makeRequest<
-    O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsResponse,
-    O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest
-  >(...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/deployment/:deploymentId/events', request, requestInit));
-}
-
-export async function o5AwsDeployerV1DeploymentQueryServiceListDeployments(
-  baseUrl: string | undefined,
-  request?: O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest,
-  requestInit?: RequestInit,
-): Promise<O5AwsDeployerV1DeploymentQueryServiceListDeploymentsResponse | undefined> {
-  return makeRequest<O5AwsDeployerV1DeploymentQueryServiceListDeploymentsResponse, O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest>(
-    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/deployments', request, requestInit),
   );
 }
 
@@ -201,6 +185,38 @@ export async function o5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEvent
   >(...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/environment/:environmentId/events', request, requestInit));
 }
 
+export async function o5AwsDeployerV1DeploymentQueryServiceGetDeployment(
+  baseUrl: string | undefined,
+  request?: O5AwsDeployerV1DeploymentQueryServiceGetDeploymentGetDeploymentRequest,
+  requestInit?: RequestInit,
+): Promise<O5AwsDeployerV1DeploymentQueryServiceGetDeploymentResponse | undefined> {
+  return makeRequest<
+    O5AwsDeployerV1DeploymentQueryServiceGetDeploymentResponse,
+    O5AwsDeployerV1DeploymentQueryServiceGetDeploymentGetDeploymentRequest
+  >(...buildMergedRequestInit('GET', baseUrl || '', '/deployer/v1/q/deployment/:deploymentId', request, requestInit));
+}
+
+export async function o5AwsDeployerV1DeploymentQueryServiceListDeploymentEvents(
+  baseUrl: string | undefined,
+  request?: O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest,
+  requestInit?: RequestInit,
+): Promise<O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsResponse | undefined> {
+  return makeRequest<
+    O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsResponse,
+    O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest
+  >(...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/deployment/:deploymentId/events', request, requestInit));
+}
+
+export async function o5AwsDeployerV1DeploymentQueryServiceListDeployments(
+  baseUrl: string | undefined,
+  request?: O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest,
+  requestInit?: RequestInit,
+): Promise<O5AwsDeployerV1DeploymentQueryServiceListDeploymentsResponse | undefined> {
+  return makeRequest<O5AwsDeployerV1DeploymentQueryServiceListDeploymentsResponse, O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/deployments', request, requestInit),
+  );
+}
+
 export async function o5AwsDeployerV1DeploymentCommandServiceTriggerDeployment(
   baseUrl: string | undefined,
   request?: O5AwsDeployerV1DeploymentCommandServiceTriggerDeploymentRequest,
@@ -251,5 +267,105 @@ export async function o5AwsDeployerV1DeploymentCommandServiceUpsertStack(
 ): Promise<O5AwsDeployerV1DeploymentCommandServiceUpsertStackResponse | undefined> {
   return makeRequest<O5AwsDeployerV1DeploymentCommandServiceUpsertStackResponse, O5AwsDeployerV1DeploymentCommandServiceUpsertStackRequest>(
     ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/c/stacks/:stackId/config', request, requestInit),
+  );
+}
+
+export async function o5RealmV1AuthServiceWhoami(
+  baseUrl: string | undefined,
+  requestInit?: RequestInit,
+): Promise<O5RealmV1AuthServiceWhoamiResponse | undefined> {
+  return makeRequest<O5RealmV1AuthServiceWhoamiResponse>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/o5-auth/v1/whoami', undefined, requestInit),
+  );
+}
+
+export async function j5RegistryRegistryV1DownloadServiceDownloadImage(
+  baseUrl: string | undefined,
+  request?: J5RegistryRegistryV1DownloadServiceDownloadImageDownloadImageRequest,
+  requestInit?: RequestInit,
+): Promise<undefined> {
+  return makeRequest<undefined, J5RegistryRegistryV1DownloadServiceDownloadImageDownloadImageRequest>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/registry/v1/:owner/:name/:version/image.bin', request, requestInit),
+  );
+}
+
+export async function j5RegistryRegistryV1DownloadServiceDownloadSwagger(
+  baseUrl: string | undefined,
+  request?: J5RegistryRegistryV1DownloadServiceDownloadSwaggerDownloadSwaggerRequest,
+  requestInit?: RequestInit,
+): Promise<undefined> {
+  return makeRequest<undefined, J5RegistryRegistryV1DownloadServiceDownloadSwaggerDownloadSwaggerRequest>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/registry/v1/:owner/:name/:version/swagger.json', request, requestInit),
+  );
+}
+
+export async function j5RegistryRegistryV1DownloadServiceDownloadJDef(
+  baseUrl: string | undefined,
+  request?: J5RegistryRegistryV1DownloadServiceDownloadJDefDownloadJDefRequest,
+  requestInit?: RequestInit,
+): Promise<undefined> {
+  return makeRequest<undefined, J5RegistryRegistryV1DownloadServiceDownloadJDefDownloadJDefRequest>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/registry/v1/:owner/:name/:version/jdef.json', request, requestInit),
+  );
+}
+
+export async function j5RegistryRegistryV1DownloadServiceDownloadClientApi(
+  baseUrl: string | undefined,
+  request?: J5RegistryRegistryV1DownloadServiceDownloadClientApiDownloadClientApiRequest,
+  requestInit?: RequestInit,
+): Promise<J5RegistryRegistryV1DownloadServiceDownloadClientApiResponse | undefined> {
+  return makeRequest<
+    J5RegistryRegistryV1DownloadServiceDownloadClientApiResponse,
+    J5RegistryRegistryV1DownloadServiceDownloadClientApiDownloadClientApiRequest
+  >(...buildMergedRequestInit('GET', baseUrl || '', '/registry/v1/:owner/:name/:version/api.json', request, requestInit));
+}
+
+export async function j5RegistryGithubV1RepoQueryServiceGetRepo(
+  baseUrl: string | undefined,
+  request?: J5RegistryGithubV1RepoQueryServiceGetRepoGetRepoRequest,
+  requestInit?: RequestInit,
+): Promise<J5RegistryGithubV1RepoQueryServiceGetRepoResponse | undefined> {
+  return makeRequest<J5RegistryGithubV1RepoQueryServiceGetRepoResponse, J5RegistryGithubV1RepoQueryServiceGetRepoGetRepoRequest>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/registry/github/v1/q/repo/:owner/:name', request, requestInit),
+  );
+}
+
+export async function j5RegistryGithubV1RepoQueryServiceListRepos(
+  baseUrl: string | undefined,
+  request?: J5RegistryGithubV1RepoQueryServiceListReposListReposRequest,
+  requestInit?: RequestInit,
+): Promise<J5RegistryGithubV1RepoQueryServiceListReposResponse | undefined> {
+  return makeRequest<J5RegistryGithubV1RepoQueryServiceListReposResponse, J5RegistryGithubV1RepoQueryServiceListReposListReposRequest>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/registry/github/v1/q/repo', request, requestInit),
+  );
+}
+
+export async function j5RegistryGithubV1RepoQueryServiceListRepoEvents(
+  baseUrl: string | undefined,
+  request?: J5RegistryGithubV1RepoQueryServiceListRepoEventsListRepoEventsRequest,
+  requestInit?: RequestInit,
+): Promise<J5RegistryGithubV1RepoQueryServiceListRepoEventsResponse | undefined> {
+  return makeRequest<J5RegistryGithubV1RepoQueryServiceListRepoEventsResponse, J5RegistryGithubV1RepoQueryServiceListRepoEventsListRepoEventsRequest>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/registry/github/v1/q/repo/:owner/:name/events', request, requestInit),
+  );
+}
+
+export async function j5RegistryGithubV1RepoCommandServiceConfigureRepo(
+  baseUrl: string | undefined,
+  request?: J5RegistryGithubV1RepoCommandServiceConfigureRepoRequest,
+  requestInit?: RequestInit,
+): Promise<J5RegistryGithubV1RepoCommandServiceConfigureRepoResponse | undefined> {
+  return makeRequest<J5RegistryGithubV1RepoCommandServiceConfigureRepoResponse, J5RegistryGithubV1RepoCommandServiceConfigureRepoRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/registry/github/v1/c/repo/:owner/:name/configure', request, requestInit),
+  );
+}
+
+export async function j5RegistryGithubV1RepoCommandServiceTrigger(
+  baseUrl: string | undefined,
+  request?: J5RegistryGithubV1RepoCommandServiceTriggerRequest,
+  requestInit?: RequestInit,
+): Promise<J5RegistryGithubV1RepoCommandServiceTriggerResponse | undefined> {
+  return makeRequest<J5RegistryGithubV1RepoCommandServiceTriggerResponse, J5RegistryGithubV1RepoCommandServiceTriggerRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/registry/github/v1/c/repo/:owner/:repo/trigger', request, requestInit),
   );
 }
