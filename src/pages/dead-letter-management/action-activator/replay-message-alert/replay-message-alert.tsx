@@ -10,11 +10,11 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { ReloadIcon } from '@radix-ui/react-icons';
-import { useReplayMessage } from '@/data/api/mutation';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { useErrorHandler } from '@/lib/error.ts';
+import { useO5DanteV1DeadMessageCommandServiceReplayDeadMessage } from '@/data/api/hooks/generated';
 
 interface ReplayMessageAlertProps {
   messageId: string;
@@ -23,7 +23,7 @@ interface ReplayMessageAlertProps {
 export function ReplayMessageAlert({ messageId }: ReplayMessageAlertProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync, isPending, error } = useReplayMessage();
+  const { mutateAsync, isPending, error } = useO5DanteV1DeadMessageCommandServiceReplayDeadMessage();
   useErrorHandler(error, 'Error replaying message');
 
   async function handleReplay() {

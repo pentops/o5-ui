@@ -13,13 +13,13 @@ import { Cross1Icon } from '@radix-ui/react-icons';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRejectMessage } from '@/data/api/mutation';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { useErrorHandler } from '@/lib/error.ts';
+import { useO5DanteV1DeadMessageCommandServiceRejectDeadMessage } from '@/data/api/hooks/generated';
 
 const schema = z.object({
   reason: z.string().optional(),
@@ -34,7 +34,7 @@ interface ConfirmRejectAlertProps {
 export function ConfirmRejectAlert({ messageId }: ConfirmRejectAlertProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync, isPending, error } = useRejectMessage();
+  const { mutateAsync, isPending, error } = useO5DanteV1DeadMessageCommandServiceRejectDeadMessage();
   useErrorHandler(error, 'Error rejecting message');
 
   const form = useForm<Values>({

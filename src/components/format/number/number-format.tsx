@@ -5,7 +5,7 @@ import React, { BaseHTMLAttributes } from 'react';
  * BaseHTMLAttributes "style" (which would be the CSS style object)
  */
 export interface NumberFormatProps extends BaseHTMLAttributes<HTMLSpanElement>, Omit<Intl.NumberFormatOptions, 'style'> {
-  formatStyle?: string;
+  formatStyle?: Intl.NumberFormatOptions['style'];
   locale?: string;
   value?: number;
 }

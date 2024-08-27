@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/theme-provider.tsx';
 import { router } from '@/pages/routes.tsx';
+import './translation';
 import '../app/globals.css';
 
 const defaultQueryClientOptions = { queries: { staleTime: 20000 } };

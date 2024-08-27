@@ -6,12 +6,12 @@ import {
   getCoreRowModel,
   Header,
   HeaderGroup,
-  OnChangeFn,
   Row,
   RowSelectionState,
-  SortingState,
+  SortingState as RTSortingState,
   useReactTable,
 } from '@tanstack/react-table';
+import { SortingState, OnChangeFn } from '@pentops/react-table-state-psm';
 import { Table } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { useIntersectionObserverAction } from '@/lib/intersection-observer.ts';
@@ -118,27 +118,39 @@ interface TablePagination {
   fetchNextPage: () => Promise<any>;
 }
 
-interface DataTableProps<TData extends Object, TValue> {
+interface DataTableProps<
+  TData extends Object,
+  TValue,
+  TSearchableField extends string = string,
+  TSortableField extends string = string,
+  TFilterableField extends string = string,
+> {
   columns: CustomColumnDef<TData, TValue>[];
-  controlledColumnSort?: SortingState;
+  controlledColumnSort?: SortingState<TSortableField>;
   data: TData[];
-  filterValues?: Record<string, TableFilterValueType>;
+  filterValues?: Record<TFilterableField, TableFilterValueType>;
   getRowCanExpand?: true | ((row: Row<TData>) => boolean);
-  onColumnSort?: OnChangeFn<SortingState>;
-  onFilter?: OnChangeFn<Record<string, TableFilterValueType>>;
+  onColumnSort?: OnChangeFn<SortingState<TSortableField>>;
+  onFilter?: OnChangeFn<Record<TFilterableField, TableFilterValueType>>;
   onRowSelect?: OnChangeFn<RowSelectionState>;
   onSearch?: OnChangeFn<string>;
-  onSearchFieldChange?: (fields: string[]) => void;
+  onSearchFieldChange?: (fields: TSearchableField[]) => void;
   pagination?: TablePagination;
   renderSubComponent?: (props: TableRowType<TData>) => React.ReactElement;
   rowSelections?: RowSelectionState;
   searchFields?: { value: string; label: string }[];
-  searchFieldSelections?: string[];
+  searchFieldSelections?: TSearchableField[];
   searchValue?: string;
   showSkeleton?: boolean;
 }
 
-export function DataTable<TData extends Object, TValue>({
+export function DataTable<
+  TData extends Object,
+  TValue,
+  TSearchableField extends string,
+  TSortableField extends string,
+  TFilterableField extends string,
+>({
   columns,
   controlledColumnSort,
   data,
@@ -156,7 +168,7 @@ export function DataTable<TData extends Object, TValue>({
   searchFieldSelections,
   searchValue,
   showSkeleton,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData, TValue, TSearchableField, TSortableField, TFilterableField>) {
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const { fetchNextPage, hasNextPage, isFetchingNextPage } = pagination || {};
   const [setObservedItemRef] = useIntersectionObserverAction(fetchNextPage, {
@@ -173,7 +185,7 @@ export function DataTable<TData extends Object, TValue>({
     getRowCanExpand: getRowCanExpand === true ? allRowsCanExpand : getRowCanExpand,
     enableRowSelection: onRowSelect && !showSkeleton,
     onRowSelectionChange: onRowSelect,
-    onSortingChange: onColumnSort,
+    onSortingChange: onColumnSort as unknown as OnChangeFn<RTSortingState>,
     state: { rowSelection: rowSelections || {}, sorting: controlledColumnSort },
     manualSorting: true,
     enableSorting: Boolean(onColumnSort),
@@ -224,11 +236,7 @@ export function DataTable<TData extends Object, TValue>({
       <div className="rounded-md border overflow-x-auto relative scrollbars" ref={tableContainerRef}>
         <Table className="relative block" style={styleVariables}>
           <DataTableHeader filterValues={filterValues} headerGroups={table.getHeaderGroups() as HeaderGroup<any>[]} onFilter={onFilter} />
-          <DataTableBody
-            columnCount={columns.length}
-            rows={table.getRowModel().rows as Row<TData>[]}
-            renderSubComponent={renderSubComponent as any}
-          />
+          <DataTableBody columnCount={columns.length} rows={table.getRowModel().rows as Row<TData>[]} renderSubComponent={renderSubComponent} />
           <tfoot className="flex w-full" ref={setObservedItemRef} />
         </Table>
       </div>

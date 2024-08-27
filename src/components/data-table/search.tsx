@@ -20,15 +20,21 @@ function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(callback:
   };
 }
 
-interface DataTableSearchProps {
+interface DataTableSearchProps<TSearchableField extends string = string> {
   fields?: { value: string; label: string }[];
-  fieldSelections?: string[];
+  fieldSelections?: TSearchableField[];
   onSearch: (searchValue: string) => void;
-  onSearchFieldChange?: (fields: string[]) => void;
+  onSearchFieldChange?: (fields: TSearchableField[]) => void;
   searchValue: string;
 }
 
-export const DataTableSearch = React.memo(({ fields, fieldSelections, onSearch, onSearchFieldChange, searchValue }: DataTableSearchProps) => {
+function NonMemoizedDataTableSearch<TSearchableField extends string = string>({
+  fields,
+  fieldSelections,
+  onSearch,
+  onSearchFieldChange,
+  searchValue,
+}: DataTableSearchProps<TSearchableField>) {
   const [internalValue, setInternalValue] = useState(searchValue);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(debounce(onSearch, 250), [onSearch]);
@@ -60,7 +66,7 @@ export const DataTableSearch = React.memo(({ fields, fieldSelections, onSearch, 
             isMulti
             name="searchFields"
             onChange={(e) => {
-              onSearchFieldChange(e.target.value as unknown as string[]);
+              onSearchFieldChange(e.target.value as unknown as TSearchableField[]);
             }}
             options={fields}
             value={fieldSelections || []}
@@ -69,4 +75,6 @@ export const DataTableSearch = React.memo(({ fields, fieldSelections, onSearch, 
       )}
     </div>
   );
-});
+}
+
+export const DataTableSearch = React.memo(NonMemoizedDataTableSearch) as typeof NonMemoizedDataTableSearch;

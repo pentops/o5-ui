@@ -10,44 +10,46 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { useErrorHandler } from '@/lib/error.ts';
-import { useDeployment, useListEnvironments } from '@/data/api';
-import { useTriggerDeployment } from '@/data/api/mutation';
-import { Input } from '@/components/ui/input.tsx';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { Combobox } from '@/components/combobox/combobox.tsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+import {
+  useO5AwsDeployerV1DeploymentCommandServiceTriggerDeployment,
+  useO5AwsDeployerV1DeploymentQueryServiceGetDeployment,
+  useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments,
+} from '@/data/api/hooks/generated';
 
-const refTypeOptions = [
-  {
-    value: 'branch',
-    label: 'Branch',
-  },
-  {
-    value: 'commit',
-    label: 'Commit',
-  },
-  {
-    value: 'tag',
-    label: 'Tag',
-  },
-] as const;
+// const refTypeOptions = [
+//   {
+//     value: 'branch',
+//     label: 'Branch',
+//   },
+//   {
+//     value: 'commit',
+//     label: 'Commit',
+//   },
+//   {
+//     value: 'tag',
+//     label: 'Tag',
+//   },
+// ] as const;
 
 const schema = z.object({
   environment: z.string().min(1, { message: 'Environment is required (ID or full name)' }),
-  source: z.object({
-    github: z.object({
-      owner: z.string().min(1, { message: 'Owner is required' }),
-      repo: z.string().min(1, { message: 'Repo is required' }),
-      ref: z.string().min(1, { message: 'Ref is required' }),
-      refType: z.string(),
-    }),
-  }),
+  // source: z.object({
+  //   github: z.object({
+  //     owner: z.string().min(1, { message: 'Owner is required' }),
+  //     repo: z.string().min(1, { message: 'Repo is required' }),
+  //     ref: z.string().min(1, { message: 'Ref is required' }),
+  //     refType: z.string(),
+  //   }),
+  // }),
   flags: z.object({
     quickMode: z.boolean(),
     rotateCredentials: z.boolean(),
     cancelUpdates: z.boolean(),
     dbOnly: z.boolean(),
     infraOnly: z.boolean(),
+    importResources: z.boolean(),
   }),
 });
 
@@ -60,10 +62,10 @@ interface TriggerDeploymentDialogProps {
 export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialogProps) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const { mutateAsync, isPending, error } = useTriggerDeployment();
+  const { mutateAsync, isPending, error } = useO5AwsDeployerV1DeploymentCommandServiceTriggerDeployment();
   useErrorHandler(error, 'Error triggering deployment');
 
-  const { data, error: messageError } = useDeployment(isOpen && deploymentId ? { deploymentId } : undefined);
+  const { data, error: messageError } = useO5AwsDeployerV1DeploymentQueryServiceGetDeployment(isOpen && deploymentId ? { deploymentId } : undefined);
   useErrorHandler(messageError, 'Failed to load deployment');
 
   const {
@@ -71,7 +73,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
     hasNextPage: hasMoreEnvironments,
     fetchNextPage: fetchMoreEnvironments,
     isFetchingNextPage: isFetchingMoreEnvironments,
-  } = useListEnvironments();
+  } = useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments();
   const environmentOptions = useMemo(
     () =>
       (environmentData?.pages || []).reduce(
@@ -79,7 +81,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
           return [
             ...accum,
             ...(curr?.environments?.map((environment) => ({
-              label: environment?.config?.fullName || 'UNKNOWN ENVIRONMENT',
+              label: environment?.data?.config?.fullName || 'UNKNOWN ENVIRONMENT',
               value: environment?.environmentId || '',
             })) || []),
           ];
@@ -91,28 +93,29 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
 
   const defaultValues = useMemo(
     () => ({
-      environment: data?.state?.spec?.environmentId || '',
+      environment: data?.state?.data?.spec?.environmentId || '',
       source: {
-        github: {
-          owner: data?.state?.spec?.source?.type?.github?.owner || '',
-          repo: data?.state?.spec?.source?.type?.github?.repo || '',
-          ref: data?.state?.spec?.version || '',
-          refType: 'commit',
-        },
+        // github: {
+        //   owner: data?.state?.data?.spec??.type?.github?.owner || '',
+        //   repo: data?.state?.spec?.source?.type?.github?.repo || '',
+        //   ref: data?.state?.spec?.version || '',
+        //   refType: 'commit',
+        // },
       },
       flags: {
-        quickMode: data?.state?.spec?.flags?.quickMode || false,
-        rotateCredentials: data?.state?.spec?.flags?.rotateCredentials || false,
-        cancelUpdates: data?.state?.spec?.flags?.cancelUpdates || false,
-        dbOnly: data?.state?.spec?.flags?.dbOnly || false,
-        infraOnly: data?.state?.spec?.flags?.infraOnly || false,
+        quickMode: data?.state?.data?.spec?.flags?.quickMode || false,
+        rotateCredentials: data?.state?.data?.spec?.flags?.rotateCredentials || false,
+        cancelUpdates: data?.state?.data?.spec?.flags?.cancelUpdates || false,
+        dbOnly: data?.state?.data?.spec?.flags?.dbOnly || false,
+        infraOnly: data?.state?.data?.spec?.flags?.infraOnly || false,
+        importResources: data?.state?.data?.spec?.flags?.importResources || false,
       },
     }),
-    [data?.state?.spec],
+    [data?.state?.data?.spec],
   );
 
   const form = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
-  const refType = form.watch('source.github.refType');
+  // const refType = form.watch('source.github.refType');
 
   useEffect(() => {
     if (isOpen) {
@@ -125,20 +128,20 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
       await mutateAsync({
         deploymentId: uuid(),
         ...values,
-        source: {
-          github: {
-            owner: values.source.github.owner,
-            repo: values.source.github.repo,
-            ref: {
-              [values.source.github.refType]: values.source.github.ref,
-            },
-          },
-        },
+        // source: {
+        //   github: {
+        //     owner: values.source.github.owner,
+        //     repo: values.source.github.repo,
+        //     ref: {
+        //       [values.source.github.refType]: values.source.github.ref,
+        //     },
+        //   },
+        // },
       });
 
       toast({
         title: 'Deployment triggered',
-        description: `Deployment ${values.source.github.owner}/${values.source.github.repo}:${values.source.github.ref} has been triggered.`,
+        // description: `Deployment ${values.source.github.owner}/${values.source.github.repo}:${values.source.github.ref} has been triggered.`,
       });
 
       setIsOpen(false);
@@ -157,7 +160,7 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
               <DialogTitle>Trigger Deployment</DialogTitle>
               <DialogDescription asChild>
                 <div>
-                  Initiate a deployment for <strong>{data?.state?.spec?.appName || 'your app'}</strong>.
+                  Initiate a deployment for <strong>{data?.state?.data?.spec?.appName || 'your app'}</strong>.
                 </div>
               </DialogDescription>
             </DialogHeader>
@@ -184,78 +187,78 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <FormField
-                control={form.control}
-                name="source.github.owner"
-                render={({ field }) => (
-                  <FormItem className="py-2">
-                    <FormLabel>GitHub Owner</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/*<div className="grid grid-cols-1 md:grid-cols-2 gap-2">*/}
+            {/*  <FormField*/}
+            {/*    control={form.control}*/}
+            {/*    name="source.github.owner"*/}
+            {/*    render={({ field }) => (*/}
+            {/*      <FormItem className="py-2">*/}
+            {/*        <FormLabel>GitHub Owner</FormLabel>*/}
+            {/*        <FormControl>*/}
+            {/*          <Input {...field} />*/}
+            {/*        </FormControl>*/}
+            {/*        <FormMessage />*/}
+            {/*      </FormItem>*/}
+            {/*    )}*/}
+            {/*  />*/}
 
-              <FormField
-                control={form.control}
-                name="source.github.repo"
-                render={({ field }) => (
-                  <FormItem className="py-2">
-                    <FormLabel>Repository</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/*  <FormField*/}
+            {/*    control={form.control}*/}
+            {/*    name="source.github.repo"*/}
+            {/*    render={({ field }) => (*/}
+            {/*      <FormItem className="py-2">*/}
+            {/*        <FormLabel>Repository</FormLabel>*/}
+            {/*        <FormControl>*/}
+            {/*          <Input {...field} />*/}
+            {/*        </FormControl>*/}
+            {/*        <FormMessage />*/}
+            {/*      </FormItem>*/}
+            {/*    )}*/}
+            {/*  />*/}
+            {/*</div>*/}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <FormField
-                control={form.control}
-                name="source.github.refType"
-                render={({ field }) => (
-                  <FormItem className="py-2">
-                    <FormLabel>Ref Type</FormLabel>
-                    <FormControl>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a ref type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {refTypeOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/*<div className="grid grid-cols-1 md:grid-cols-2 gap-2">*/}
+            {/*  <FormField*/}
+            {/*    control={form.control}*/}
+            {/*    name="source.github.refType"*/}
+            {/*    render={({ field }) => (*/}
+            {/*      <FormItem className="py-2">*/}
+            {/*        <FormLabel>Ref Type</FormLabel>*/}
+            {/*        <FormControl>*/}
+            {/*          <Select onValueChange={field.onChange} defaultValue={field.value}>*/}
+            {/*            <FormControl>*/}
+            {/*              <SelectTrigger>*/}
+            {/*                <SelectValue placeholder="Select a ref type" />*/}
+            {/*              </SelectTrigger>*/}
+            {/*            </FormControl>*/}
+            {/*            <SelectContent>*/}
+            {/*              {refTypeOptions.map((option) => (*/}
+            {/*                <SelectItem key={option.value} value={option.value}>*/}
+            {/*                  {option.label}*/}
+            {/*                </SelectItem>*/}
+            {/*              ))}*/}
+            {/*            </SelectContent>*/}
+            {/*          </Select>*/}
+            {/*        </FormControl>*/}
+            {/*        <FormMessage />*/}
+            {/*      </FormItem>*/}
+            {/*    )}*/}
+            {/*  />*/}
 
-              <FormField
-                control={form.control}
-                name="source.github.ref"
-                render={({ field }) => (
-                  <FormItem className="py-2">
-                    <FormLabel>{refTypeOptions.find((t) => t.value === refType)?.label || 'Ref'}</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/*  <FormField*/}
+            {/*    control={form.control}*/}
+            {/*    name="source.github.ref"*/}
+            {/*    render={({ field }) => (*/}
+            {/*      <FormItem className="py-2">*/}
+            {/*        <FormLabel>{refTypeOptions.find((t) => t.value === refType)?.label || 'Ref'}</FormLabel>*/}
+            {/*        <FormControl>*/}
+            {/*          <Input {...field} />*/}
+            {/*        </FormControl>*/}
+            {/*        <FormMessage />*/}
+            {/*      </FormItem>*/}
+            {/*    )}*/}
+            {/*  />*/}
+            {/*</div>*/}
 
             <legend className="flex flex-col gap-2 items-start space-x-0 space-y-0">
               <h3>Flags</h3>
@@ -331,6 +334,21 @@ export function TriggerDeploymentDialog({ deploymentId }: TriggerDeploymentDialo
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>Infrastructure Only</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="flags.importResources"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Import Resources</FormLabel>
                       </div>
                     </FormItem>
                   )}

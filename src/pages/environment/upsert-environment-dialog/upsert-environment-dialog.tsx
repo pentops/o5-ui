@@ -11,10 +11,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { useErrorHandler } from '@/lib/error.ts';
-import { useUpsertEnvironment } from '@/data/api/mutation';
 import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
-import { useEnvironment } from '@/data/api';
+import {
+  useO5AwsDeployerV1DeploymentCommandServiceUpsertEnvironment,
+  useO5AwsDeployerV1EnvironmentQueryServiceGetEnvironment,
+} from '@/data/api/hooks/generated';
+import { O5AwsDeployerV1DeploymentCommandServiceUpsertEnvironmentRequest } from '@/data/types';
 
 const schema = z.object({
   type: z.enum(['json', 'yaml']),
@@ -31,18 +34,20 @@ interface UpsertEnvironmentDialogProps {
 export function UpsertEnvironmentDialog({ activator = <Pencil1Icon aria-hidden />, environmentId }: UpsertEnvironmentDialogProps) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const { data: environment, error: environmentError } = useEnvironment({ environmentId });
+  const { data: environment, error: environmentError } = useO5AwsDeployerV1EnvironmentQueryServiceGetEnvironment(
+    environmentId ? { environmentId } : undefined,
+  );
   useErrorHandler(environmentError, 'Failed to load environment');
 
-  const { mutateAsync, isPending, error } = useUpsertEnvironment();
+  const { mutateAsync, isPending, error } = useO5AwsDeployerV1DeploymentCommandServiceUpsertEnvironment();
   useErrorHandler(error, 'Error upserting environment');
 
   const defaultValues: Values = useMemo(
     () => ({
       type: 'json',
-      config: environment?.state?.config ? JSON.stringify(environment.state.config, null, 2) : '',
+      config: environment?.state?.data?.config ? JSON.stringify(environment.state.data?.config, null, 2) : '',
     }),
-    [environment?.state?.config],
+    [environment?.state?.data?.config],
   );
 
   const form = useForm<Values>({ defaultValues, resetOptions: { keepDefaultValues: false, keepDirtyValues: false }, resolver: zodResolver(schema) });
@@ -58,12 +63,19 @@ export function UpsertEnvironmentDialog({ activator = <Pencil1Icon aria-hidden /
   async function handleEdit(values: Values) {
     try {
       const usableEnvironmentId = environmentId || uuid();
-      await mutateAsync({
+      const baseRequest: O5AwsDeployerV1DeploymentCommandServiceUpsertEnvironmentRequest = {
         environmentId: usableEnvironmentId,
-        src: {
-          config: values.type === 'json' ? JSON.parse(values.config) : yaml.load(values.config),
-        },
-      });
+        [values.type === 'json' ? 'configJson' : 'configYaml']: values.config,
+      };
+
+      // TODO: validate
+      // if (values.type === 'json') {
+      //   baseRequest.configJson = JSON.parse(values.config);
+      // } else {
+      //   baseRequest.configYaml = yaml.load().toString();
+      // }
+
+      await mutateAsync(baseRequest);
 
       toast({
         title: 'Environment upserted',

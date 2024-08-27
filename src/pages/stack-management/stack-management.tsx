@@ -1,118 +1,125 @@
 import React, { useMemo } from 'react';
-import { useListStacks } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
-import { O5DeployerV1StackState, stackStatusLabels } from '@/data/types';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
-import { buildCodeSourceFact } from '@/pages/stack/build-facts.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 import { RocketIcon } from '@radix-ui/react-icons';
 import { TableRowType } from '@/components/data-table/body.tsx';
 import { Link } from 'react-router-dom';
+import {
+  O5AwsDeployerV1StackQueryServiceListStacksRequest,
+  O5AwsDeployerV1StackQueryServiceListStacksSearchableFields,
+  O5AwsDeployerV1StackState,
+} from '@/data/types';
+import { TFunction } from 'i18next';
+import { useO5AwsDeployerV1StackQueryServiceListStacks } from '@/data/api/hooks/generated';
+import { useTranslation } from 'react-i18next';
 
-const columns: CustomColumnDef<O5DeployerV1StackState>[] = [
-  getRowExpander(),
-  {
-    header: 'ID',
-    accessorKey: 'stackId',
-    id: 'stackId',
-    size: 110,
-    minSize: 110,
-    maxSize: 110,
-    cell: ({ getValue }) => {
-      const value = getValue<string>();
-      return value ? <UUID canCopy short to={`/stack/${value}`} uuid={value} /> : null;
-    },
-  },
-  {
-    header: 'Name',
-    id: 'stackName',
-    accessorKey: 'stackName',
-    size: 120,
-    minSize: 120,
-    maxSize: 140,
-  },
-  {
-    header: 'App',
-    id: 'applicationName',
-    accessorKey: 'applicationName',
-    size: 120,
-    minSize: 120,
-    maxSize: 140,
-  },
-  {
-    header: 'Environment',
-    id: 'environmentName',
-    accessorKey: 'environmentName',
-    size: 120,
-    minSize: 120,
-    maxSize: 140,
-    cell: ({ getValue, row }) => {
-      const value = getValue<string>();
-      return value && row.original.environmentId ? <Link to={`/environment/${row.original.environmentId}`}>{value}</Link> : value;
-    },
-  },
-  {
-    header: 'Status',
-    id: 'status',
-    accessorFn: (row) => stackStatusLabels[row.status!] || '',
-    size: 120,
-    minSize: 120,
-    maxSize: 150,
-    filter: {
-      type: {
-        select: {
-          isMultiple: true,
-          options: Object.entries(stackStatusLabels).map(([value, label]) => ({ value, label })),
-        },
+function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackState>[] {
+  return [
+    getRowExpander(),
+    {
+      header: 'ID',
+      accessorKey: 'stackId',
+      id: 'stackId',
+      size: 110,
+      minSize: 110,
+      maxSize: 110,
+      cell: ({ getValue }) => {
+        const value = getValue<string>();
+        return value ? <UUID canCopy short to={`/stack/${value}`} uuid={value} /> : null;
       },
     },
-  },
-  {
-    header: 'Current Deployment',
-    id: 'currentDeployment.deploymentId',
-    size: 150,
-    minSize: 150,
-    maxSize: 200,
-    accessorFn: (row) => row.currentDeployment?.deploymentId,
-    cell: ({ getValue }) => {
-      const value = getValue<string>();
-      return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
+    {
+      header: 'Name',
+      id: 'data.stackName',
+      accessorKey: 'data.stackName',
+      size: 120,
+      minSize: 120,
+      maxSize: 140,
     },
-  },
-  {
-    header: 'Current Deployment Version',
-    id: 'currentDeployment.version',
-    size: 200,
-    minSize: 200,
-    maxSize: 200,
-    accessorFn: (row) => row.currentDeployment?.version,
-    cell: ({ getValue }) => {
-      const value = getValue<string>();
-      return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
+    {
+      header: 'App',
+      id: 'data.applicationName',
+      accessorKey: 'data.applicationName',
+      size: 120,
+      minSize: 120,
+      maxSize: 140,
     },
-  },
-  {
-    header: 'Queued Deployments',
-    id: 'queuedDeployments.deploymentId',
-    minSize: 160,
-    size: 160,
-    align: 'right',
-    accessorFn: (row) => row.queuedDeployments?.map((d) => d.deploymentId || '-'),
-    cell: ({ row }) =>
-      row.original.queuedDeployments?.map((d, i) => (
-        <div key={d.deploymentId}>
-          <UUID canCopy short to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />
-          {i !== row.original.queuedDeployments!.length - 1 && ', '}
-        </div>
-      )),
-  },
-];
+    {
+      header: 'Environment',
+      id: 'data.environmentName',
+      accessorKey: 'data.environmentName',
+      size: 120,
+      minSize: 120,
+      maxSize: 140,
+      cell: ({ getValue, row }) => {
+        const value = getValue<string>();
+        return value && row.original.environmentId ? <Link to={`/environment/${row.original.environmentId}`}>{value}</Link> : value;
+      },
+    },
+    {
+      header: 'Status',
+      id: 'status',
+      accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1StackStatus.${row.status}`) : ''),
+      size: 120,
+      minSize: 120,
+      maxSize: 150,
+      // filter: {
+      //   type: {
+      //     select: {
+      //       isMultiple: true,
+      //       options: Object.entries(stackStatusLabels).map(([value, label]) => ({ value, label })),
+      //     },
+      //   },
+      // },
+    },
+    {
+      header: 'Current Deployment',
+      id: 'data.currentDeployment.deploymentId',
+      size: 150,
+      minSize: 150,
+      maxSize: 200,
+      accessorFn: (row) => row.data?.currentDeployment?.deploymentId,
+      cell: ({ getValue }) => {
+        const value = getValue<string>();
+        return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
+      },
+    },
+    {
+      header: 'Current Deployment Version',
+      id: 'data.currentDeployment.version',
+      size: 200,
+      minSize: 200,
+      maxSize: 200,
+      accessorFn: (row) => row.data?.currentDeployment?.version,
+      cell: ({ getValue }) => {
+        const value = getValue<string>();
+        return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
+      },
+    },
+    {
+      header: 'Queued Deployments',
+      id: 'data.queuedDeployments.deploymentId',
+      minSize: 160,
+      size: 160,
+      align: 'right',
+      accessorFn: (row) => row.data?.queuedDeployments?.map((d) => d.deploymentId || '-'),
+      cell: ({ row }) =>
+        row.original.data?.queuedDeployments?.map((d, i) => (
+          <div key={d.deploymentId}>
+            <UUID canCopy short to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />
+            {i !== (row.original.data?.queuedDeployments?.length || 0) - 1 && ', '}
+          </div>
+        )),
+    },
+  ];
+}
 
-function renderSubRow({ row }: TableRowType<O5DeployerV1StackState>) {
+function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackState>) {
   return (
     <div className="flex flex-col gap-4">
       <NutritionFact
@@ -125,22 +132,44 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackState>) {
         }
       />
 
-      {buildCodeSourceFact(row.original.config?.codeSource)}
+      {/*{buildCodeSourceFact(row.original.config?.codeSource)}*/}
     </div>
   );
 }
 
-const searchableFields = [
-  { value: 'applicationName', label: 'App' },
-  { value: 'environmentName', label: 'Environment' },
-  { value: 'stackName', label: 'Stack Name' },
-];
-const initialSearchFields = searchableFields.map((field) => field.value);
+function getSearchableFields(t: TFunction) {
+  return [
+    {
+      value: O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataApplicationName,
+      label: t(
+        `awsDeployer:enum.O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.${O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataApplicationName}`,
+      ),
+    },
+    {
+      value: O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataEnvironmentName,
+      label: t(
+        `awsDeployer:enum.O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.${O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataEnvironmentName}`,
+      ),
+    },
+    {
+      value: O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataStackName,
+      label: t(
+        `awsDeployer:enum.O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.${O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataStackName}`,
+      ),
+    },
+  ];
+}
 
 export function StackManagement() {
+  const { t } = useTranslation('awsDeployer');
+  const columns = useMemo(() => getColumns(t), [t]);
+  const searchableFields = useMemo(() => getSearchableFields(t), [t]);
+  const initialSearchFields = useMemo(() => searchableFields.map((field) => field.value), [searchableFields]);
   const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
-    useTableState({ initialSearchFields });
-  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListStacks({ query: psmQuery });
+    useTableState<O5AwsDeployerV1StackQueryServiceListStacksRequest['query']>({ initialSearchFields });
+  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5AwsDeployerV1StackQueryServiceListStacks({
+    query: psmQuery,
+  });
   useErrorHandler(error, 'Failed to load stacks');
 
   const flatData = useMemo(() => {
@@ -154,7 +183,7 @@ export function StackManagement() {
       }
 
       return acc;
-    }, [] as O5DeployerV1StackState[]);
+    }, [] as O5AwsDeployerV1StackState[]);
   }, [data?.pages]);
 
   return (

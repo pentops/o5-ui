@@ -10,11 +10,11 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { CircleBackslashIcon } from '@radix-ui/react-icons';
-import { useTerminateDeployment } from '@/data/api/mutation';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { useErrorHandler } from '@/lib/error.ts';
+import { useO5AwsDeployerV1DeploymentCommandServiceTerminateDeployment } from '@/data/api/hooks/generated';
 
 interface ConfirmTerminateDeploymentAlertProps {
   deploymentId: string;
@@ -23,7 +23,7 @@ interface ConfirmTerminateDeploymentAlertProps {
 export function ConfirmTerminateDeploymentAlert({ deploymentId }: ConfirmTerminateDeploymentAlertProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync, isPending, error } = useTerminateDeployment();
+  const { mutateAsync, isPending, error } = useO5AwsDeployerV1DeploymentCommandServiceTerminateDeployment();
   useErrorHandler(error, 'Error terminating deployment');
   async function handleTerminateDeployment() {
     try {

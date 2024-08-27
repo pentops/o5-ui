@@ -45,7 +45,7 @@ const i18nTranslationWriter = (schema, schemaPath, existingValues) =>
     )
     .otherwise(() => undefined);
 
-export default new I18nPlugin({
+export const i18nPlugin = new I18nPlugin({
   indexFile: {
     preWriteHook: (file) => {
       file.addManualImport(I18NEXT_IMPORT_PATH, [I18N_T_FUNCTION_TYPE_NAME], [I18N_T_FUNCTION_TYPE_NAME]);

@@ -1,23 +1,12 @@
 import React, { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useDeployment, useListDeploymentEvents } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
-import {
-  DeploymentEventType,
-  deploymentEventTypeLabels,
-  deploymentStatusLabels,
-  deploymentStepOutputTypeLabels,
-  deploymentStepStatusLabels,
-  getDeploymentEventType,
-  getDeploymentStepOutputType,
-  O5DeployerV1DeploymentEvent,
-  O5DeployerV1DeploymentStatus,
-} from '@/data/types';
+import { getOneOfType, O5AwsDeployerV1DeploymentEvent, O5AwsDeployerV1DeploymentStatus } from '@/data/types';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { match, P } from 'ts-pattern';
@@ -29,8 +18,13 @@ import { useTableState } from '@/components/data-table/state.ts';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import { TableRowType } from '@/components/data-table/body.tsx';
+import { TranslatedText } from '@/components/translated-text/translated-text.tsx';
+import {
+  useO5AwsDeployerV1DeploymentQueryServiceGetDeployment,
+  useO5AwsDeployerV1DeploymentQueryServiceListDeploymentEvents,
+} from '@/data/api/hooks/generated';
 
-const eventColumns: CustomColumnDef<O5DeployerV1DeploymentEvent>[] = [
+const eventColumns: CustomColumnDef<O5AwsDeployerV1DeploymentEvent>[] = [
   getRowExpander(),
   {
     header: 'ID',
@@ -45,22 +39,27 @@ const eventColumns: CustomColumnDef<O5DeployerV1DeploymentEvent>[] = [
   },
   {
     header: 'Type',
-    id: 'event.type',
+    id: 'event',
     size: 120,
     minSize: 120,
     maxSize: 150,
     accessorFn: (row) => {
-      const type = getDeploymentEventType(row);
-      return row.event ? deploymentEventTypeLabels[type] : '';
+      const eventType = getOneOfType(row.event);
+
+      if (eventType) {
+        return <TranslatedText i18nKey={`awsDeployer:oneOf.O5AwsDeployerV1DeploymentEventType.${eventType}`} />;
+      }
+
+      return null;
     },
-    filter: {
-      type: {
-        select: {
-          isMultiple: true,
-          options: Object.values(DeploymentEventType).map((value) => ({ label: deploymentEventTypeLabels[value], value })),
-        },
-      },
-    },
+    // filter: {
+    //   type: {
+    //     select: {
+    //       isMultiple: true,
+    //       options: Object.values(DeploymentEventType).map((value) => ({ label: deploymentEventTypeLabels[value], value })),
+    //     },
+    //   },
+    // },
   },
   {
     header: 'Timestamp',
@@ -95,12 +94,12 @@ const eventColumns: CustomColumnDef<O5DeployerV1DeploymentEvent>[] = [
   },
 ];
 
-function renderSubRow({ row }: TableRowType<O5DeployerV1DeploymentEvent>) {
+function renderSubRow({ row }: TableRowType<O5AwsDeployerV1DeploymentEvent>) {
   return (
     <div className="flex flex-col gap-4">
       <NutritionFact vertical label="Actor" value="-" />
 
-      {match(row.original.event?.type)
+      {match(row.original.event)
         .with({ created: P.not(P.nullish) }, (e) => buildDeploymentSpecFacts(e.created.spec))
         .with({ error: P.not(P.nullish) }, (e) => <NutritionFact renderWhenEmpty="-" label="Error" value={e.error?.error} />)
         .with({ stackAvailable: P.not(P.nullish) }, (e) => buildCFStackOutput(e.stackAvailable.stackOutput))
@@ -109,7 +108,13 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1DeploymentEvent>) {
           <>
             <div className="grid grid-cols-3 gap-2">
               <NutritionFact renderWhenEmpty="-" label="Step ID" value={<UUID canCopy short uuid={e.stepResult.stepId} />} />
-              <NutritionFact renderWhenEmpty="-" label="Status" value={deploymentStepStatusLabels[e.stepResult.status!]} />
+              <NutritionFact
+                renderWhenEmpty="-"
+                label="Status"
+                value={
+                  e.stepResult.status ? <TranslatedText i18nKey={`awsDeployer:enum.O5AwsDeployerV1StepStatus.${e.stepResult.status}`} /> : undefined
+                }
+              />
               <NutritionFact renderWhenEmpty="-" label="Error" value={e.stepResult.error} />
             </div>
 
@@ -122,9 +127,9 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1DeploymentEvent>) {
                   </button>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <h5>{deploymentStepOutputTypeLabels[getDeploymentStepOutputType(e.stepResult.output)]}</h5>
+                  {/*<h5>{deploymentStepOutputTypeLabels[getDeploymentStepOutputType(e.stepResult.output)]}</h5>*/}
 
-                  {match(e.stepResult.output?.type)
+                  {match(e.stepResult.output)
                     .with({ cfStatus: P.not(P.nullish) }, (o) => buildCFStackOutput(o.cfStatus.output))
                     .otherwise(() => null)}
                 </CollapsibleContent>
@@ -137,17 +142,17 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1DeploymentEvent>) {
   );
 }
 
-function canTerminateDeployment(status: O5DeployerV1DeploymentStatus | undefined) {
+function canTerminateDeployment(status: O5AwsDeployerV1DeploymentStatus | undefined) {
   if (!status) {
     return false;
   }
 
-  return ![O5DeployerV1DeploymentStatus.Done, O5DeployerV1DeploymentStatus.Failed, O5DeployerV1DeploymentStatus.Terminated].includes(status);
+  return ![O5AwsDeployerV1DeploymentStatus.Done, O5AwsDeployerV1DeploymentStatus.Failed, O5AwsDeployerV1DeploymentStatus.Terminated].includes(status);
 }
 
 export function Deployment() {
   const { deploymentId } = useParams();
-  const { data, error, isPending } = useDeployment({ deploymentId });
+  const { data, error, isPending } = useO5AwsDeployerV1DeploymentQueryServiceGetDeployment(deploymentId ? { deploymentId } : undefined);
   useErrorHandler(error, 'Failed to load deployment');
 
   const eventTableState = useTableState();
@@ -158,7 +163,7 @@ export function Deployment() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useListDeploymentEvents({ deploymentId, query: eventTableState.psmQuery });
+  } = useO5AwsDeployerV1DeploymentQueryServiceListDeploymentEvents(deploymentId ? { deploymentId, query: eventTableState.psmQuery } : undefined);
   useErrorHandler(eventsError, 'Failed to load deployment events');
   const flattenedEvents = useMemo(() => {
     if (!eventsData?.pages) {
@@ -171,7 +176,7 @@ export function Deployment() {
       }
 
       return acc;
-    }, [] as O5DeployerV1DeploymentEvent[]);
+    }, [] as O5AwsDeployerV1DeploymentEvent[]);
   }, [eventsData?.pages]);
 
   return (
@@ -197,9 +202,9 @@ export function Deployment() {
               label="Stack"
               value={
                 data?.state?.stackId ? (
-                  <Link to={`/stack/${data.state.stackId}`}>{data?.state?.stackName || data.state.stackId}</Link>
+                  <Link to={`/stack/${data.state.stackId}`}>{data?.state?.data?.spec?.cfStackName || data.state.stackId}</Link>
                 ) : (
-                  data?.state?.stackName
+                  data?.state?.data?.spec?.cfStackName
                 )
               }
             />
@@ -207,19 +212,21 @@ export function Deployment() {
               isLoading={isPending}
               renderWhenEmpty="-"
               label="Status"
-              value={data?.state?.status ? deploymentStatusLabels[data.state.status] : undefined}
+              value={
+                data?.state?.status ? <TranslatedText i18nKey={`awsDeployer:enum.O5AwsDeployerV1DeploymentStatus.${data.state.status}`} /> : undefined
+              }
             />
             <NutritionFact
               isLoading={isPending}
               renderWhenEmpty="-"
               label="Created At"
-              value={data?.state?.createdAt ? <DateFormat value={data.state.createdAt} /> : undefined}
+              value={data?.state?.metadata?.createdAt ? <DateFormat value={data.state.metadata.createdAt} /> : undefined}
             />
           </CardContent>
 
           <CardContent className="flex flex-col gap-2">
-            {buildDeploymentSpecFacts(data?.state?.spec, [], isPending)}
-            {buildDeploymentStepFacts(data?.state?.steps)}
+            {buildDeploymentSpecFacts(data?.state?.data?.spec, [], isPending)}
+            {buildDeploymentStepFacts(data?.state?.data?.steps)}
           </CardContent>
         </Card>
 

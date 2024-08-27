@@ -1,15 +1,15 @@
 import { useCallback, useState } from 'react';
 import {
+  ExtractFilterField,
+  ExtractSearchField,
+  ExtractSortField,
   FilterState,
-  FilterValue,
-  RangeFilter,
   TableStateOptions as PSMTableStateOptions,
   Updater,
   useTableState as usePSMTableState,
 } from '@pentops/react-table-state-psm';
-import { match, P } from 'ts-pattern';
 import { OnChangeFn } from '@tanstack/react-table';
-import { endOfDay, startOfDay } from 'date-fns';
+import { J5ListV1QueryRequest } from '@/data/types';
 
 export interface TableFilterValueExact {
   exact: string | undefined;
@@ -63,84 +63,86 @@ export interface TableFilter {
   };
 }
 
-function mapTableFiltersToPSM(filters: Record<string, TableFilterValueType>): FilterState {
-  return [
-    {
-      inclusion: 'and',
-      type: {
-        filters: Object.entries(filters).reduce<FilterValue[]>((accum, [k, v]) => {
-          const tzOffset = new Date().getTimezoneOffset() * 60000;
-
-          const valueType = match(v)
-            .with({ date: P.not(P.nullish) }, (dv) => {
-              if (dv.date.start || dv.date.end) {
-                const range: RangeFilter = {};
-
-                if (dv.date.start) {
-                  if (dv.date.start.includes('T')) {
-                    range.min = dv.date.start.toString();
-                  } else {
-                    const rawDate = new Date(dv.date.start);
-                    const start = startOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
-                    range.min = start.toString();
-                  }
-                }
-
-                if (dv.date.end) {
-                  if (dv.date.end.includes('T')) {
-                    range.max = dv.date.end.toString();
-                  } else {
-                    const rawDate = new Date(dv.date.end);
-                    const end = endOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
-                    range.max = end.toString();
-                  }
-                }
-
-                return { range };
-              }
-
-              if (dv.date.exact) {
-                // For an exact date, if the date is not a date-time, we actually need to send it as a range from the beginning of the
-                // target date to the end of the target date.
-                if (!dv.date.exact.includes('T')) {
-                  try {
-                    const rawDate = new Date(dv.date.exact);
-                    const start = startOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
-                    const end = endOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
-
-                    return {
-                      range: {
-                        min: start,
-                        max: end,
-                      },
-                    };
-                  } catch {}
-                }
-
-                return { exact: dv.date.exact.toString() };
-              }
-
-              return undefined;
-            })
-            .with({ exact: P.not(P.nullish) }, (ev) => ({ exact: ev.exact.toString() }))
-            .with({ multiple: P.not(P.nullish) }, (mv) => {
-              if (mv.multiple.length) {
-                return { in: mv.multiple };
-              }
-
-              return undefined;
-            })
-            .otherwise(() => undefined);
-
-          if (valueType === undefined) {
-            return accum;
-          }
-
-          return [...accum, { id: k, value: valueType }];
-        }, []),
-      },
-    },
-  ];
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function mapTableFiltersToPSM<TFilterField extends string = never>(_filters: Record<string, TableFilterValueType>): FilterState<TFilterField> {
+  return [];
+  // return [
+  //   {
+  //     inclusion: 'and',
+  //     type: {
+  //       filters: Object.entries(filters).reduce<FilterValue[]>((accum, [k, v]) => {
+  //         const tzOffset = new Date().getTimezoneOffset() * 60000;
+  //
+  //         const valueType = match(v)
+  //           .with({ date: P.not(P.nullish) }, (dv) => {
+  //             if (dv.date.start || dv.date.end) {
+  //               const range: RangeFilter = {};
+  //
+  //               if (dv.date.start) {
+  //                 if (dv.date.start.includes('T')) {
+  //                   range.min = dv.date.start.toString();
+  //                 } else {
+  //                   const rawDate = new Date(dv.date.start);
+  //                   const start = startOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
+  //                   range.min = start.toString();
+  //                 }
+  //               }
+  //
+  //               if (dv.date.end) {
+  //                 if (dv.date.end.includes('T')) {
+  //                   range.max = dv.date.end.toString();
+  //                 } else {
+  //                   const rawDate = new Date(dv.date.end);
+  //                   const end = endOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
+  //                   range.max = end.toString();
+  //                 }
+  //               }
+  //
+  //               return { range };
+  //             }
+  //
+  //             if (dv.date.exact) {
+  //               // For an exact date, if the date is not a date-time, we actually need to send it as a range from the beginning of the
+  //               // target date to the end of the target date.
+  //               if (!dv.date.exact.includes('T')) {
+  //                 try {
+  //                   const rawDate = new Date(dv.date.exact);
+  //                   const start = startOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
+  //                   const end = endOfDay(new Date(rawDate.getTime() + tzOffset)).toISOString();
+  //
+  //                   return {
+  //                     range: {
+  //                       min: start,
+  //                       max: end,
+  //                     },
+  //                   };
+  //                 } catch {}
+  //               }
+  //
+  //               return { exact: dv.date.exact.toString() };
+  //             }
+  //
+  //             return undefined;
+  //           })
+  //           .with({ exact: P.not(P.nullish) }, (ev) => ({ exact: ev.exact.toString() }))
+  //           .with({ multiple: P.not(P.nullish) }, (mv) => {
+  //             if (mv.multiple.length) {
+  //               return { in: mv.multiple };
+  //             }
+  //
+  //             return undefined;
+  //           })
+  //           .otherwise(() => undefined);
+  //
+  //         if (valueType === undefined) {
+  //           return accum;
+  //         }
+  //
+  //         return [...accum, { id: k, value: valueType }];
+  //       }, []),
+  //     },
+  //   },
+  // ];
 }
 
 // function buildInitialState(
@@ -158,22 +160,27 @@ function mapTableFiltersToPSM(filters: Record<string, TableFilterValueType>): Fi
 //   };
 // }
 
-export interface TableStateOptions extends Omit<PSMTableStateOptions, 'initialFilters'> {
-  initialFilters?: Record<string, TableFilterValueType>;
-  initialSearchFields?: string[];
+export interface TableStateOptions<T extends J5ListV1QueryRequest<ExtractSearchField<T>, ExtractSortField<T>, ExtractFilterField<T>> | undefined>
+  extends Omit<PSMTableStateOptions<T>, 'initialFilters'> {
+  initialFilters?: Record<ExtractFilterField<T>, TableFilterValueType>;
+  initialSearchFields?: ExtractSearchField<T>[];
 }
 
-export function useTableState(options?: TableStateOptions) {
+export function useTableState<T extends J5ListV1QueryRequest<ExtractSearchField<T>, ExtractSortField<T>, ExtractFilterField<T>> | undefined>(
+  options?: TableStateOptions<T>,
+) {
   // const [searchParams, setSearchParams] = useSearchParams();
   const { initialFilters, initialSearch, initialSort, onFilter, onSearch, onSort, initialSearchFields } = options || {};
-  const [searchFields, setSearchFields] = useState<string[]>(initialSearchFields || []);
+  const [searchFields, setSearchFields] = useState<ExtractSearchField<T>[]>(initialSearchFields || []);
   // const { initialFilters, initialSearch, initialSort } = buildInitialState(
   //   searchParams.toString(),
   //   options?.initialFilters,
   //   options?.initialSearch,
   //   options?.initialSort,
   // );
-  const [basicFilters, setBasicFilters] = useState<Record<string, TableFilterValueType>>(initialFilters || {});
+  const [basicFilters, setBasicFilters] = useState<Record<ExtractFilterField<T>, TableFilterValueType>>(
+    initialFilters || ({} as Record<ExtractFilterField<T>, TableFilterValueType>),
+  );
   // Only using one search field for the time being
   const [singleSearchValue, setSingleSearchValue] = useState('');
   const { setFilterValues, sortValues, setSortValues, setSearchValue, psmQuery } = usePSMTableState({
@@ -201,7 +208,7 @@ export function useTableState(options?: TableStateOptions) {
   );
 
   const handleSetSearchFields = useCallback(
-    (newSearchFields: string[]) => {
+    (newSearchFields: ExtractSearchField<T>[]) => {
       setSearchFields(newSearchFields);
 
       setSearchValue(
