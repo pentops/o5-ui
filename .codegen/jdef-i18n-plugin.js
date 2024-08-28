@@ -13,35 +13,19 @@ const REACT_I18NEXT_IMPORT_PATH = 'react-i18next';
 const REACT_I18NEXT_MIDDLEWARE_NAME = 'initReactI18next';
 const REACT_I18NEXT_USE_TRANSLATION_HOOK_NAME = 'useTranslation';
 
-const i18nTranslationWriter = (schema, schemaPath, existingValues) =>
+const i18nTranslationWriter = (schema, schemaPath) =>
   match(schema)
     .with({ rawSchema: { oneOf: P.not(P.nullish) } }, (s) =>
-      Array.from(s.rawSchema.oneOf.properties.values()).map((property) => {
-        const path = `${schemaPath}.${property.name}`;
-
-        if (existingValues?.has(path)) {
-          return existingValues.get(path);
-        }
-
-        return {
-          key: path,
-          value: titleCaseName(property.name, CASE_OVERRIDES),
-        };
-      }),
+      Array.from(s.rawSchema.oneOf.properties.values()).map((property) => ({
+        key: `${schemaPath}.${property.name}`,
+        value: titleCaseName(property.name, CASE_OVERRIDES),
+      })),
     )
     .with({ rawSchema: { enum: P.not(P.nullish) } }, (s) =>
-      s.rawSchema.enum.options.map((value) => {
-        const path = `${schemaPath}.${value.name}`;
-
-        if (existingValues?.has(path)) {
-          return existingValues.get(path);
-        }
-
-        return {
-          key: path,
-          value: titleCaseName(value.name, CASE_OVERRIDES),
-        };
-      }),
+      s.rawSchema.enum.options.map((value) => ({
+        key: `${schemaPath}.${value.name}`,
+        value: titleCaseName(value.name, CASE_OVERRIDES),
+      })),
     )
     .otherwise(() => undefined);
 

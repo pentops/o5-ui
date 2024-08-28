@@ -1,4 +1,8 @@
 import React, { useMemo } from 'react';
+import { RocketIcon } from '@radix-ui/react-icons';
+import { Link } from 'react-router-dom';
+import { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { useErrorHandler } from '@/lib/error.ts';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
@@ -6,17 +10,10 @@ import { useTableState } from '@/components/data-table/state.ts';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
-import { RocketIcon } from '@radix-ui/react-icons';
 import { TableRowType } from '@/components/data-table/body.tsx';
-import { Link } from 'react-router-dom';
-import {
-  O5AwsDeployerV1StackQueryServiceListStacksRequest,
-  O5AwsDeployerV1StackQueryServiceListStacksSearchableFields,
-  O5AwsDeployerV1StackState,
-} from '@/data/types';
-import { TFunction } from 'i18next';
+import { O5AwsDeployerV1StackQueryServiceListStacksRequest, O5AwsDeployerV1StackState } from '@/data/types';
 import { useO5AwsDeployerV1StackQueryServiceListStacks } from '@/data/api/hooks/generated';
-import { useTranslation } from 'react-i18next';
+import { getO5AwsDeployerV1StackQueryServiceListStacksSearchFields } from '@/data/table-config/generated';
 
 function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackState>[] {
   return [
@@ -137,34 +134,11 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackState>) {
   );
 }
 
-function getSearchableFields(t: TFunction) {
-  return [
-    {
-      value: O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataApplicationName,
-      label: t(
-        `awsDeployer:enum.O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.${O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataApplicationName}`,
-      ),
-    },
-    {
-      value: O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataEnvironmentName,
-      label: t(
-        `awsDeployer:enum.O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.${O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataEnvironmentName}`,
-      ),
-    },
-    {
-      value: O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataStackName,
-      label: t(
-        `awsDeployer:enum.O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.${O5AwsDeployerV1StackQueryServiceListStacksSearchableFields.DataStackName}`,
-      ),
-    },
-  ];
-}
-
 export function StackManagement() {
   const { t } = useTranslation('awsDeployer');
   const columns = useMemo(() => getColumns(t), [t]);
-  const searchableFields = useMemo(() => getSearchableFields(t), [t]);
-  const initialSearchFields = useMemo(() => searchableFields.map((field) => field.value), [searchableFields]);
+  const searchableFields = useMemo(() => getO5AwsDeployerV1StackQueryServiceListStacksSearchFields(t), [t]);
+  const initialSearchFields = useMemo(() => searchableFields.map((field) => field.id), [searchableFields]);
   const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
     useTableState<O5AwsDeployerV1StackQueryServiceListStacksRequest['query']>({ initialSearchFields });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5AwsDeployerV1StackQueryServiceListStacks({

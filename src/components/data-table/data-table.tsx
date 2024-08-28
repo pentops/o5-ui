@@ -11,14 +11,14 @@ import {
   SortingState as RTSortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { SortingState, OnChangeFn } from '@pentops/react-table-state-psm';
+import type { SortingState, OnChangeFn, BaseTableSearch } from '@pentops/react-table-state-psm';
 import { Table } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { useIntersectionObserverAction } from '@/lib/intersection-observer.ts';
 import { TableFilter as TableFilterType, TableFilterValueType } from '@/components/data-table/state.ts';
 import { DataTableHeader } from '@/components/data-table/header.tsx';
 import { getSafeColumnId } from '@/components/data-table/util.ts';
-import { DataTableSearch } from '@/components/data-table/search.tsx';
+import { DataTableSearch, OnSearchFieldChange } from '@/components/data-table/search.tsx';
 import { DataTableBody, TableRowType } from '@/components/data-table/body.tsx';
 
 const LOADING_ROWS = 20;
@@ -138,7 +138,7 @@ interface DataTableProps<
   pagination?: TablePagination;
   renderSubComponent?: (props: TableRowType<TData>) => React.ReactElement;
   rowSelections?: RowSelectionState;
-  searchFields?: { value: string; label: string }[];
+  searchFields?: BaseTableSearch<TSearchableField>[];
   searchFieldSelections?: TSearchableField[];
   searchValue?: string;
   showSkeleton?: boolean;
@@ -228,7 +228,7 @@ export function DataTable<
           fields={searchFields}
           fieldSelections={searchFieldSelections}
           onSearch={onSearch}
-          onSearchFieldChange={onSearchFieldChange}
+          onSearchFieldChange={onSearchFieldChange as OnSearchFieldChange<string>}
           searchValue={searchValue || ''}
         />
       )}

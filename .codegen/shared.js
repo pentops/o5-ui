@@ -1,3 +1,4 @@
+import { DerivedEnumHelperType } from '@pentops/jsonapi-jdef-ts-generator';
 import { capitalCase, kebabCase } from 'change-case';
 import { match, P } from 'ts-pattern';
 
@@ -44,9 +45,9 @@ export function getPackageFileName(pkg) {
 export function getValidSchemaPackage(schema) {
   return match(schema)
     .with({ rawSchema: { enum: P.not(P.nullish) } }, (s) => {
-      // if (s.rawSchema.enum.isDerivedHelperType) {
-      //   return undefined;
-      // }
+      if (s.rawSchema.enum.derivedHelperType === DerivedEnumHelperType.OneOfTypes) {
+        return undefined;
+      }
 
       return s.parentPackage || s.rawSchema.enum.package;
     })
