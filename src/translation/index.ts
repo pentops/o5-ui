@@ -18,8 +18,8 @@ i18n.use(initReactI18next).init({
   resources: {
     en: {
       dante: enDanteNs,
-      o5: enO5Ns,
       j5: enJ5Ns,
+      o5: enO5Ns,
       awsDeployer: enAwsDeployerNs,
       psm: enPsmNs,
     },

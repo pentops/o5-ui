@@ -144,16 +144,16 @@ dependencies:
 devDependencies:
   '@pentops/j5-ts-generator-i18n-plugin':
     specifier: ^0.0.12
-    version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.83)(i18next@23.14.0)
+    version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.84)(i18next@23.14.0)
   '@pentops/j5-ts-generator-normalized-query-plugin':
     specifier: ^0.0.12
-    version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.83)(@pentops/normalized-query-cache@0.0.2)(normalizr@3.6.2)
+    version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.84)(@pentops/normalized-query-cache@0.0.2)(normalizr@3.6.2)
   '@pentops/j5-ts-generator-psm-table-config-plugin':
     specifier: ^0.0.12
-    version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.83)(@pentops/react-table-state-psm@0.0.9)
+    version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.84)(@pentops/react-table-state-psm@0.0.9)
   '@pentops/jsonapi-jdef-ts-generator':
-    specifier: ^0.0.83
-    version: 0.0.83(@pentops/jsonapi-request@0.0.4)
+    specifier: ^0.0.84
+    version: 0.0.84(@pentops/jsonapi-request@0.0.4)
   '@types/js-yaml':
     specifier: ^4.0.9
     version: 4.0.9
@@ -796,13 +796,13 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  /@pentops/j5-ts-generator-i18n-plugin@0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.83)(i18next@23.14.0):
+  /@pentops/j5-ts-generator-i18n-plugin@0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.84)(i18next@23.14.0):
     resolution: {integrity: sha512-O+i2HpxIuedR219eXIlVFYCweD7O4rpLEyY83awPxLkI8wIBjfwCXbchMHE2t3//tQa5e5W8PVLK5ooGYPyLDA==}
     peerDependencies:
       '@pentops/jsonapi-jdef-ts-generator': '>=0.0.83 < 0.1.0'
       i18next: '>=23.0.0 < 24.0.0'
     dependencies:
-      '@pentops/jsonapi-jdef-ts-generator': 0.0.83(@pentops/jsonapi-request@0.0.4)
+      '@pentops/jsonapi-jdef-ts-generator': 0.0.84(@pentops/jsonapi-request@0.0.4)
       '@pentops/sort-helpers': 0.0.1
       change-case: 5.4.4
       i18next: 23.14.0
@@ -810,14 +810,14 @@ packages:
       ts-pattern: 5.3.1
     dev: true
 
-  /@pentops/j5-ts-generator-normalized-query-plugin@0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.83)(@pentops/normalized-query-cache@0.0.2)(normalizr@3.6.2):
+  /@pentops/j5-ts-generator-normalized-query-plugin@0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.84)(@pentops/normalized-query-cache@0.0.2)(normalizr@3.6.2):
     resolution: {integrity: sha512-NaeYypoJDvptmtmSQeIAx+oD8yHh5C+peraj0aYcI8s5j/hIet9MNRbPjysoQP5p9HqPHrPxjdaH6x0YTyahvA==}
     peerDependencies:
       '@pentops/jsonapi-jdef-ts-generator': '>=0.0.80 < 0.1.0'
       '@pentops/normalized-query-cache': '>=0.0.1 < 0.1.0'
       normalizr: '>=3.0.0 < 4.0.0'
     dependencies:
-      '@pentops/jsonapi-jdef-ts-generator': 0.0.83(@pentops/jsonapi-request@0.0.4)
+      '@pentops/jsonapi-jdef-ts-generator': 0.0.84(@pentops/jsonapi-request@0.0.4)
       '@pentops/normalized-query-cache': 0.0.2(@tanstack/react-query@5.52.2)(@types/react@18.3.4)(normalizr@3.6.2)(react@18.3.1)
       change-case: 5.4.4
       normalizr: 3.6.2
@@ -825,21 +825,21 @@ packages:
       ts-pattern: 5.3.1
     dev: true
 
-  /@pentops/j5-ts-generator-psm-table-config-plugin@0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.83)(@pentops/react-table-state-psm@0.0.9):
+  /@pentops/j5-ts-generator-psm-table-config-plugin@0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.84)(@pentops/react-table-state-psm@0.0.9):
     resolution: {integrity: sha512-ttXIREaGuU9aS/vC8I7pnWXlQ8arOGhBm8BsSLDG8Fx/IdK9xXkiRpPzjiIH5M3mZ+VQt9ONwBczY0nYQhoX3Q==}
     peerDependencies:
       '@pentops/jsonapi-jdef-ts-generator': '>=0.0.83 < 0.1.0'
       '@pentops/react-table-state-psm': '>=0.0.6 < 0.1.0'
     dependencies:
-      '@pentops/jsonapi-jdef-ts-generator': 0.0.83(@pentops/jsonapi-request@0.0.4)
+      '@pentops/jsonapi-jdef-ts-generator': 0.0.84(@pentops/jsonapi-request@0.0.4)
       '@pentops/react-table-state-psm': 0.0.9(react-dom@18.3.1)(react@18.3.1)
       change-case: 5.4.4
       ts-morph: 23.0.0
       ts-pattern: 5.3.1
     dev: true
 
-  /@pentops/jsonapi-jdef-ts-generator@0.0.83(@pentops/jsonapi-request@0.0.4):
-    resolution: {integrity: sha512-zqUmBklsS7mHczOP3CkVvOYCnfdiBt4BtRANIKQFGC849VgUsknvtRFcUJuP79OG1PPIWVtuOR8Fer+6cLs+DA==}
+  /@pentops/jsonapi-jdef-ts-generator@0.0.84(@pentops/jsonapi-request@0.0.4):
+    resolution: {integrity: sha512-qEH/CIbjA3rlq5d02JuoY4Ev7wnVGtapkoApyiwBLjkMwUSSFjF67045qeOA77cfOYQgAmumwGeB/OM8mXbzmA==}
     hasBin: true
     peerDependencies:
       '@pentops/jsonapi-request': '>=0.0.4'

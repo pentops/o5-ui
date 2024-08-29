@@ -61,7 +61,7 @@
     "@pentops/j5-ts-generator-i18n-plugin": "^0.0.12",
     "@pentops/j5-ts-generator-normalized-query-plugin": "^0.0.12",
     "@pentops/j5-ts-generator-psm-table-config-plugin": "^0.0.12",
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.83",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.84",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash.get": "^4.4.9",
     "@types/lodash.set": "^4.3.9",

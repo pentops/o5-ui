@@ -10,13 +10,10 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
 import { RocketIcon } from '@radix-ui/react-icons';
 import { TableRowType } from '@/components/data-table/body.tsx';
-import {
-  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest,
-  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchableFields,
-  O5AwsDeployerV1EnvironmentState,
-} from '@/data/types';
+import { O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest, O5AwsDeployerV1EnvironmentState } from '@/data/types';
 import { useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments } from '@/data/api/hooks/generated';
 import { useTranslation } from 'react-i18next';
+import { getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchFields } from '@/data/table-config/generated';
 
 function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1EnvironmentState>[] {
   return [
@@ -76,22 +73,11 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1EnvironmentState>) {
   );
 }
 
-function getSearchableFields(t: TFunction) {
-  return [
-    {
-      value: O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchableFields.DataConfigFullName,
-      label: t(
-        `awsDeployer:enum.O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchableFields.${O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchableFields.DataConfigFullName}`,
-      ),
-    },
-  ];
-}
-
 export function EnvironmentManagement() {
   const { t } = useTranslation('awsDeployer');
   const columns = useMemo(() => getColumns(t), [t]);
-  const searchableFields = useMemo(() => getSearchableFields(t), [t]);
-  const initialSearchFields = useMemo(() => searchableFields.map((field) => field.value), [searchableFields]);
+  const searchableFields = useMemo(() => getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchFields(t), [t]);
+  const initialSearchFields = useMemo(() => searchableFields.map((field) => field.id), [searchableFields]);
   const { sortValues, setSortValues, psmQuery, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields } =
     useTableState<O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest['query']>({ initialSearchFields });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments({
