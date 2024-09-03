@@ -3,8 +3,6 @@ import { TFunction } from 'i18next';
 import { useErrorHandler } from '@/lib/error.ts';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
-import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
-import { buildEnvironmentCustomVariables } from '@/pages/environment/build-facts.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
@@ -14,6 +12,9 @@ import { O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest, O5AwsDep
 import { useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments } from '@/data/api/hooks/generated';
 import { useTranslation } from 'react-i18next';
 import { getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchFields } from '@/data/table-config/generated';
+import { EnvironmentSpec } from '@/pages/environment/spec/environment-spec.tsx';
+import { buildJ5StateMetadataFacts } from '@/lib/metadata.tsx';
+import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 
 function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1EnvironmentState>[] {
   return [
@@ -45,30 +46,34 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1EnvironmentSta
       minSize: 120,
       maxSize: 150,
       accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1EnvironmentStatus.${row.status}`) : ''),
-      // filter: {
-      //   type: {
-      //     select: {
-      //       isMultiple: true,
-      //       options: Object.entries(environmentStatusLabels).map(([value, label]) => ({ value, label })),
-      //     },
-      //   },
-      // },
+    },
+    {
+      header: 'Cluster ID',
+      id: 'clusterId',
+      accessorKey: 'clusterId',
+      size: 110,
+      minSize: 110,
+      maxSize: 110,
+      cell: ({ getValue }) => {
+        const value = getValue<string>();
+        return value ? <UUID canCopy short uuid={value} /> : null;
+      },
     },
   ];
 }
 
 function renderSubRow({ row }: TableRowType<O5AwsDeployerV1EnvironmentState>) {
+  const metadataFacts = buildJ5StateMetadataFacts(row.original.metadata);
+
   return (
     <div className="flex flex-col gap-4">
-      <NutritionFact vertical label="Full Name" renderWhenEmpty="-" value={row.original.data?.config?.fullName} />
-      <NutritionFact label="CORS Origins" renderWhenEmpty="-" value={row.original.data?.config?.corsOrigins?.join('\n')} />
-      <NutritionFact label="Trust JWKS" renderWhenEmpty="-" value={row.original.data?.config?.trustJwks?.join('\n')} />
+      <span>Metadata</span>
 
-      {/*<h4>Provider</h4>*/}
-      {/*{buildEnvironmentProvider(row.original.config?.provider)}*/}
+      <NutritionFact vertical {...metadataFacts.createdAt} />
+      <NutritionFact vertical {...metadataFacts.updatedAt} />
+      <NutritionFact vertical {...metadataFacts.lastSequence} />
 
-      <h4>Variables</h4>
-      {buildEnvironmentCustomVariables(row.original.data?.config?.vars)}
+      <EnvironmentSpec vertical heading="Config" spec={row.original.data?.config} />
     </div>
   );
 }

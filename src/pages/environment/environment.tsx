@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
+import { match, P } from 'ts-pattern';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
@@ -9,8 +11,6 @@ import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.t
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
-import { match, P } from 'ts-pattern';
-import { buildEnvironmentCustomVariables } from '@/pages/environment/build-facts.tsx';
 import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 import { TableRowType } from '@/components/data-table/body.tsx';
@@ -20,7 +20,8 @@ import {
   useO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEvents,
 } from '@/data/api/hooks/generated';
 import { TranslatedText } from '@/components/translated-text/translated-text.tsx';
-import { useTranslation } from 'react-i18next';
+import { EnvironmentSpec } from '@/pages/environment/spec/environment-spec.tsx';
+import { buildJ5StateMetadataFacts } from '@/lib/metadata.tsx';
 
 function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1EnvironmentEvent>[] {
   return [
@@ -47,14 +48,6 @@ function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1Environme
         const eventType = getOneOfType(row.event);
         return eventType ? t(`awsDeployer:oneOf.O5AwsDeployerV1EnvironmentEventType.${eventType}`) : null;
       },
-      // filter: {
-      //   type: {
-      //     select: {
-      //       isMultiple: true,
-      //       options: Object.values(EnvironmentEventType).map((value) => ({ label: environmentEventTypeLabels[value], value })),
-      //     },
-      //   },
-      // },
     },
     {
       header: 'Timestamp',
@@ -78,16 +71,6 @@ function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1Environme
           />
         ) : null;
       },
-      filter: {
-        type: {
-          date: {
-            isFlexible: true,
-            exactLabel: 'Pick a date',
-            startLabel: 'Min',
-            endLabel: 'Max',
-          },
-        },
-      },
     },
   ];
 }
@@ -99,28 +82,7 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1EnvironmentEvent>) {
 
       {match(row.original.event)
         .with({ configured: P.not(P.nullish) }, (e) => {
-          return (
-            <>
-              <NutritionFact vertical label="Full Name" renderWhenEmpty="-" value={e.configured.config?.fullName} />
-              <NutritionFact vertical label="CORS Origins" renderWhenEmpty="-" value={e.configured.config?.corsOrigins?.join('\n')} />
-              <NutritionFact vertical label="Trust JWKS" renderWhenEmpty="-" value={e.configured.config?.trustJwks?.join('\n')} />
-
-              {/*{e.configured.config?.provider && (*/}
-              {/*  <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">*/}
-              {/*    <CollapsibleTrigger asChild>*/}
-              {/*      <button className="w-full flex items-center justify-start gap-1" type="button">*/}
-              {/*        <CaretDownIcon />*/}
-              {/*        <h4 className="text-lg">Provider</h4>*/}
-              {/*      </button>*/}
-              {/*    </CollapsibleTrigger>*/}
-              {/*    <CollapsibleContent>{buildEnvironmentProvider(e.configured.config.provider)}</CollapsibleContent>*/}
-              {/*  </Collapsible>*/}
-              {/*)}*/}
-
-              <h4>Variables</h4>
-              {buildEnvironmentCustomVariables(e.configured.config?.vars)}
-            </>
-          );
+          return <EnvironmentSpec vertical heading="Config" spec={e.configured.config} />;
         })
         .otherwise(() => null)}
     </div>
@@ -159,6 +121,7 @@ export function Environment() {
   }, [eventsData?.pages]);
 
   const eventColumns = useMemo(() => getEventColumns(t), [t]);
+  const metadataFacts = useMemo(() => buildJ5StateMetadataFacts(data?.state?.metadata), [data?.state?.metadata]);
 
   return (
     <div className="w-full">
@@ -169,15 +132,30 @@ export function Environment() {
       <div className="w-full inline-flex gap-4 flex-wrap lg:flex-nowrap">
         <Card className="flex-grow lg:flex-grow-0 w-[325px] h-fit">
           <CardHeader className="text-lg font-semibold">Details</CardHeader>
+
           <CardContent className="w-full flex flex-col gap-4">
             <NutritionFact
               isLoading={isLoading}
               label="Status"
               renderWhenEmpty="-"
               value={
-                data?.state?.status ? <TranslatedText i18nKey={`awsDeployer:enum.O5AwsDeployerV1EnvironmentStatus.${data.state.status}`} /> : null
+                data?.state?.status ? (
+                  <TranslatedText i18nKey={`awsDeployer:enum.O5AwsDeployerV1EnvironmentStatus.${data.state.status}`} />
+                ) : undefined
               }
             />
+
+            <NutritionFact
+              isLoading={isLoading}
+              label="Cluster ID"
+              value={data?.state?.clusterId ? <UUID canCopy short uuid={data.state.clusterId} /> : undefined}
+            />
+
+            <span>Metadata</span>
+
+            <NutritionFact vertical {...metadataFacts.createdAt} />
+            <NutritionFact vertical {...metadataFacts.updatedAt} />
+            <NutritionFact vertical {...metadataFacts.lastSequence} />
           </CardContent>
         </Card>
 
@@ -186,24 +164,7 @@ export function Environment() {
             <CardHeader className="text-lg font-semibold">Config</CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4">
-                <NutritionFact renderWhenEmpty="-" label="Full Name" value={data?.state?.data?.config?.fullName} />
-                <NutritionFact renderWhenEmpty="-" label="CORS Origins" value={data?.state?.data?.config?.corsOrigins?.join('\n')} />
-                <NutritionFact renderWhenEmpty="-" label="Trust JWKS" value={data?.state?.data?.config?.trustJwks?.join('\n')} />
-
-                {/*{data?.state?.data?.config?.provider && (*/}
-                {/*  <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">*/}
-                {/*    <CollapsibleTrigger asChild>*/}
-                {/*      <button className="w-full flex items-center justify-start gap-1" type="button">*/}
-                {/*        <CaretDownIcon />*/}
-                {/*        <h4 className="text-lg">Provider</h4>*/}
-                {/*      </button>*/}
-                {/*    </CollapsibleTrigger>*/}
-                {/*    <CollapsibleContent>{buildEnvironmentProvider(data.state.config.provider)}</CollapsibleContent>*/}
-                {/*  </Collapsible>*/}
-                {/*)}*/}
-
-                <h4>Variables</h4>
-                {buildEnvironmentCustomVariables(data?.state?.data?.config?.vars)}
+                <EnvironmentSpec vertical isLoading={isLoading} spec={data?.state?.data?.config} />
               </div>
             </CardContent>
           </Card>
