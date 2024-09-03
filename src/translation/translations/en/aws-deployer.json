@@ -189,5 +189,13 @@
       "github": "GitHub",
       "inline": "Inline"
     }
+  },
+  "flags": {
+    "quickMode": "Quick Mode",
+    "rotateCredentials": "Rotate Credentials",
+    "cancelUpdates": "Cancel Updates",
+    "dbOnly": "DB Only",
+    "infraOnly": "Infra Only",
+    "importResources": "Import Resources"
   }
 }

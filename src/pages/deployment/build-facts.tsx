@@ -1,4 +1,4 @@
-import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
+import { NutritionFact, NutritionFactProps } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { match, P } from 'ts-pattern';
 import React from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
@@ -7,8 +7,156 @@ import { NumberFormat } from '@/components/format/number/number-format.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { buildCFStackOutput } from '@/pages/stack/build-facts.tsx';
 import { Link } from 'react-router-dom';
-import { O5AwsDeployerV1CfStackInput, O5AwsDeployerV1DeploymentSpec, O5AwsDeployerV1DeploymentStep, O5AwsDeployerV1PostgresSpec } from '@/data/types';
+import {
+  O5AwsDeployerV1CfChangesetOutput,
+  O5AwsDeployerV1CfStackInput,
+  O5AwsDeployerV1CfStackOutput,
+  O5AwsDeployerV1CloudFormationStackParameter,
+  O5AwsDeployerV1CloudFormationStackParameterType,
+  O5AwsDeployerV1CloudFormationStackParameterTypeRulePriority,
+  O5AwsDeployerV1DeploymentFlags,
+  O5AwsDeployerV1DeploymentSpec,
+  O5AwsDeployerV1DeploymentStep,
+  O5AwsDeployerV1PostgresSpec,
+  O5AwsDeployerV1S3Template,
+} from '@/data/types';
 import { TranslatedText } from '@/components/translated-text/translated-text.tsx';
+import { deployerKeyValuePairsToJSON } from '@/lib/aws.ts';
+import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
+
+export function buildDeployerCloudFormationStackParameterTypeFacts(param: O5AwsDeployerV1CloudFormationStackParameterType | undefined) {
+  return match(param)
+    .with({ rulePriority: P.not(P.nullish) }, (t) => {
+      const base: Record<keyof O5AwsDeployerV1CloudFormationStackParameterTypeRulePriority, NutritionFactProps> = {
+        routeGroup: { renderWhenEmpty: '-', label: 'Route Group', value: t.rulePriority.routeGroup },
+      };
+
+      return { rulePriority: base } as Record<keyof O5AwsDeployerV1CloudFormationStackParameterType, typeof base>;
+    })
+    .with({ desiredCount: P.not(P.nullish) }, () => {
+      return { desiredCount: {} } as Record<keyof O5AwsDeployerV1CloudFormationStackParameterType, {}>;
+    })
+    .otherwise(() => undefined);
+}
+
+export function buildDeployerCloudFormationStackParameterFacts(param: O5AwsDeployerV1CloudFormationStackParameter | undefined) {
+  const base: Omit<Record<keyof O5AwsDeployerV1CloudFormationStackParameter, NutritionFactProps>, 'resolve'> = {
+    name: { renderWhenEmpty: '-', label: 'Name', value: param?.name },
+    value: { renderWhenEmpty: '-', label: 'Value', value: param?.value },
+  };
+
+  return base;
+}
+
+export function buildDeployerS3TemplateSpecFacts(spec: O5AwsDeployerV1S3Template | undefined) {
+  const base: Record<keyof O5AwsDeployerV1S3Template, NutritionFactProps> = {
+    bucket: { renderWhenEmpty: '-', label: 'Bucket', value: spec?.bucket },
+    key: { renderWhenEmpty: '-', label: 'Key', value: spec?.key },
+    region: { renderWhenEmpty: '-', label: 'Region', value: spec?.region },
+  };
+
+  return base;
+}
+
+export function buildDeployerPostgresSpecFacts(spec: O5AwsDeployerV1PostgresSpec | undefined) {
+  const base: Record<keyof O5AwsDeployerV1PostgresSpec, NutritionFactProps> = {
+    dbName: { renderWhenEmpty: '-', label: 'Database Name', value: spec?.dbName },
+    dbExtensions: { renderWhenEmpty: '-', label: 'Extensions', value: spec?.dbExtensions?.join(', ') },
+    rootSecretName: { renderWhenEmpty: '-', label: 'Root Secret Name', value: spec?.rootSecretName },
+    secretOutputName: { renderWhenEmpty: '-', label: 'Secret Output Name', value: spec?.secretOutputName },
+    migrationTaskOutputName: { renderWhenEmpty: '-', label: 'Migration Task Output Name', value: spec?.migrationTaskOutputName },
+  };
+
+  return base;
+}
+
+export function buildDeployerFlagsFacts(flags: O5AwsDeployerV1DeploymentFlags | undefined) {
+  const base: Record<keyof O5AwsDeployerV1DeploymentFlags, NutritionFactProps> = {
+    quickMode: { renderWhenEmpty: '-', label: <TranslatedText i18nKey="awsDeployer:flags.quickMode" />, value: flags?.quickMode ? 'Yes' : 'No' },
+    rotateCredentials: {
+      renderWhenEmpty: '-',
+      label: <TranslatedText i18nKey="awsDeployer:flags.rotateCredentials" />,
+      value: flags?.rotateCredentials ? 'Yes' : 'No',
+    },
+    cancelUpdates: {
+      renderWhenEmpty: '-',
+      label: <TranslatedText i18nKey="awsDeployer:flags.cancelUpdates" />,
+      value: flags?.cancelUpdates ? 'Yes' : 'No',
+    },
+    infraOnly: { renderWhenEmpty: '-', label: <TranslatedText i18nKey="awsDeployer:flags.infraOnly" />, value: flags?.infraOnly ? 'Yes' : 'No' },
+    dbOnly: { renderWhenEmpty: '-', label: <TranslatedText i18nKey="awsDeployer:flags.dbOnly" />, value: flags?.dbOnly ? 'Yes' : 'No' },
+    importResources: {
+      renderWhenEmpty: '-',
+      label: <TranslatedText i18nKey="awsDeployer:flags.importResources" />,
+      value: flags?.importResources ? 'Yes' : 'No',
+    },
+  };
+
+  return base;
+}
+
+export function buildDeployerDeploymentSpecFacts(spec: O5AwsDeployerV1DeploymentSpec | undefined) {
+  const base: Omit<Record<keyof O5AwsDeployerV1DeploymentSpec, NutritionFactProps>, 'databases' | 'flags' | 'template' | 'parameters'> = {
+    appName: { renderWhenEmpty: '-', label: 'App Name', value: spec?.appName },
+    version: { renderWhenEmpty: '-', label: 'Version', value: spec?.version },
+    environmentId: {
+      renderWhenEmpty: '-',
+      label: 'Environment ID',
+      value: spec?.environmentId ? <UUID canCopy short uuid={spec.environmentId} to={`/environment/${spec.environmentId}`} /> : undefined,
+    },
+    environmentName: { renderWhenEmpty: '-', label: 'Environment Name', value: spec?.environmentName },
+    ecsCluster: { renderWhenEmpty: '-', label: 'ECS Cluster', value: spec?.ecsCluster },
+    cfStackName: { renderWhenEmpty: '-', label: 'CF Stack Name', value: spec?.cfStackName },
+    snsTopics: { renderWhenEmpty: '-', label: 'SNS Topics', value: spec?.snsTopics?.join(', ') },
+  };
+
+  return base;
+}
+
+export function buildDeployerCloudFormationStackOutputFacts(output: O5AwsDeployerV1CfStackOutput | undefined) {
+  const base: Record<keyof O5AwsDeployerV1CfStackOutput, NutritionFactProps> = {
+    lifecycle: {
+      renderWhenEmpty: '-',
+      label: 'Lifecycle',
+      value: output?.lifecycle ? <TranslatedText i18nKey={`awsDeployer:enum.O5AwsDeployerV1CfLifecycle.${output.lifecycle}`} /> : undefined,
+    },
+    outputs: {
+      renderWhenEmpty: '-',
+      label: 'Outputs',
+      value: output?.outputs ? <CodeEditor disabled value={deployerKeyValuePairsToJSON(output.outputs)} /> : undefined,
+    },
+  };
+
+  return base;
+}
+
+export function buildDeployerCloudFormationChangeSetOutputFacts(output: O5AwsDeployerV1CfChangesetOutput | undefined) {
+  const base: Record<keyof O5AwsDeployerV1CfChangesetOutput, NutritionFactProps> = {
+    lifecycle: {
+      renderWhenEmpty: '-',
+      label: 'Lifecycle',
+      value: output?.lifecycle ? <TranslatedText i18nKey={`awsDeployer:enum.O5AwsDeployerV1CfChangesetLifecycle.${output.lifecycle}`} /> : undefined,
+    },
+  };
+
+  return base;
+}
+
+export function buildDeployerDeploymentStepFacts(step: O5AwsDeployerV1DeploymentStep | undefined) {
+  const base: Omit<Record<keyof O5AwsDeployerV1DeploymentStep, NutritionFactProps>, 'request' | 'output'> = {
+    id: { renderWhenEmpty: '-', label: 'ID', value: step?.id ? <UUID canCopy short uuid={step.id} /> : undefined },
+    name: { renderWhenEmpty: '-', label: 'Name', value: step?.name },
+    status: {
+      renderWhenEmpty: '-',
+      label: 'Status',
+      value: step?.status ? <TranslatedText i18nKey={`awsDeployer:enum.O5AwsDeployerV1StepStatus.${step.status}`} /> : undefined,
+    },
+    error: { renderWhenEmpty: '-', label: 'Error', value: step?.error },
+    dependsOn: { renderWhenEmpty: '-', label: 'Depends On', value: step?.dependsOn?.join(', ') },
+  };
+
+  return base;
+}
 
 export function buildCFStackInput(spec: O5AwsDeployerV1CfStackInput | undefined) {
   return (

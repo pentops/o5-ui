@@ -92,8 +92,6 @@ function getEventColumns(t: TFunction) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getSubRowRenderer(_decodeBase64: boolean, _setDecodeBase64: (value: boolean) => void) {
   return function renderSubRow({ row }: TableRowType<O5DanteV1DeadMessageEvent>) {
-    // const problemType = getDeadMessageProblem(row.original.event?.type?.created?.spec);
-
     return (
       <div className="flex flex-col gap-4">
         <NutritionFact vertical label="Actor" value="-" />
