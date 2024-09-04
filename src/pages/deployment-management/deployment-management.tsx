@@ -7,7 +7,6 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { TriggerDeploymentDialog } from '@/pages/deployment/trigger-deployment-dialog/trigger-deployment-dialog.tsx';
 import { ConfirmTerminateDeploymentAlert } from '@/pages/deployment/confirm-terminate-deployment-alert/confirm-terminate-deployment-alert.tsx';
-import { buildDeploymentSpecFacts, buildDeploymentStepFacts } from '@/pages/deployment/build-facts.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { TableRowType } from '@/components/data-table/body.tsx';
@@ -18,6 +17,10 @@ import {
 } from '@/data/types';
 import { useO5AwsDeployerV1DeploymentQueryServiceListDeployments } from '@/data/api/hooks/generated';
 import { useTranslation } from 'react-i18next';
+import { J5StateMetadata } from '@/components/j5/j5-state-metadata.tsx';
+import { DeploymentStep } from '@/pages/deployment/step/deployment-step.tsx';
+import { DeploymentSpec } from '@/pages/deployment/spec/deployment-spec.tsx';
+import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 
 function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1DeploymentState>[] {
   return [
@@ -73,14 +76,6 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1DeploymentStat
       minSize: 120,
       maxSize: 150,
       accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1DeploymentStatus.${row.status}`) : ''),
-      // filter: {
-      //   type: {
-      //     select: {
-      //       isMultiple: true,
-      //       options: Object.entries(deploymentStatusLabels).map(([value, label]) => ({ value, label })),
-      //     },
-      //   },
-      // },
     },
     {
       header: 'Stack',
@@ -115,16 +110,6 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1DeploymentStat
           />
         ) : undefined;
       },
-      filter: {
-        type: {
-          date: {
-            isFlexible: true,
-            exactLabel: 'Pick a date',
-            startLabel: 'Min',
-            endLabel: 'Max',
-          },
-        },
-      },
     },
     {
       header: () => {
@@ -152,28 +137,31 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1DeploymentStat
   ];
 }
 
-const searchableFields: any[] = [
-  // { value: 'spec.appName', label: 'App' },
-  // { value: 'spec.environmentName', label: 'Environment' },
-  // { value: 'spec.version', label: 'Version' },
-  // { value: 'spec.templateUrl', label: 'Template URL' },
-];
-
-const initialSearchFields = searchableFields.map((field) => field.value);
-
 function renderSubRow({ row }: TableRowType<O5AwsDeployerV1DeploymentState>) {
   return (
     <div className="flex flex-col gap-4">
-      {buildDeploymentSpecFacts(row.original.data?.spec, ['appName', 'environmentName', 'version'])}
-      {buildDeploymentStepFacts(row.original.data?.steps)}
+      <J5StateMetadata vertical metadata={row.original.metadata} heading="Metadata" />
+
+      <DeploymentSpec vertical heading="Spec" spec={row.original.data?.spec} />
+
+      {row.original.data?.request ? (
+        <>
+          <span>Request</span>
+          <NutritionFact vertical renderWhenEmpty="-" label="Context" value={row.original.data.request.context} />
+          <NutritionFact vertical renderWhenEmpty="-" label="Reply To" value={row.original.data.request.replyTo} />
+        </>
+      ) : null}
+
+      {row.original.data?.steps?.length ? <span>Steps</span> : null}
+      {row.original.data?.steps?.map((step, index) => <DeploymentStep vertical step={step} key={step.id || step.name || index} />)}
     </div>
   );
 }
 
 function DeploymentManagement() {
   const { t } = useTranslation('awsDeployer');
-  const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
-    useTableState<O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest['query']>({ initialSearchFields });
+  const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } =
+    useTableState<O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest['query']>();
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5AwsDeployerV1DeploymentQueryServiceListDeployments({
     query: psmQuery,
   });
@@ -209,13 +197,13 @@ function DeploymentManagement() {
         filterValues={filterValues}
         onColumnSort={setSortValues}
         onFilter={setFilterValues}
-        onSearch={setSearchValue}
-        onSearchFieldChange={setSearchFields}
+        // onSearch={setSearchValue}
+        // onSearchFieldChange={setSearchFields}
         pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
         renderSubComponent={renderSubRow}
-        searchValue={searchValue}
-        searchFields={searchableFields}
-        searchFieldSelections={searchFields}
+        // searchValue={searchValue}
+        // searchFields={searchableFields}
+        // searchFieldSelections={searchFields}
         showSkeleton={Boolean(data === undefined || isLoading || error)}
       />
     </div>

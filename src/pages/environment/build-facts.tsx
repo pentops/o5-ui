@@ -80,7 +80,7 @@ export function buildDeployerAWSEnvironment(spec: O5EnvironmentV1AwsEnvironment 
     iamPolicies: {
       renderWhenEmpty: '-',
       label: 'IAM Policies',
-      value: <CodeEditor disabled value={variablesToJSON(spec?.iamPolicies) || '[]'} language="json" />,
+      value: <CodeEditor disabled value={deployerAWSNamedIAMPoliciesToJSON(spec?.iamPolicies) || '[]'} language="json" />,
     },
   };
 

@@ -13,8 +13,7 @@ import { useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments } from '@/dat
 import { useTranslation } from 'react-i18next';
 import { getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchFields } from '@/data/table-config/generated';
 import { EnvironmentSpec } from '@/pages/environment/spec/environment-spec.tsx';
-import { buildJ5StateMetadataFacts } from '@/lib/metadata.tsx';
-import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
+import { J5StateMetadata } from '@/components/j5/j5-state-metadata.tsx';
 
 function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1EnvironmentState>[] {
   return [
@@ -39,15 +38,6 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1EnvironmentSta
       accessorFn: (row) => row.data?.config?.fullName,
     },
     {
-      header: 'Status',
-      align: 'right',
-      id: 'status',
-      size: 120,
-      minSize: 120,
-      maxSize: 150,
-      accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1EnvironmentStatus.${row.status}`) : ''),
-    },
-    {
       header: 'Cluster ID',
       id: 'clusterId',
       accessorKey: 'clusterId',
@@ -59,19 +49,22 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1EnvironmentSta
         return value ? <UUID canCopy short uuid={value} /> : null;
       },
     },
+    {
+      header: 'Status',
+      align: 'right',
+      id: 'status',
+      size: 120,
+      minSize: 120,
+      maxSize: 150,
+      accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1EnvironmentStatus.${row.status}`) : ''),
+    },
   ];
 }
 
 function renderSubRow({ row }: TableRowType<O5AwsDeployerV1EnvironmentState>) {
-  const metadataFacts = buildJ5StateMetadataFacts(row.original.metadata);
-
   return (
     <div className="flex flex-col gap-4">
-      <span>Metadata</span>
-
-      <NutritionFact vertical {...metadataFacts.createdAt} />
-      <NutritionFact vertical {...metadataFacts.updatedAt} />
-      <NutritionFact vertical {...metadataFacts.lastSequence} />
+      <J5StateMetadata vertical heading="Metadata" metadata={row.original.metadata} />
 
       <EnvironmentSpec vertical heading="Config" spec={row.original.data?.config} />
     </div>

@@ -29,6 +29,9 @@ import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
 import { O5_DANTE_V1_DEAD_MESSAGE_QUERY_SERVICE_LIST_DEAD_MESSAGE_EVENTS_DEFAULT_SORTS } from '@/data/table-config/generated';
 import { DeadMessage } from '@/pages/dead-letter/dead-message/dead-message.tsx';
 import { DeadMessageVersion } from '@/pages/dead-letter/dead-message/dead-message-version.tsx';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
+import { CaretDownIcon } from '@radix-ui/react-icons';
+import { J5EventMetadata } from '@/components/j5/j5-event-metadata.tsx';
 
 function getEventColumns(t: TFunction) {
   return extendColumnsWithPSMFeatures<
@@ -94,7 +97,17 @@ function getSubRowRenderer(_decodeBase64: boolean, _setDecodeBase64: (value: boo
   return function renderSubRow({ row }: TableRowType<O5DanteV1DeadMessageEvent>) {
     return (
       <div className="flex flex-col gap-4">
-        <NutritionFact vertical label="Actor" value="-" />
+        <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+          <CollapsibleTrigger asChild>
+            <button className="w-full flex items-center justify-start gap-1" type="button">
+              <CaretDownIcon />
+              <h4 className="text-lg">Metadata</h4>
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <J5EventMetadata metadata={row.original.metadata} isLoading={false} />
+          </CollapsibleContent>
+        </Collapsible>
 
         {match(row.original.event)
           .with({ notified: P.not(P.nullish) }, (e) => <DeadMessage vertical deadMessage={e.notified.notification} heading="Notification" />)

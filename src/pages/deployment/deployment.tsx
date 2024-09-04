@@ -10,6 +10,7 @@ import {
   getOneOfType,
   O5AwsDeployerV1DeploymentEvent,
   O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest,
+  O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsSortableFields,
   O5AwsDeployerV1DeploymentStatus,
 } from '@/data/types';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
@@ -29,61 +30,84 @@ import { StackOutput } from '@/pages/stack/stack-output.tsx';
 import { StepOutput } from '@/pages/deployment/step/step-output.tsx';
 import { DeploymentSpec } from '@/pages/deployment/spec/deployment-spec.tsx';
 import { DeploymentStep } from '@/pages/deployment/step/deployment-step.tsx';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
+import { CaretDownIcon } from '@radix-ui/react-icons';
+import { J5EventMetadata } from '@/components/j5/j5-event-metadata.tsx';
+import { TFunction } from 'i18next';
+import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
+import { useTranslation } from 'react-i18next';
+import { getO5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsFilters } from '@/data/table-config/generated';
 
-const eventColumns: CustomColumnDef<O5AwsDeployerV1DeploymentEvent>[] = [
-  getRowExpander(),
-  {
-    header: 'ID',
-    id: 'metadata.eventId',
-    size: 110,
-    minSize: 110,
-    maxSize: 110,
-    accessorFn: (row) => row.metadata?.eventId,
-    cell: ({ getValue }) => {
-      const value = getValue<string>();
-      return value ? <UUID canCopy short uuid={value} /> : null;
-    },
-  },
-  {
-    header: 'Type',
-    id: 'event',
-    size: 120,
-    minSize: 120,
-    maxSize: 150,
-    accessorFn: (row) => {
-      const eventType = getOneOfType(row.event);
-      return eventType ? <TranslatedText i18nKey={`awsDeployer:oneOf.O5AwsDeployerV1DeploymentEventType.${eventType}`} /> : null;
-    },
-  },
-  {
-    header: 'Timestamp',
-    id: 'metadata.timestamp',
-    align: 'right',
-    accessorFn: (row) => row.metadata?.timestamp,
-    enableSorting: true,
-    cell: ({ getValue }) => {
-      const value = getValue<string>();
+function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1DeploymentEvent>[] {
+  return extendColumnsWithPSMFeatures<O5AwsDeployerV1DeploymentEvent, O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest['query']>(
+    [
+      getRowExpander(),
+      {
+        header: 'ID',
+        id: 'metadata.eventId',
+        size: 110,
+        minSize: 110,
+        maxSize: 110,
+        accessorFn: (row) => row.metadata?.eventId,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
+          return value ? <UUID canCopy short uuid={value} /> : null;
+        },
+      },
+      {
+        header: 'Type',
+        id: 'event',
+        size: 120,
+        minSize: 120,
+        maxSize: 150,
+        accessorFn: (row) => {
+          const eventType = getOneOfType(row.event);
+          return eventType ? t(`awsDeployer:oneOf.O5AwsDeployerV1DeploymentEventType.${eventType}`) : '';
+        },
+      },
+      {
+        header: 'Timestamp',
+        id: 'metadata.timestamp',
+        align: 'right',
+        accessorFn: (row) => row.metadata?.timestamp,
+        enableSorting: true,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
 
-      return value ? (
-        <DateFormat
-          day="2-digit"
-          hour="numeric"
-          minute="2-digit"
-          second="numeric"
-          month="2-digit"
-          timeZoneName="short"
-          year="numeric"
-          value={value}
-        />
-      ) : null;
-    },
-  },
-];
+          return value ? (
+            <DateFormat
+              day="2-digit"
+              hour="numeric"
+              minute="2-digit"
+              second="numeric"
+              month="2-digit"
+              timeZoneName="short"
+              year="numeric"
+              value={value}
+            />
+          ) : null;
+        },
+      },
+    ],
+    getO5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsFilters(t),
+    Object.values(O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsSortableFields),
+  );
+}
 
 function renderSubRow({ row }: TableRowType<O5AwsDeployerV1DeploymentEvent>) {
   return (
     <div className="flex flex-col gap-4">
-      <NutritionFact vertical label="Actor" value="-" />
+      <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+        <CollapsibleTrigger asChild>
+          <button className="w-full flex items-center justify-start gap-1" type="button">
+            <CaretDownIcon />
+            <h4 className="text-lg">Metadata</h4>
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <J5EventMetadata metadata={row.original.metadata} isLoading={false} />
+        </CollapsibleContent>
+      </Collapsible>
 
       {match(row.original.event)
         .with({ created: P.not(P.nullish) }, (e) => (
@@ -155,6 +179,7 @@ function canTerminateDeployment(status: O5AwsDeployerV1DeploymentStatus | undefi
 
 export function Deployment() {
   const { deploymentId } = useParams();
+  const { t } = useTranslation('awsDeployer');
   const { data, error, isPending } = useO5AwsDeployerV1DeploymentQueryServiceGetDeployment(deploymentId ? { deploymentId } : undefined);
   useErrorHandler(error, 'Failed to load deployment');
 
@@ -181,6 +206,7 @@ export function Deployment() {
       return acc;
     }, [] as O5AwsDeployerV1DeploymentEvent[]);
   }, [eventsData?.pages]);
+  const eventColumns = useMemo(() => getEventColumns(t), [t]);
 
   return (
     <div className="w-full">

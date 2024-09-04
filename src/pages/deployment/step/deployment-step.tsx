@@ -3,6 +3,7 @@ import { O5AwsDeployerV1DeploymentStep } from '@/data/types';
 import { buildDeployerDeploymentStepFacts } from '@/pages/deployment/build-facts.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { StepOutput } from '@/pages/deployment/step/step-output.tsx';
+import { DeploymentStepRequest } from '@/pages/deployment/step/deployment-step-request.tsx';
 
 interface DeploymentStepProps {
   heading?: React.ReactNode;
@@ -29,7 +30,7 @@ export function DeploymentStep({ heading, step, isLoading, vertical }: Deploymen
 
       <StepOutput isLoading={isLoading} vertical={vertical} heading="Output" output={step?.output} />
 
-      {/* TODO: request */}
+      <DeploymentStepRequest heading="Request" request={step?.request} isLoading={isLoading} vertical={vertical} />
     </>
   );
 }

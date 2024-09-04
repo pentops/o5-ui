@@ -17,6 +17,9 @@ import { TFunction } from 'i18next';
 import { useO5AwsDeployerV1StackQueryServiceGetStack, useO5AwsDeployerV1StackQueryServiceListStackEvents } from '@/data/api/hooks/generated';
 import { TranslatedText } from '@/components/translated-text/translated-text.tsx';
 import { useTranslation } from 'react-i18next';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
+import { CaretDownIcon } from '@radix-ui/react-icons';
+import { J5EventMetadata } from '@/components/j5/j5-event-metadata.tsx';
 
 function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackEvent>[] {
   return [
@@ -43,14 +46,6 @@ function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackEven
         const eventType = getOneOfType(row.event);
         return eventType ? t(`awsDeployer:oneOf.O5AwsDeployerV1StackEventType.${eventType}`) : '';
       },
-      // filter: {
-      //   type: {
-      //     select: {
-      //       isMultiple: true,
-      //       options: Object.values(StackEventType).map((value) => ({ label: stackEventTypeLabels[value], value })),
-      //     },
-      //   },
-      // },
     },
     {
       header: 'Timestamp',
@@ -74,16 +69,6 @@ function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackEven
           />
         ) : null;
       },
-      filter: {
-        type: {
-          date: {
-            isFlexible: true,
-            exactLabel: 'Pick a date',
-            startLabel: 'Min',
-            endLabel: 'Max',
-          },
-        },
-      },
     },
   ];
 }
@@ -91,7 +76,17 @@ function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackEven
 function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackEvent>) {
   return (
     <div className="flex flex-col gap-4">
-      <NutritionFact label="Actor" value="-" />
+      <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+        <CollapsibleTrigger asChild>
+          <button className="w-full flex items-center justify-start gap-1" type="button">
+            <CaretDownIcon />
+            <h4 className="text-lg">Metadata</h4>
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <J5EventMetadata metadata={row.original.metadata} isLoading={false} />
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* TODO: add missing events */}
       {match(row.original.event)

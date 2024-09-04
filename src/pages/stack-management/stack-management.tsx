@@ -14,6 +14,7 @@ import { TableRowType } from '@/components/data-table/body.tsx';
 import { O5AwsDeployerV1StackQueryServiceListStacksRequest, O5AwsDeployerV1StackState } from '@/data/types';
 import { useO5AwsDeployerV1StackQueryServiceListStacks } from '@/data/api/hooks/generated';
 import { getO5AwsDeployerV1StackQueryServiceListStacksSearchFields } from '@/data/table-config/generated';
+import { J5StateMetadata } from '@/components/j5/j5-state-metadata.tsx';
 
 function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackState>[] {
   return [
@@ -65,14 +66,6 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackState>[] 
       size: 120,
       minSize: 120,
       maxSize: 150,
-      // filter: {
-      //   type: {
-      //     select: {
-      //       isMultiple: true,
-      //       options: Object.entries(stackStatusLabels).map(([value, label]) => ({ value, label })),
-      //     },
-      //   },
-      // },
     },
     {
       header: 'Current Deployment',
@@ -81,18 +74,6 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackState>[] 
       minSize: 150,
       maxSize: 200,
       accessorFn: (row) => row.data?.currentDeployment?.deploymentId,
-      cell: ({ getValue }) => {
-        const value = getValue<string>();
-        return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
-      },
-    },
-    {
-      header: 'Current Deployment Version',
-      id: 'data.currentDeployment.version',
-      size: 200,
-      minSize: 200,
-      maxSize: 200,
-      accessorFn: (row) => row.data?.currentDeployment?.version,
       cell: ({ getValue }) => {
         const value = getValue<string>();
         return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
@@ -119,6 +100,8 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackState>[] 
 function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackState>) {
   return (
     <div className="flex flex-col gap-4">
+      <J5StateMetadata vertical heading="Metadata" metadata={row.original.metadata} />
+
       <NutritionFact
         label="Environment ID"
         renderWhenEmpty="-"
@@ -129,7 +112,13 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackState>) {
         }
       />
 
-      {/*{buildCodeSourceFact(row.original.config?.codeSource)}*/}
+      <NutritionFact
+        label="Cluster ID"
+        renderWhenEmpty="-"
+        value={row.original.clusterId ? <UUID canCopy short uuid={row.original.clusterId} /> : undefined}
+      />
+
+      <NutritionFact label="Version" renderWhenEmpty="-" value={row.original.data?.currentDeployment?.version} />
     </div>
   );
 }

@@ -23,6 +23,27 @@ import {
 import { TranslatedText } from '@/components/translated-text/translated-text.tsx';
 import { deployerKeyValuePairsToJSON } from '@/lib/aws.ts';
 import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
+import { getYesNoOrUndefined } from '@/lib/bool.ts';
+
+export function buildDeployerCFStackInputFacts(input: O5AwsDeployerV1CfStackInput | undefined) {
+  const base: Omit<Record<keyof O5AwsDeployerV1CfStackInput, NutritionFactProps>, 'parameters' | 's3Template'> = {
+    stackName: { renderWhenEmpty: '-', label: 'Stack Name', value: input?.stackName },
+    templateBody: { renderWhenEmpty: '-', label: 'Template Body', value: input?.templateBody },
+    emptyStack: {
+      renderWhenEmpty: '-',
+      label: 'Empty Stack',
+      value: getYesNoOrUndefined(input?.emptyStack),
+    },
+    desiredCount: {
+      renderWhenEmpty: '-',
+      label: 'Desired Count',
+      value: input?.desiredCount !== undefined ? <NumberFormat value={input.desiredCount} /> : undefined,
+    },
+    snsTopics: { renderWhenEmpty: '-', label: 'SNS Topics', value: input?.snsTopics?.join(', ') },
+  };
+
+  return base;
+}
 
 export function buildDeployerCloudFormationStackParameterTypeFacts(param: O5AwsDeployerV1CloudFormationStackParameterType | undefined) {
   return match(param)
@@ -31,10 +52,10 @@ export function buildDeployerCloudFormationStackParameterTypeFacts(param: O5AwsD
         routeGroup: { renderWhenEmpty: '-', label: 'Route Group', value: t.rulePriority.routeGroup },
       };
 
-      return { rulePriority: base } as Record<keyof O5AwsDeployerV1CloudFormationStackParameterType, typeof base>;
+      return { rulePriority: base } as const;
     })
     .with({ desiredCount: P.not(P.nullish) }, () => {
-      return { desiredCount: {} } as Record<keyof O5AwsDeployerV1CloudFormationStackParameterType, {}>;
+      return { desiredCount: {} } as const;
     })
     .otherwise(() => undefined);
 }
@@ -260,12 +281,17 @@ export function buildDeploymentSpecFacts(
       <h4 className="text-lg">Flags</h4>
 
       <div className="grid grid-cols-2 gap-2">
-        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Cancel Updates" value={spec?.flags?.cancelUpdates ? 'Yes' : 'No'} />
-        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Rotate Credentials" value={spec?.flags?.rotateCredentials ? 'Yes' : 'No'} />
-        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Quick Mode" value={spec?.flags?.quickMode ? 'Yes' : 'No'} />
-        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Infra Only" value={spec?.flags?.infraOnly ? 'Yes' : 'No'} />
-        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Database Only" value={spec?.flags?.dbOnly ? 'Yes' : 'No'} />
-        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Import Resources" value={spec?.flags?.importResources ? 'Yes' : 'No'} />
+        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Cancel Updates" value={getYesNoOrUndefined(spec?.flags?.cancelUpdates)} />
+        <NutritionFact
+          renderWhenEmpty="-"
+          isLoading={isLoading}
+          label="Rotate Credentials"
+          value={getYesNoOrUndefined(spec?.flags?.rotateCredentials)}
+        />
+        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Quick Mode" value={getYesNoOrUndefined(spec?.flags?.quickMode)} />
+        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Infra Only" value={getYesNoOrUndefined(spec?.flags?.infraOnly)} />
+        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Database Only" value={getYesNoOrUndefined(spec?.flags?.dbOnly)} />
+        <NutritionFact renderWhenEmpty="-" isLoading={isLoading} label="Import Resources" value={getYesNoOrUndefined(spec?.flags?.importResources)} />
       </div>
 
       {(spec?.snsTopics?.length || 0) > 0 && (
