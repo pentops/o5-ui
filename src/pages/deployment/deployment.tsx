@@ -36,7 +36,10 @@ import { J5EventMetadata } from '@/components/j5/j5-event-metadata.tsx';
 import { TFunction } from 'i18next';
 import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
 import { useTranslation } from 'react-i18next';
-import { getO5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsFilters } from '@/data/table-config/generated';
+import {
+  getO5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsFilters,
+  O5_AWS_DEPLOYER_V1_DEPLOYMENT_QUERY_SERVICE_LIST_DEPLOYMENT_EVENTS_DEFAULT_SORTS,
+} from '@/data/table-config/generated';
 
 function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1DeploymentEvent>[] {
   return extendColumnsWithPSMFeatures<O5AwsDeployerV1DeploymentEvent, O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest['query']>(
@@ -183,7 +186,9 @@ export function Deployment() {
   const { data, error, isPending } = useO5AwsDeployerV1DeploymentQueryServiceGetDeployment(deploymentId ? { deploymentId } : undefined);
   useErrorHandler(error, 'Failed to load deployment');
 
-  const eventTableState = useTableState<O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest['query']>();
+  const eventTableState = useTableState<O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest['query']>({
+    initialSort: O5_AWS_DEPLOYER_V1_DEPLOYMENT_QUERY_SERVICE_LIST_DEPLOYMENT_EVENTS_DEFAULT_SORTS,
+  });
   const {
     data: eventsData,
     isLoading: eventsAreLoading,

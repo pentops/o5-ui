@@ -12,6 +12,7 @@ import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { TableRowType } from '@/components/data-table/body.tsx';
 import {
   O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest,
+  O5AwsDeployerV1DeploymentQueryServiceListDeploymentsSortableFields,
   O5AwsDeployerV1DeploymentState,
   O5AwsDeployerV1DeploymentStatus,
 } from '@/data/types';
@@ -21,120 +22,129 @@ import { J5StateMetadata } from '@/components/j5/j5-state-metadata.tsx';
 import { DeploymentStep } from '@/pages/deployment/step/deployment-step.tsx';
 import { DeploymentSpec } from '@/pages/deployment/spec/deployment-spec.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
+import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
+import {
+  getO5AwsDeployerV1DeploymentQueryServiceListDeploymentsFilters,
+  O5_AWS_DEPLOYER_V1_DEPLOYMENT_QUERY_SERVICE_LIST_DEPLOYMENTS_DEFAULT_SORTS,
+} from '@/data/table-config/generated';
 
 function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1DeploymentState>[] {
-  return [
-    getRowExpander(),
-    {
-      header: 'ID',
-      accessorKey: 'deploymentId',
-      id: 'deploymentId',
-      size: 110,
-      minSize: 110,
-      maxSize: 110,
-      cell: ({ getValue }) => {
-        const value = getValue<string>();
-        return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
+  return extendColumnsWithPSMFeatures<O5AwsDeployerV1DeploymentState, O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest['query']>(
+    [
+      getRowExpander(),
+      {
+        header: 'ID',
+        accessorKey: 'deploymentId',
+        id: 'deploymentId',
+        size: 110,
+        minSize: 110,
+        maxSize: 110,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
+          return value ? <UUID canCopy short to={`/deployment/${value}`} uuid={value} /> : null;
+        },
       },
-    },
-    {
-      header: 'App',
-      id: 'spec.appName',
-      size: 120,
-      minSize: 120,
-      maxSize: 140,
-      accessorFn: (row) => row.data?.spec?.appName || '',
-    },
-    {
-      header: 'Environment',
-      id: 'spec.environmentName',
-      size: 120,
-      minSize: 120,
-      maxSize: 140,
-      accessorFn: (row) => row.data?.spec?.environmentName || '',
-      cell: ({ getValue, row }) => {
-        const value = getValue<string>();
-        return row.original.data?.spec?.environmentId ? <Link to={`/environment/${row.original.data?.spec.environmentId}`}>{value}</Link> : value;
+      {
+        header: 'App',
+        id: 'data.spec.appName',
+        size: 120,
+        minSize: 120,
+        maxSize: 140,
+        accessorFn: (row) => row.data?.spec?.appName || '',
       },
-    },
-    {
-      header: 'Version',
-      id: 'spec.version',
-      size: 110,
-      minSize: 110,
-      maxSize: 110,
-      accessorFn: (row) => row.data?.spec?.version || '',
-      cell: ({ getValue }) => {
-        const value = getValue<string>();
-        return value ? <UUID canCopy short uuid={value} /> : null;
+      {
+        header: 'Environment',
+        id: 'data.spec.environmentName',
+        size: 120,
+        minSize: 120,
+        maxSize: 140,
+        accessorFn: (row) => row.data?.spec?.environmentName || '',
+        cell: ({ getValue, row }) => {
+          const value = getValue<string>();
+          return row.original.data?.spec?.environmentId ? <Link to={`/environment/${row.original.data?.spec.environmentId}`}>{value}</Link> : value;
+        },
       },
-    },
-    {
-      header: 'Status',
-      id: 'status',
-      size: 120,
-      minSize: 120,
-      maxSize: 150,
-      accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1DeploymentStatus.${row.status}`) : ''),
-    },
-    {
-      header: 'Stack',
-      accessorKey: 'stackName',
-      id: 'stackName',
-      cell: ({ getValue, row }) => {
-        const value = getValue<string>();
-        return row.original.stackId ? <Link to={`/stack/${row.original.stackId}`}>{value}</Link> : value;
+      {
+        header: 'Version',
+        id: 'data.spec.version',
+        size: 110,
+        minSize: 110,
+        maxSize: 110,
+        accessorFn: (row) => row.data?.spec?.version || '',
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
+          return value ? <UUID canCopy short uuid={value} /> : null;
+        },
       },
-    },
-    {
-      header: 'Created At',
-      id: 'metadata.createdAt',
-      accessorFn: (row) => row.metadata?.createdAt,
-      enableSorting: true,
-      minSize: 135,
-      maxSize: 215,
-      size: 215,
-      cell: ({ getValue }) => {
-        const createdAt = getValue<string>();
+      {
+        header: 'Status',
+        id: 'status',
+        size: 120,
+        minSize: 120,
+        maxSize: 150,
+        accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1DeploymentStatus.${row.status}`) : ''),
+      },
+      {
+        header: 'Stack',
+        accessorKey: 'stackName',
+        id: 'stackName',
+        cell: ({ getValue, row }) => {
+          const value = getValue<string>();
+          return row.original.stackId ? <Link to={`/stack/${row.original.stackId}`}>{value}</Link> : value;
+        },
+      },
+      {
+        header: 'Created At',
+        id: 'metadata.createdAt',
+        accessorFn: (row) => row.metadata?.createdAt,
+        enableSorting: true,
+        minSize: 135,
+        maxSize: 215,
+        size: 215,
+        cell: ({ getValue }) => {
+          const createdAt = getValue<string>();
 
-        return createdAt ? (
-          <DateFormat
-            day="2-digit"
-            hour="numeric"
-            minute="2-digit"
-            second="numeric"
-            month="2-digit"
-            timeZoneName="short"
-            year="numeric"
-            value={createdAt}
-          />
-        ) : undefined;
+          return createdAt ? (
+            <DateFormat
+              day="2-digit"
+              hour="numeric"
+              minute="2-digit"
+              second="numeric"
+              month="2-digit"
+              timeZoneName="short"
+              year="numeric"
+              value={createdAt}
+            />
+          ) : undefined;
+        },
       },
-    },
-    {
-      header: () => {
-        return <div className="block w-[65px]" />;
-      },
-      align: 'right',
-      id: 'actions',
-      size: 65,
-      minSize: 65,
-      maxSize: 65,
-      accessorFn: (row) => row.deploymentId,
-      cell: ({ getValue, row }) => {
-        const value = getValue<string>();
+      {
+        header: () => {
+          return <div className="block w-[65px]" />;
+        },
+        align: 'right',
+        id: 'actions',
+        size: 65,
+        minSize: 65,
+        maxSize: 65,
+        accessorFn: (row) => row.deploymentId,
+        cell: ({ getValue, row }) => {
+          const value = getValue<string>();
 
-        return (
-          <div className="flex items-center justify-end gap-2">
-            <TriggerDeploymentDialog deploymentId={value} />
-            {![O5AwsDeployerV1DeploymentStatus.Done, O5AwsDeployerV1DeploymentStatus.Failed, O5AwsDeployerV1DeploymentStatus.Terminated].includes(
-              row.original.status!,
-            ) && <ConfirmTerminateDeploymentAlert deploymentId={value} />}
-          </div>
-        );
+          return (
+            <div className="flex items-center justify-end gap-2">
+              <TriggerDeploymentDialog deploymentId={value} />
+              {![O5AwsDeployerV1DeploymentStatus.Done, O5AwsDeployerV1DeploymentStatus.Failed, O5AwsDeployerV1DeploymentStatus.Terminated].includes(
+                row.original.status!,
+              ) && <ConfirmTerminateDeploymentAlert deploymentId={value} />}
+            </div>
+          );
+        },
       },
-    },
-  ];
+    ],
+    getO5AwsDeployerV1DeploymentQueryServiceListDeploymentsFilters(t),
+    Object.values(O5AwsDeployerV1DeploymentQueryServiceListDeploymentsSortableFields),
+  );
 }
 
 function renderSubRow({ row }: TableRowType<O5AwsDeployerV1DeploymentState>) {
@@ -160,8 +170,9 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1DeploymentState>) {
 
 function DeploymentManagement() {
   const { t } = useTranslation('awsDeployer');
-  const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } =
-    useTableState<O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest['query']>();
+  const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } = useTableState<
+    O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest['query']
+  >({ initialSort: O5_AWS_DEPLOYER_V1_DEPLOYMENT_QUERY_SERVICE_LIST_DEPLOYMENTS_DEFAULT_SORTS });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5AwsDeployerV1DeploymentQueryServiceListDeployments({
     query: psmQuery,
   });

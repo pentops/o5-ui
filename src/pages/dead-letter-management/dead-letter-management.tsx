@@ -3,8 +3,8 @@ import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.t
 import {
   getOneOfType,
   O5DanteV1DeadMessageQueryServiceListDeadMessagesListDeadMessagesRequest,
+  O5DanteV1DeadMessageQueryServiceListDeadMessagesSortableFields,
   O5DanteV1DeadMessageState,
-  O5MessagingV1ProblemOneOfValue,
   O5MessagingV1WireEncoding,
 } from '@/data/types';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
@@ -16,103 +16,110 @@ import { TableRowType } from '@/components/data-table/body.tsx';
 import { useO5DanteV1DeadMessageQueryServiceListDeadMessages } from '@/data/api/hooks/generated';
 import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import { O5_DANTE_V1_DEAD_MESSAGE_QUERY_SERVICE_LIST_DEAD_MESSAGES_DEFAULT_SORTS } from '@/data/table-config/generated';
+import {
+  getO5DanteV1DeadMessageQueryServiceListDeadMessagesFilters,
+  O5_DANTE_V1_DEAD_MESSAGE_QUERY_SERVICE_LIST_DEAD_MESSAGES_DEFAULT_SORTS,
+} from '@/data/table-config/generated';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
-import { TranslatedText } from '@/components/translated-text/translated-text.tsx';
 import { MessageProblem } from '@/pages/dead-letter/dead-message/message-problem.tsx';
 import { match } from 'ts-pattern';
 import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
+import { J5StateMetadata } from '@/components/j5/j5-state-metadata.tsx';
+import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
 
 function getColumns(t: TFunction): CustomColumnDef<O5DanteV1DeadMessageState>[] {
-  return [
-    getRowExpander(),
-    {
-      header: 'Message ID',
-      id: 'messageId',
-      minSize: 110,
-      size: 110,
-      maxSize: 110,
-      accessorFn: (row) => row.messageId,
-      cell: ({ getValue }) => {
-        const value = getValue<string>();
-        return value ? <UUID canCopy short to={`/dead-letter/${value}`} uuid={value} /> : null;
+  return extendColumnsWithPSMFeatures<O5DanteV1DeadMessageState, O5DanteV1DeadMessageQueryServiceListDeadMessagesListDeadMessagesRequest['query']>(
+    [
+      getRowExpander(),
+      {
+        header: 'Message ID',
+        id: 'messageId',
+        minSize: 110,
+        size: 110,
+        maxSize: 110,
+        accessorFn: (row) => row.messageId,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
+          return value ? <UUID canCopy short to={`/dead-letter/${value}`} uuid={value} /> : null;
+        },
       },
-    },
-    {
-      header: 'Status',
-      id: 'status',
-      minSize: 120,
-      size: 120,
-      maxSize: 150,
-      accessorFn: (row) => (row.status ? t(`dante:enum.O5DanteV1MessageStatus.${row.status}`) : ''),
-    },
-    {
-      header: 'Handler App',
-      id: 'data.notification.handlerApp',
-      accessorFn: (row) => row.data?.notification?.handlerApp,
-    },
-    {
-      header: 'Handler Environment',
-      id: 'data.notification.handlerEnv',
-      accessorFn: (row) => row.data?.notification?.handlerEnv,
-    },
-    {
-      header: 'Queue URL',
-      id: 'data.currentVersion.sqsMessage.queueUrl',
-      accessorFn: (row) => row.data?.currentVersion?.sqsMessage?.queueUrl,
-    },
-    {
-      header: 'Problem',
-      id: 'data.notification.problem',
-      accessorFn: (row) => getOneOfType(row.data?.notification?.problem),
-      cell: ({ getValue }) => {
-        const value = getValue<O5MessagingV1ProblemOneOfValue>();
-        return value ? <TranslatedText i18nKey={`o5:oneOf.O5MessagingV1Problem.${value}`} /> : null;
+      {
+        header: 'Status',
+        id: 'status',
+        minSize: 120,
+        size: 120,
+        maxSize: 150,
+        accessorFn: (row) => (row.status ? t(`dante:enum.O5DanteV1MessageStatus.${row.status}`) : ''),
       },
-      size: 225,
-      maxSize: 225,
-      minSize: 225,
-    },
-    {
-      header: 'Created At',
-      id: 'metadata.createdAt',
-      size: 225,
-      maxSize: 225,
-      minSize: 225,
-      accessorFn: (row) => row.metadata?.createdAt,
-      cell: ({ getValue }) => {
-        const value = getValue<string>();
+      {
+        header: 'Handler App',
+        id: 'data.notification.handlerApp',
+        accessorFn: (row) => row.data?.notification?.handlerApp,
+      },
+      {
+        header: 'Handler Environment',
+        id: 'data.notification.handlerEnv',
+        accessorFn: (row) => row.data?.notification?.handlerEnv,
+      },
+      {
+        header: 'Queue URL',
+        id: 'data.currentVersion.sqsMessage.queueUrl',
+        accessorFn: (row) => row.data?.currentVersion?.sqsMessage?.queueUrl,
+      },
+      {
+        header: 'Problem',
+        id: 'data.notification.problem',
+        accessorFn: (row) => {
+          const oneOfType = getOneOfType(row.data?.notification?.problem);
+          return oneOfType ? t(`o5:oneOf.O5MessagingV1Problem.${oneOfType}`) : '';
+        },
+        size: 225,
+        maxSize: 225,
+        minSize: 225,
+      },
+      {
+        header: 'Created At',
+        id: 'metadata.createdAt',
+        size: 225,
+        maxSize: 225,
+        minSize: 225,
+        accessorFn: (row) => row.metadata?.createdAt,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
 
-        return value ? (
-          <DateFormat
-            day="2-digit"
-            hour="numeric"
-            minute="2-digit"
-            second="numeric"
-            month="2-digit"
-            timeZoneName="short"
-            year="numeric"
-            value={value}
-          />
-        ) : null;
+          return value ? (
+            <DateFormat
+              day="2-digit"
+              hour="numeric"
+              minute="2-digit"
+              second="numeric"
+              month="2-digit"
+              timeZoneName="short"
+              year="numeric"
+              value={value}
+            />
+          ) : null;
+        },
       },
-    },
-    {
-      header: () => {
-        return <div className="block w-[40px]" />;
+      {
+        header: () => {
+          return <div className="block w-[40px]" />;
+        },
+        size: 75,
+        minSize: 75,
+        maxSize: 75,
+        id: 'actions',
+        align: 'right',
+        accessorFn: (row) => row.messageId,
+        cell: ({ getValue }) => {
+          return <ActionActivator messageId={getValue<string>()} />;
+        },
       },
-      size: 75,
-      minSize: 75,
-      maxSize: 75,
-      id: 'actions',
-      align: 'right',
-      accessorFn: (row) => row.messageId,
-      cell: ({ getValue }) => {
-        return <ActionActivator messageId={getValue<string>()} />;
-      },
-    },
-  ];
+    ],
+    getO5DanteV1DeadMessageQueryServiceListDeadMessagesFilters(t),
+    Object.values(O5DanteV1DeadMessageQueryServiceListDeadMessagesSortableFields),
+  );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -120,6 +127,8 @@ function getSubRowRenderer(_decodeB64: boolean, _setDecodeB64: (value: boolean) 
   return function renderSubRow({ row }: TableRowType<O5DanteV1DeadMessageState>) {
     return (
       <div className="flex flex-col gap-4">
+        <J5StateMetadata vertical heading="Metadata" metadata={row.original.metadata} />
+
         {row.original.data?.notification?.problem && <MessageProblem vertical heading="Problem" problem={row.original.data?.notification?.problem} />}
 
         <div className="flex gap-2 items-center">

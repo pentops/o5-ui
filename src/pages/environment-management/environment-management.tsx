@@ -8,57 +8,70 @@ import { getRowExpander } from '@/components/data-table/row-expander/row-expande
 import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
 import { RocketIcon } from '@radix-ui/react-icons';
 import { TableRowType } from '@/components/data-table/body.tsx';
-import { O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest, O5AwsDeployerV1EnvironmentState } from '@/data/types';
+import {
+  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest,
+  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSortableFields,
+  O5AwsDeployerV1EnvironmentState,
+} from '@/data/types';
 import { useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments } from '@/data/api/hooks/generated';
 import { useTranslation } from 'react-i18next';
-import { getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchFields } from '@/data/table-config/generated';
+import {
+  getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilters,
+  getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchFields,
+  O5_AWS_DEPLOYER_V1_ENVIRONMENT_QUERY_SERVICE_LIST_ENVIRONMENTS_DEFAULT_SORTS,
+} from '@/data/table-config/generated';
 import { EnvironmentSpec } from '@/pages/environment/spec/environment-spec.tsx';
 import { J5StateMetadata } from '@/components/j5/j5-state-metadata.tsx';
+import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
 
 function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1EnvironmentState>[] {
-  return [
-    getRowExpander(),
-    {
-      header: 'ID',
-      id: 'environmentId',
-      accessorKey: 'environmentId',
-      size: 110,
-      minSize: 110,
-      maxSize: 110,
-      cell: ({ getValue }) => {
-        const value = getValue<string>();
-        return value ? <UUID canCopy short to={`/environment/${value}`} uuid={value} /> : null;
+  return extendColumnsWithPSMFeatures<O5AwsDeployerV1EnvironmentState, O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest['query']>(
+    [
+      getRowExpander(),
+      {
+        header: 'ID',
+        id: 'environmentId',
+        accessorKey: 'environmentId',
+        size: 110,
+        minSize: 110,
+        maxSize: 110,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
+          return value ? <UUID canCopy short to={`/environment/${value}`} uuid={value} /> : null;
+        },
       },
-    },
-    {
-      header: 'Full Name',
-      id: 'data.config.fullName',
-      size: 150,
-      minSize: 150,
-      accessorFn: (row) => row.data?.config?.fullName,
-    },
-    {
-      header: 'Cluster ID',
-      id: 'clusterId',
-      accessorKey: 'clusterId',
-      size: 110,
-      minSize: 110,
-      maxSize: 110,
-      cell: ({ getValue }) => {
-        const value = getValue<string>();
-        return value ? <UUID canCopy short uuid={value} /> : null;
+      {
+        header: 'Full Name',
+        id: 'data.config.fullName',
+        size: 150,
+        minSize: 150,
+        accessorFn: (row) => row.data?.config?.fullName,
       },
-    },
-    {
-      header: 'Status',
-      align: 'right',
-      id: 'status',
-      size: 120,
-      minSize: 120,
-      maxSize: 150,
-      accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1EnvironmentStatus.${row.status}`) : ''),
-    },
-  ];
+      {
+        header: 'Cluster ID',
+        id: 'clusterId',
+        accessorKey: 'clusterId',
+        size: 110,
+        minSize: 110,
+        maxSize: 110,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
+          return value ? <UUID canCopy short uuid={value} /> : null;
+        },
+      },
+      {
+        header: 'Status',
+        align: 'right',
+        id: 'status',
+        size: 120,
+        minSize: 120,
+        maxSize: 150,
+        accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1EnvironmentStatus.${row.status}`) : ''),
+      },
+    ],
+    getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilters(t),
+    Object.values(O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSortableFields),
+  );
 }
 
 function renderSubRow({ row }: TableRowType<O5AwsDeployerV1EnvironmentState>) {
@@ -77,7 +90,10 @@ export function EnvironmentManagement() {
   const searchableFields = useMemo(() => getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchFields(t), [t]);
   const initialSearchFields = useMemo(() => searchableFields.map((field) => field.id), [searchableFields]);
   const { sortValues, setSortValues, psmQuery, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields } =
-    useTableState<O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest['query']>({ initialSearchFields });
+    useTableState<O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest['query']>({
+      initialSearchFields,
+      initialSort: O5_AWS_DEPLOYER_V1_ENVIRONMENT_QUERY_SERVICE_LIST_ENVIRONMENTS_DEFAULT_SORTS,
+    });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments({
     query: psmQuery,
   });

@@ -6,7 +6,12 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
-import { getOneOfType, O5AwsDeployerV1StackEvent, O5AwsDeployerV1StackQueryServiceListStackEventsRequest } from '@/data/types';
+import {
+  getOneOfType,
+  O5AwsDeployerV1StackEvent,
+  O5AwsDeployerV1StackQueryServiceListStackEventsRequest,
+  O5AwsDeployerV1StackQueryServiceListStackEventsSortableFields,
+} from '@/data/types';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
@@ -20,57 +25,63 @@ import { useTranslation } from 'react-i18next';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import { J5EventMetadata } from '@/components/j5/j5-event-metadata.tsx';
+import { O5_AWS_DEPLOYER_V1_STACK_QUERY_SERVICE_LIST_STACK_EVENTS_DEFAULT_SORTS } from '@/data/table-config/generated';
+import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
 
 function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackEvent>[] {
-  return [
-    getRowExpander(),
-    {
-      header: 'ID',
-      id: 'metadata.eventId',
-      size: 110,
-      minSize: 110,
-      maxSize: 110,
-      accessorFn: (row) => row.metadata?.eventId,
-      cell: ({ getValue }) => {
-        const value = getValue<string>();
-        return value ? <UUID canCopy short uuid={value} /> : null;
+  return extendColumnsWithPSMFeatures<O5AwsDeployerV1StackEvent, O5AwsDeployerV1StackQueryServiceListStackEventsRequest['query']>(
+    [
+      getRowExpander(),
+      {
+        header: 'ID',
+        id: 'metadata.eventId',
+        size: 110,
+        minSize: 110,
+        maxSize: 110,
+        accessorFn: (row) => row.metadata?.eventId,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
+          return value ? <UUID canCopy short uuid={value} /> : null;
+        },
       },
-    },
-    {
-      header: 'Type',
-      id: 'event',
-      size: 175,
-      minSize: 175,
-      maxSize: 175,
-      accessorFn: (row) => {
-        const eventType = getOneOfType(row.event);
-        return eventType ? t(`awsDeployer:oneOf.O5AwsDeployerV1StackEventType.${eventType}`) : '';
+      {
+        header: 'Type',
+        id: 'event',
+        size: 175,
+        minSize: 175,
+        maxSize: 175,
+        accessorFn: (row) => {
+          const eventType = getOneOfType(row.event);
+          return eventType ? t(`awsDeployer:oneOf.O5AwsDeployerV1StackEventType.${eventType}`) : '';
+        },
       },
-    },
-    {
-      header: 'Timestamp',
-      id: 'metadata.timestamp',
-      align: 'right',
-      accessorFn: (row) => row.metadata?.timestamp,
-      enableSorting: true,
-      cell: ({ getValue }) => {
-        const value = getValue<string>();
+      {
+        header: 'Timestamp',
+        id: 'metadata.timestamp',
+        align: 'right',
+        accessorFn: (row) => row.metadata?.timestamp,
+        enableSorting: true,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
 
-        return value ? (
-          <DateFormat
-            day="2-digit"
-            hour="numeric"
-            minute="2-digit"
-            second="numeric"
-            month="2-digit"
-            timeZoneName="short"
-            year="numeric"
-            value={value}
-          />
-        ) : null;
+          return value ? (
+            <DateFormat
+              day="2-digit"
+              hour="numeric"
+              minute="2-digit"
+              second="numeric"
+              month="2-digit"
+              timeZoneName="short"
+              year="numeric"
+              value={value}
+            />
+          ) : null;
+        },
       },
-    },
-  ];
+    ],
+    [],
+    Object.values(O5AwsDeployerV1StackQueryServiceListStackEventsSortableFields),
+  );
 }
 
 function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackEvent>) {
@@ -166,7 +177,11 @@ export function Stack() {
   const { data, isLoading, error } = useO5AwsDeployerV1StackQueryServiceGetStack(stackId ? { stackId } : undefined);
   useErrorHandler(error, 'Failed to load stack');
 
-  const { sortValues, filterValues, setFilterValues, psmQuery } = useTableState<O5AwsDeployerV1StackQueryServiceListStackEventsRequest['query']>();
+  const { sortValues, filterValues, setFilterValues, setSortValues, psmQuery } = useTableState<
+    O5AwsDeployerV1StackQueryServiceListStackEventsRequest['query']
+  >({
+    initialSort: O5_AWS_DEPLOYER_V1_STACK_QUERY_SERVICE_LIST_STACK_EVENTS_DEFAULT_SORTS,
+  });
   const {
     data: eventsData,
     isLoading: eventsAreLoading,
@@ -214,8 +229,6 @@ export function Stack() {
                 )
               }
             />
-
-            {/*{buildCodeSourceFact(data?.state?.config?.codeSource, isLoading)}*/}
 
             <NutritionFact
               isLoading={isLoading}
@@ -271,7 +284,7 @@ export function Stack() {
               controlledColumnSort={sortValues}
               data={flattenedEvents}
               filterValues={filterValues}
-              // onColumnSort={setSortValues}
+              onColumnSort={setSortValues}
               onFilter={setFilterValues}
               pagination={{ hasNextPage, fetchNextPage, isFetchingNextPage }}
               renderSubComponent={renderSubRow}
