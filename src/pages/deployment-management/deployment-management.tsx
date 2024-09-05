@@ -11,6 +11,7 @@ import { useTableState } from '@/components/data-table/state.ts';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { TableRowType } from '@/components/data-table/body.tsx';
 import {
+  O5AwsDeployerV1DeploymentQueryServiceListDeploymentsFilterableFields,
   O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest,
   O5AwsDeployerV1DeploymentQueryServiceListDeploymentsSortableFields,
   O5AwsDeployerV1DeploymentState,
@@ -27,8 +28,12 @@ import {
   getO5AwsDeployerV1DeploymentQueryServiceListDeploymentsFilters,
   O5_AWS_DEPLOYER_V1_DEPLOYMENT_QUERY_SERVICE_LIST_DEPLOYMENTS_DEFAULT_SORTS,
 } from '@/data/table-config/generated';
+import { BaseTableFilter } from '@pentops/react-table-state-psm';
 
-function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1DeploymentState>[] {
+function getColumns(
+  t: TFunction,
+  filters: BaseTableFilter<O5AwsDeployerV1DeploymentQueryServiceListDeploymentsFilterableFields>[],
+): CustomColumnDef<O5AwsDeployerV1DeploymentState>[] {
   return extendColumnsWithPSMFeatures<O5AwsDeployerV1DeploymentState, O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest['query']>(
     [
       getRowExpander(),
@@ -142,7 +147,7 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1DeploymentStat
         },
       },
     ],
-    getO5AwsDeployerV1DeploymentQueryServiceListDeploymentsFilters(t),
+    filters,
     Object.values(O5AwsDeployerV1DeploymentQueryServiceListDeploymentsSortableFields),
   );
 }
@@ -170,9 +175,10 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1DeploymentState>) {
 
 function DeploymentManagement() {
   const { t } = useTranslation('awsDeployer');
+  const filters = useMemo(() => getO5AwsDeployerV1DeploymentQueryServiceListDeploymentsFilters(t), [t]);
   const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } = useTableState<
     O5AwsDeployerV1DeploymentQueryServiceListDeploymentsRequest['query']
-  >({ initialSort: O5_AWS_DEPLOYER_V1_DEPLOYMENT_QUERY_SERVICE_LIST_DEPLOYMENTS_DEFAULT_SORTS });
+  >({ initialSort: O5_AWS_DEPLOYER_V1_DEPLOYMENT_QUERY_SERVICE_LIST_DEPLOYMENTS_DEFAULT_SORTS, filterFields: filters });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5AwsDeployerV1DeploymentQueryServiceListDeployments({
     query: psmQuery,
   });
@@ -191,7 +197,7 @@ function DeploymentManagement() {
     }, [] as O5AwsDeployerV1DeploymentState[]);
   }, [data?.pages]);
 
-  const columns = useMemo(() => getColumns(t), [t]);
+  const columns = useMemo(() => getColumns(t, filters), [t, filters]);
 
   return (
     <div className="w-full overflow-auto">

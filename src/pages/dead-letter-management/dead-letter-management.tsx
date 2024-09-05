@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import {
   getOneOfType,
+  O5DanteV1DeadMessageQueryServiceListDeadMessagesFilterableFields,
   O5DanteV1DeadMessageQueryServiceListDeadMessagesListDeadMessagesRequest,
   O5DanteV1DeadMessageQueryServiceListDeadMessagesSortableFields,
   O5DanteV1DeadMessageState,
@@ -18,6 +19,7 @@ import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import {
   getO5DanteV1DeadMessageQueryServiceListDeadMessagesFilters,
+  O5_DANTE_V1_DEAD_MESSAGE_QUERY_SERVICE_LIST_DEAD_MESSAGES_DEFAULT_FILTERS,
   O5_DANTE_V1_DEAD_MESSAGE_QUERY_SERVICE_LIST_DEAD_MESSAGES_DEFAULT_SORTS,
 } from '@/data/table-config/generated';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
@@ -27,8 +29,12 @@ import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { J5StateMetadata } from '@/components/j5/j5-state-metadata.tsx';
 import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
+import { BaseTableFilter } from '@pentops/react-table-state-psm';
 
-function getColumns(t: TFunction): CustomColumnDef<O5DanteV1DeadMessageState>[] {
+function getColumns(
+  t: TFunction,
+  filters: BaseTableFilter<O5DanteV1DeadMessageQueryServiceListDeadMessagesFilterableFields>[],
+): CustomColumnDef<O5DanteV1DeadMessageState>[] {
   return extendColumnsWithPSMFeatures<O5DanteV1DeadMessageState, O5DanteV1DeadMessageQueryServiceListDeadMessagesListDeadMessagesRequest['query']>(
     [
       getRowExpander(),
@@ -117,7 +123,7 @@ function getColumns(t: TFunction): CustomColumnDef<O5DanteV1DeadMessageState>[] 
         },
       },
     ],
-    getO5DanteV1DeadMessageQueryServiceListDeadMessagesFilters(t),
+    filters,
     Object.values(O5DanteV1DeadMessageQueryServiceListDeadMessagesSortableFields),
   );
 }
@@ -161,12 +167,14 @@ function getSubRowRenderer(_decodeB64: boolean, _setDecodeB64: (value: boolean) 
 function DeadLetterManagement() {
   const { t } = useTranslation('dante');
   const [decodeB64, setDecodeB64] = useState<boolean>(false);
-  const columns = useMemo(() => getColumns(t), [t]);
+  const filters = useMemo(() => getO5DanteV1DeadMessageQueryServiceListDeadMessagesFilters(t), [t]);
+  const columns = useMemo(() => getColumns(t, filters), [t, filters]);
   const { sortValues, setSortValues, setFilterValues, filterValues, psmQuery } = useTableState<
     O5DanteV1DeadMessageQueryServiceListDeadMessagesListDeadMessagesRequest['query']
   >({
     initialSort: O5_DANTE_V1_DEAD_MESSAGE_QUERY_SERVICE_LIST_DEAD_MESSAGES_DEFAULT_SORTS,
-    // initialFilters: O5_DANTE_V1_DEAD_MESSAGE_QUERY_SERVICE_LIST_DEAD_MESSAGES_DEFAULT_FILTERS,
+    initialFilters: O5_DANTE_V1_DEAD_MESSAGE_QUERY_SERVICE_LIST_DEAD_MESSAGES_DEFAULT_FILTERS,
+    filterFields: filters,
   });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5DanteV1DeadMessageQueryServiceListDeadMessages({
     query: psmQuery,

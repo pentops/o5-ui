@@ -3,6 +3,7 @@ import { RocketIcon } from '@radix-ui/react-icons';
 import { Link } from 'react-router-dom';
 import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { BaseTableFilter } from '@pentops/react-table-state-psm';
 import { useErrorHandler } from '@/lib/error.ts';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
@@ -12,6 +13,7 @@ import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 import { TableRowType } from '@/components/data-table/body.tsx';
 import {
+  O5AwsDeployerV1StackQueryServiceListStacksFilterableFields,
   O5AwsDeployerV1StackQueryServiceListStacksRequest,
   O5AwsDeployerV1StackQueryServiceListStacksSortableFields,
   O5AwsDeployerV1StackState,
@@ -25,7 +27,10 @@ import {
 import { J5StateMetadata } from '@/components/j5/j5-state-metadata.tsx';
 import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
 
-function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackState>[] {
+function getColumns(
+  t: TFunction,
+  filters: BaseTableFilter<O5AwsDeployerV1StackQueryServiceListStacksFilterableFields>[],
+): CustomColumnDef<O5AwsDeployerV1StackState>[] {
   return extendColumnsWithPSMFeatures<O5AwsDeployerV1StackState, O5AwsDeployerV1StackQueryServiceListStacksRequest['query']>(
     [
       getRowExpander(),
@@ -105,7 +110,7 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackState>[] 
           )),
       },
     ],
-    getO5AwsDeployerV1StackQueryServiceListStacksFilters(t),
+    filters,
     Object.values(O5AwsDeployerV1StackQueryServiceListStacksSortableFields),
   );
 }
@@ -138,12 +143,14 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackState>) {
 
 export function StackManagement() {
   const { t } = useTranslation('awsDeployer');
-  const columns = useMemo(() => getColumns(t), [t]);
+  const filters = useMemo(() => getO5AwsDeployerV1StackQueryServiceListStacksFilters(t), [t]);
+  const columns = useMemo(() => getColumns(t, filters), [t, filters]);
   const searchableFields = useMemo(() => getO5AwsDeployerV1StackQueryServiceListStacksSearchFields(t), [t]);
   const initialSearchFields = useMemo(() => searchableFields.map((field) => field.id), [searchableFields]);
   const { sortValues, setSortValues, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields, psmQuery } =
     useTableState<O5AwsDeployerV1StackQueryServiceListStacksRequest['query']>({
       initialSearchFields,
+      filterFields: filters,
       initialSort: O5_AWS_DEPLOYER_V1_STACK_QUERY_SERVICE_LIST_STACKS_DEFAULT_SORTS,
     });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5AwsDeployerV1StackQueryServiceListStacks({

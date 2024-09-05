@@ -9,6 +9,7 @@ import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-
 import { RocketIcon } from '@radix-ui/react-icons';
 import { TableRowType } from '@/components/data-table/body.tsx';
 import {
+  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilterableFields,
   O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest,
   O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSortableFields,
   O5AwsDeployerV1EnvironmentState,
@@ -23,8 +24,12 @@ import {
 import { EnvironmentSpec } from '@/pages/environment/spec/environment-spec.tsx';
 import { J5StateMetadata } from '@/components/j5/j5-state-metadata.tsx';
 import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
+import { BaseTableFilter } from '@pentops/react-table-state-psm';
 
-function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1EnvironmentState>[] {
+function getColumns(
+  t: TFunction,
+  filters: BaseTableFilter<O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilterableFields>[],
+): CustomColumnDef<O5AwsDeployerV1EnvironmentState>[] {
   return extendColumnsWithPSMFeatures<O5AwsDeployerV1EnvironmentState, O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest['query']>(
     [
       getRowExpander(),
@@ -69,7 +74,7 @@ function getColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1EnvironmentSta
         accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1EnvironmentStatus.${row.status}`) : ''),
       },
     ],
-    getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilters(t),
+    filters,
     Object.values(O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSortableFields),
   );
 }
@@ -86,13 +91,15 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1EnvironmentState>) {
 
 export function EnvironmentManagement() {
   const { t } = useTranslation('awsDeployer');
-  const columns = useMemo(() => getColumns(t), [t]);
+  const filters = useMemo(() => getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilters(t), [t]);
+  const columns = useMemo(() => getColumns(t, filters), [t, filters]);
   const searchableFields = useMemo(() => getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchFields(t), [t]);
   const initialSearchFields = useMemo(() => searchableFields.map((field) => field.id), [searchableFields]);
   const { sortValues, setSortValues, psmQuery, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields } =
     useTableState<O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest['query']>({
       initialSearchFields,
       initialSort: O5_AWS_DEPLOYER_V1_ENVIRONMENT_QUERY_SERVICE_LIST_ENVIRONMENTS_DEFAULT_SORTS,
+      filterFields: filters,
     });
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments({
     query: psmQuery,

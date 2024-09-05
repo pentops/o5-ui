@@ -9,6 +9,7 @@ import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.t
 import {
   getOneOfType,
   O5AwsDeployerV1DeploymentEvent,
+  O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsFilterableFields,
   O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest,
   O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsSortableFields,
   O5AwsDeployerV1DeploymentStatus,
@@ -40,8 +41,12 @@ import {
   getO5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsFilters,
   O5_AWS_DEPLOYER_V1_DEPLOYMENT_QUERY_SERVICE_LIST_DEPLOYMENT_EVENTS_DEFAULT_SORTS,
 } from '@/data/table-config/generated';
+import { BaseTableFilter } from '@pentops/react-table-state-psm';
 
-function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1DeploymentEvent>[] {
+function getEventColumns(
+  t: TFunction,
+  filters: BaseTableFilter<O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsFilterableFields>[],
+): CustomColumnDef<O5AwsDeployerV1DeploymentEvent>[] {
   return extendColumnsWithPSMFeatures<O5AwsDeployerV1DeploymentEvent, O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest['query']>(
     [
       getRowExpander(),
@@ -92,7 +97,7 @@ function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1Deploymen
         },
       },
     ],
-    getO5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsFilters(t),
+    filters,
     Object.values(O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsSortableFields),
   );
 }
@@ -183,12 +188,15 @@ function canTerminateDeployment(status: O5AwsDeployerV1DeploymentStatus | undefi
 export function Deployment() {
   const { deploymentId } = useParams();
   const { t } = useTranslation('awsDeployer');
+  const filters = useMemo(() => getO5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsFilters(t), [t]);
   const { data, error, isPending } = useO5AwsDeployerV1DeploymentQueryServiceGetDeployment(deploymentId ? { deploymentId } : undefined);
   useErrorHandler(error, 'Failed to load deployment');
 
   const eventTableState = useTableState<O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsRequest['query']>({
     initialSort: O5_AWS_DEPLOYER_V1_DEPLOYMENT_QUERY_SERVICE_LIST_DEPLOYMENT_EVENTS_DEFAULT_SORTS,
+    filterFields: filters,
   });
+
   const {
     data: eventsData,
     isLoading: eventsAreLoading,
@@ -211,7 +219,7 @@ export function Deployment() {
       return acc;
     }, [] as O5AwsDeployerV1DeploymentEvent[]);
   }, [eventsData?.pages]);
-  const eventColumns = useMemo(() => getEventColumns(t), [t]);
+  const eventColumns = useMemo(() => getEventColumns(t, filters), [t, filters]);
 
   return (
     <div className="w-full">

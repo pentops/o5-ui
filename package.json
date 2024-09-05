@@ -65,7 +65,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/lodash.get": "^4.4.9",
     "@types/lodash.set": "^4.3.9",
-    "@types/node": "^22.5.3",
+    "@types/node": "^22.5.4",
     "@types/prismjs": "^1.26.4",
     "@types/qs": "^6.9.15",
     "@types/react": "^18.3.5",

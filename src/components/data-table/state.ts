@@ -3,9 +3,11 @@ import qs from 'qs';
 import { useSearchParams } from 'react-router-dom';
 import { match, P } from 'ts-pattern';
 import {
+  type BaseTableFilter,
   ExtractFilterField,
   ExtractSearchField,
   ExtractSortField,
+  FilterSet,
   FilterState,
   FilterValue,
   RangeFilter,
@@ -69,6 +71,50 @@ export interface TableFilter {
     numeric?: TableFilterNumeric;
     date?: TableFilterDate;
   };
+}
+
+function mapInitialFilterValuesToSimpleRecord<TFilterField extends string = never>(
+  initialValues: FilterState<TFilterField>,
+  filters: BaseTableFilter<TFilterField>[] = [],
+) {
+  const filterValues: Record<TFilterField, TableFilterValueType> = {} as Record<TFilterField, TableFilterValueType>;
+
+  function digForFilterValue(value: FilterSet<TFilterField>['type']) {
+    if (value) {
+      if ('filters' in value) {
+        for (const filter of value.filters) {
+          const matchingFilter = filters.find((f) => f.id === filter.id);
+          const isDate = matchingFilter && 'date' in matchingFilter.type;
+
+          if ('exact' in filter.value) {
+            if (isDate) {
+              filterValues[filter.id] = { date: { exact: filter.value.exact } };
+            } else {
+              filterValues[filter.id] = { exact: filter.value.exact };
+            }
+          } else if ('in' in filter.value) {
+            filterValues[filter.id] = { multiple: filter.value.in };
+          } else if ('range' in filter.value) {
+            if (isDate) {
+              filterValues[filter.id] = { date: { start: filter.value.range.min, end: filter.value.range.max } };
+            } else {
+              filterValues[filter.id] = { range: filter.value.range };
+            }
+          }
+        }
+      } else if ('nested' in value) {
+        for (const nested of value.nested) {
+          digForFilterValue(nested.type);
+        }
+      }
+    }
+  }
+
+  for (const filterSet of initialValues) {
+    digForFilterValue(filterSet.type);
+  }
+
+  return filterValues;
 }
 
 function mapTableFiltersToPSM<TFilterField extends string = never>(filters: Record<TFilterField, TableFilterValueType>): FilterState<TFilterField> {
@@ -158,22 +204,26 @@ function mapTableFiltersToPSM<TFilterField extends string = never>(filters: Reco
 
 function buildInitialState<T extends J5ListV1QueryRequest<ExtractSearchField<T>, ExtractSortField<T>, ExtractFilterField<T>> | undefined>(
   searchString: string | undefined,
-  initialFilters: Record<ExtractFilterField<T>, TableFilterValueType> | undefined,
+  initialFilters: FilterState<ExtractFilterField<T>> | undefined,
   initialSearch: SearchState<ExtractSearchField<T>> | undefined,
   initialSort: SortingState<ExtractSortField<T>> | undefined,
+  filterFields?: BaseTableFilter<ExtractFilterField<T>>[],
 ) {
   const fromSearchString = searchString ? qs.parse(searchString) : {};
 
   return {
-    initialFilters: { ...(fromSearchString as any)?.filter, ...initialFilters } as Record<ExtractFilterField<T>, TableFilterValueType>,
+    initialFilters: { ...(fromSearchString as any)?.filter, ...mapInitialFilterValuesToSimpleRecord(initialFilters || [], filterFields) } as Record<
+      ExtractFilterField<T>,
+      TableFilterValueType
+    >,
     initialSearch: (initialSearch || fromSearchString?.search) as SearchState<ExtractSearchField<T>>,
     initialSort: (initialSort || fromSearchString?.sort) as SortingState<ExtractSortField<T>>,
   };
 }
 
 export interface TableStateOptions<T extends J5ListV1QueryRequest<ExtractSearchField<T>, ExtractSortField<T>, ExtractFilterField<T>> | undefined>
-  extends Omit<PSMTableStateOptions<T>, 'initialFilters'> {
-  initialFilters?: Record<ExtractFilterField<T>, TableFilterValueType>;
+  extends PSMTableStateOptions<T> {
+  filterFields?: BaseTableFilter<ExtractFilterField<T>>[];
   initialSearchFields?: ExtractSearchField<T>[];
 }
 
@@ -181,17 +231,16 @@ export function useTableState<T extends J5ListV1QueryRequest<ExtractSearchField<
   options?: TableStateOptions<T>,
 ) {
   const [searchParams] = useSearchParams();
-  const { onFilter, onSearch, onSort, initialSearchFields } = options || {};
+  const { onFilter, onSearch, onSort, initialSearchFields, filterFields } = options || {};
   const [searchFields, setSearchFields] = useState<ExtractSearchField<T>[]>(initialSearchFields || []);
   const { initialFilters, initialSearch, initialSort } = buildInitialState(
     searchParams.toString(),
     options?.initialFilters,
     options?.initialSearch,
     options?.initialSort,
+    filterFields,
   );
-  const [basicFilters, setBasicFilters] = useState<Record<ExtractFilterField<T>, TableFilterValueType>>(
-    initialFilters || ({} as Record<ExtractFilterField<T>, TableFilterValueType>),
-  );
+  const [basicFilters, setBasicFilters] = useState<Record<ExtractFilterField<T>, TableFilterValueType>>(initialFilters || {});
   // Only using one search field for the time being
   const [singleSearchValue, setSingleSearchValue] = useState('');
   const { setFilterValues, sortValues, setSortValues, setSearchValue, psmQuery } = usePSMTableState<T>({
