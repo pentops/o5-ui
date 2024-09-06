@@ -148,8 +148,8 @@ importers:
         specifier: ^0.0.12
         version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.84(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(i18next@23.14.0)
       '@pentops/j5-ts-generator-normalized-query-plugin':
-        specifier: ^0.0.12
-        version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.84(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/normalized-query-cache@0.0.2(@tanstack/react-query@5.55.0(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1))(normalizr@3.6.2)
+        specifier: ^0.0.13
+        version: 0.0.13(@pentops/jsonapi-jdef-ts-generator@0.0.84(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/normalized-query-cache@0.0.2(@tanstack/react-query@5.55.0(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1))(normalizr@3.6.2)
       '@pentops/j5-ts-generator-psm-table-config-plugin':
         specifier: ^0.0.12
         version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.84(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/react-table-state-psm@0.0.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
@@ -558,10 +558,10 @@ packages:
       '@pentops/jsonapi-jdef-ts-generator': '>=0.0.83 < 0.1.0'
       i18next: '>=23.0.0 < 24.0.0'
 
-  '@pentops/j5-ts-generator-normalized-query-plugin@0.0.12':
-    resolution: {integrity: sha512-NaeYypoJDvptmtmSQeIAx+oD8yHh5C+peraj0aYcI8s5j/hIet9MNRbPjysoQP5p9HqPHrPxjdaH6x0YTyahvA==}
+  '@pentops/j5-ts-generator-normalized-query-plugin@0.0.13':
+    resolution: {integrity: sha512-H2IRQMyisSut+dgFCpe3MxqX+eLUdJmR50MXOcSpuozW7YFb80erB/jIVAOUq/7WQpsiHlgAzX0x0W6vC4SX1Q==}
     peerDependencies:
-      '@pentops/jsonapi-jdef-ts-generator': '>=0.0.80 < 0.1.0'
+      '@pentops/jsonapi-jdef-ts-generator': '>=0.0.83 < 0.1.0'
       '@pentops/normalized-query-cache': '>=0.0.1 < 0.1.0'
       normalizr: '>=3.0.0 < 4.0.0'
 
@@ -2894,7 +2894,7 @@ snapshots:
       lodash.set: 4.3.2
       ts-pattern: 5.3.1
 
-  '@pentops/j5-ts-generator-normalized-query-plugin@0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.84(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/normalized-query-cache@0.0.2(@tanstack/react-query@5.55.0(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1))(normalizr@3.6.2)':
+  '@pentops/j5-ts-generator-normalized-query-plugin@0.0.13(@pentops/jsonapi-jdef-ts-generator@0.0.84(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/normalized-query-cache@0.0.2(@tanstack/react-query@5.55.0(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1))(normalizr@3.6.2)':
     dependencies:
       '@pentops/jsonapi-jdef-ts-generator': 0.0.84(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))
       '@pentops/normalized-query-cache': 0.0.2(@tanstack/react-query@5.55.0(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1)
