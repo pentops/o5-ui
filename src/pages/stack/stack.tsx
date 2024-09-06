@@ -99,7 +99,6 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackEvent>) {
         </CollapsibleContent>
       </Collapsible>
 
-      {/* TODO: add missing events */}
       {match(row.original.event)
         .with({ configured: P.not(P.nullish) }, (e) => (
           <>
@@ -127,7 +126,7 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackEvent>) {
         .with({ deploymentCompleted: P.not(P.nullish) }, (e) => (
           <>
             <NutritionFact
-              label="Deployment"
+              label="Deployment ID"
               renderWhenEmpty="-"
               value={
                 e.deploymentCompleted.deployment?.deploymentId ? (
@@ -139,18 +138,14 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackEvent>) {
                 ) : undefined
               }
             />
-            <NutritionFact
-              label="Deployment Version"
-              renderWhenEmpty="-"
-              value={e.deploymentCompleted.deployment?.version ? <UUID canCopy uuid={e.deploymentCompleted.deployment.version} /> : undefined}
-            />
+            <NutritionFact label="Deployment Version" renderWhenEmpty="-" value={e.deploymentCompleted.deployment?.version} />
           </>
         ))
         .with({ deploymentFailed: P.not(P.nullish) }, (e) => (
           <>
-            <NutritionFact label="Failure Reason" renderWhenEmpty="-" value={e.deploymentFailed.error} />
+            <NutritionFact label="Error" renderWhenEmpty="-" value={e.deploymentFailed.error} />
             <NutritionFact
-              label="Deployment"
+              label="Deployment ID"
               renderWhenEmpty="-"
               value={
                 e.deploymentFailed.deployment?.deploymentId ? (
@@ -158,12 +153,53 @@ function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackEvent>) {
                 ) : undefined
               }
             />
-            <NutritionFact
-              label="Deployment Version"
-              renderWhenEmpty="-"
-              value={e.deploymentFailed.deployment?.version ? <UUID canCopy uuid={e.deploymentFailed.deployment.version} /> : undefined}
-            />
+            <NutritionFact label="Deployment Version" renderWhenEmpty="-" value={e.deploymentFailed.deployment?.version} />
           </>
+        ))
+        .with({ deploymentRequested: P.not(P.nullish) }, (e) => (
+          <>
+            <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.deploymentRequested.applicationName} />
+            <NutritionFact
+              label="Environment"
+              renderWhenEmpty="-"
+              value={
+                e.deploymentRequested.environmentName ? (
+                  e.deploymentRequested.environmentId ? (
+                    <span>
+                      <Link to={`/environment/${e.deploymentRequested.environmentId}`}>{e.deploymentRequested.environmentName}</Link> (
+                      <UUID canCopy to={`/environment/${e.deploymentRequested.environmentId}`} uuid={e.deploymentRequested.environmentId} />)
+                    </span>
+                  ) : (
+                    e.deploymentRequested.environmentName
+                  )
+                ) : e.deploymentRequested.environmentId ? (
+                  <UUID canCopy to={`/environment/${e.deploymentRequested.environmentId}`} uuid={e.deploymentRequested.environmentId} />
+                ) : undefined
+              }
+            />
+
+            <NutritionFact
+              label="Deployment ID"
+              renderWhenEmpty="-"
+              value={
+                e.deploymentRequested.deployment?.deploymentId ? (
+                  <UUID to={`/deployment/${e.deploymentRequested.deployment.deploymentId}`} uuid={e.deploymentRequested.deployment.deploymentId} />
+                ) : undefined
+              }
+            />
+            <NutritionFact label="Deployment Version" renderWhenEmpty="-" value={e.deploymentRequested.deployment?.version} />
+          </>
+        ))
+        .with({ runDeployment: P.not(P.nullish) }, (e) => (
+          <NutritionFact
+            label="Deployment ID"
+            renderWhenEmpty="-"
+            value={
+              e.runDeployment.deploymentId ? (
+                <UUID to={`/deployment/${e.runDeployment.deploymentId}`} uuid={e.runDeployment.deploymentId} />
+              ) : undefined
+            }
+          />
         ))
         .otherwise(() => null)}
     </div>

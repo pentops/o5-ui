@@ -2,7 +2,7 @@ import React from 'react';
 import { match, P } from 'ts-pattern';
 import { O5AwsDeployerV1StepRequestType } from '@/data/types';
 import { StackInput } from '@/pages/deployment/spec/stack-input.tsx';
-import { StackOutput } from '@/pages/stack/stack-output.tsx';
+import { StackOutput } from '@/pages/stack/spec/stack-output.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getYesNoOrUndefined } from '@/lib/bool.ts';
 import { NumberFormat } from '@/components/format/number/number-format.tsx';

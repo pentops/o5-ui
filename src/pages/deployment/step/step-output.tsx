@@ -2,7 +2,7 @@ import React from 'react';
 import { match, P } from 'ts-pattern';
 import { getOneOfType, O5AwsDeployerV1StepOutputType } from '@/data/types';
 import { TranslatedText } from '@/components/translated-text/translated-text.tsx';
-import { StackOutput } from '@/pages/stack/stack-output.tsx';
+import { StackOutput } from '@/pages/stack/spec/stack-output.tsx';
 import { ChangesetOutput } from '@/pages/deployment/step/changeset-output.tsx';
 
 interface StepOutputProps {

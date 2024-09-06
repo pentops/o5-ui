@@ -27,7 +27,7 @@ import {
   useO5AwsDeployerV1DeploymentQueryServiceGetDeployment,
   useO5AwsDeployerV1DeploymentQueryServiceListDeploymentEvents,
 } from '@/data/api/hooks/generated';
-import { StackOutput } from '@/pages/stack/stack-output.tsx';
+import { StackOutput } from '@/pages/stack/spec/stack-output.tsx';
 import { StepOutput } from '@/pages/deployment/step/step-output.tsx';
 import { DeploymentSpec } from '@/pages/deployment/spec/deployment-spec.tsx';
 import { DeploymentStep } from '@/pages/deployment/step/deployment-step.tsx';
