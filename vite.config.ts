@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === 'development') {
   viteConfig.server.proxy = {};
 
   if (process.env.VITE_AUTH_PROXY_TARGET) {
-    viteConfig.server.proxy['^/o5-auth/.*'] = {
+    viteConfig.server.proxy['^/realm-auth/.*'] = {
       target: process.env.VITE_AUTH_PROXY_TARGET,
       changeOrigin: true,
       secure: true,

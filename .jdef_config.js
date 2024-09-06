@@ -1,11 +1,37 @@
+import { camelCase, pascalCase } from 'change-case';
+import { i18nPlugin } from './.codegen/jdef-i18n-plugin.js';
+import { psmTableConfigPlugin } from './.codegen/jdef-table-config-plugin.js';
+import { normalizedQueryPlugin } from './.codegen/jdef-normalized-query-plugin.js';
+
 const EXCLUDED_NAMESPACES = ['service', 'topic'];
 
-export default {
-  jdefJsonSource: {
-    service: {
-      url: process.env.O5_REGISTRY_JDEF_URL,
-    },
+const organization = 'pentops';
+const projects = [
+  {
+    name: 'dante',
+    version: process.env.O5_DANTE_VERSION || 'main',
   },
+  {
+    name: 'o5-deploy',
+    version: process.env.O5_DEPLOY_VERSION || 'main',
+  },
+  {
+    name: 'realms',
+    version: process.env.O5_REALMS_VERSION || 'main',
+  },
+  {
+    name: 'registry',
+    version: process.env.O5_REGISTRY_VERSION || 'main',
+  },
+];
+const version = process.env.O5_REGISTRY_IMAGE_VERSION || 'v1';
+
+export default {
+  jsonSource: projects.map((project) => ({
+    service: {
+      url: `${process.env.O5_REGISTRY_URL}/${version}/${organization}/${project.name}/${project.version}/api.json`,
+    },
+  })),
   typeOutput: {
     directory: './src/data/types/generated',
     fileName: 'index.ts',
@@ -18,16 +44,27 @@ export default {
     nameWriter: (x) =>
       x
         .split('.')
-        .filter((s) => s && !EXCLUDED_NAMESPACES.includes(s.toLowerCase()))
-        .map((s) => s?.[0]?.toUpperCase() + s?.slice(1))
+        .reduce((acc, curr) => {
+          if (curr && !EXCLUDED_NAMESPACES.includes(curr.toLowerCase())) {
+            acc.push(pascalCase(curr));
+          }
+
+          return acc;
+        }, [])
         .join(''),
   },
   client: {
     methodNameWriter: (method) =>
       method.fullGrpcName
         .split(/[./]/)
-        .filter((s) => s && !EXCLUDED_NAMESPACES.includes(s.toLowerCase()))
-        .map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1)))
+        .reduce((acc, curr) => {
+          if (curr && !EXCLUDED_NAMESPACES.includes(curr.toLowerCase())) {
+            acc.push(acc.length === 0 ? camelCase(curr) : pascalCase(curr));
+          }
+
+          return acc;
+        }, [])
         .join(''),
   },
+  plugins: [i18nPlugin, psmTableConfigPlugin, normalizedQueryPlugin],
 };

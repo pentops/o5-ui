@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 
-interface NutritionFactProps {
+export interface NutritionFactProps {
   isLoading?: boolean;
   label: React.ReactNode;
   renderWhenEmpty?: React.ReactNode;

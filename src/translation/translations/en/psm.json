@@ -1,0 +1,10 @@
+{
+  "oneOf": {
+    "PsmStateV1Cause": {
+      "command": "Command",
+      "externalEvent": "External Event",
+      "psmEvent": "PSM Event",
+      "reply": "Reply"
+    }
+  }
+}

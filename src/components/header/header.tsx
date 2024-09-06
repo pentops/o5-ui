@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useWhoAmI } from '@/data/api';
-import { useSelectedRealmId, useSetRealmId } from '@/context/api-context.ts';
+import { useSelectedRealmId, useSetRealmId, useWhoAmI } from '@/context/api-context.ts';
 
 export function Header() {
   const { data } = useWhoAmI();
@@ -25,7 +24,7 @@ export function Header() {
             <div className="relative flex items-center ml-auto">
               <nav className="text-sm leading-6 font-semibold text-slate-700 dark:text-slate-200">
                 <ul className="flex space-x-8">
-                  {(data?.realmAccess?.length || 0) > 1 && (
+                  {(data?.realms?.length || 0) > 1 && (
                     <li>
                       <Select
                         onValueChange={(value: string) => {
@@ -37,9 +36,9 @@ export function Header() {
                           <SelectValue placeholder="Realm" />
                         </SelectTrigger>
                         <SelectContent>
-                          {data?.realmAccess?.map((realm) => (
-                            <SelectItem key={realm.realmId} value={realm.realmId || ''}>
-                              {realm.realmName || realm.realmId}
+                          {data?.realms?.map((realmAccess) => (
+                            <SelectItem key={realmAccess.realm.realmId} value={realmAccess.realm.realmId || ''}>
+                              {realmAccess.realm.data.spec?.name || realmAccess.realm.realmId}
                             </SelectItem>
                           ))}
                         </SelectContent>

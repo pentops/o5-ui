@@ -1,0 +1,30 @@
+{
+  "oneOf": {
+    "J5AuthV1AuthenticationMethod": {
+      "external": "External",
+      "jwt": "JWT",
+      "session": "Session"
+    },
+    "J5AuthV1MethodAuthType": {
+      "cookie": "Cookie",
+      "custom": "Custom",
+      "jwtBearer": "JWT Bearer",
+      "none": "None"
+    },
+    "J5ListV1FieldType": {
+      "range": "Range",
+      "value": "Value"
+    },
+    "J5ListV1Filter": {
+      "and": "And",
+      "field": "Field",
+      "or": "Or"
+    },
+    "J5StateV1Cause": {
+      "command": "Command",
+      "externalEvent": "External Event",
+      "psmEvent": "PSM Event",
+      "reply": "Reply"
+    }
+  }
+}

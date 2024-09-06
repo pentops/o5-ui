@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { useListStackEvents, useStack } from '@/data/api';
 import { Link, useParams } from 'react-router-dom';
 import { match, P } from 'ts-pattern';
 import { useErrorHandler } from '@/lib/error.ts';
@@ -7,124 +6,100 @@ import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
-import { getStackEventType, O5DeployerV1StackEvent, StackEventType, stackEventTypeLabels, stackStatusLabels } from '@/data/types';
+import {
+  getOneOfType,
+  O5AwsDeployerV1StackEvent,
+  O5AwsDeployerV1StackQueryServiceListStackEventsRequest,
+  O5AwsDeployerV1StackQueryServiceListStackEventsSortableFields,
+} from '@/data/types';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
 import { UpsertStackDialog } from '@/pages/stack/upsert-stack-dialog/upsert-stack-dialog.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
-import { buildCodeSourceFact } from '@/pages/stack/build-facts.tsx';
 import { TableRowType } from '@/components/data-table/body.tsx';
+import { TFunction } from 'i18next';
+import { useO5AwsDeployerV1StackQueryServiceGetStack, useO5AwsDeployerV1StackQueryServiceListStackEvents } from '@/data/api/hooks/generated';
+import { TranslatedText } from '@/components/translated-text/translated-text.tsx';
+import { useTranslation } from 'react-i18next';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
+import { CaretDownIcon } from '@radix-ui/react-icons';
+import { J5EventMetadata } from '@/components/j5/j5-event-metadata.tsx';
+import { O5_AWS_DEPLOYER_V1_STACK_QUERY_SERVICE_LIST_STACK_EVENTS_DEFAULT_SORTS } from '@/data/table-config/generated';
+import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
 
-const eventColumns: CustomColumnDef<O5DeployerV1StackEvent>[] = [
-  getRowExpander(),
-  {
-    header: 'ID',
-    id: 'metadata.eventId',
-    size: 110,
-    minSize: 110,
-    maxSize: 110,
-    accessorFn: (row) => row.metadata?.eventId,
-    cell: ({ getValue }) => {
-      const value = getValue<string>();
-      return value ? <UUID canCopy short uuid={value} /> : null;
-    },
-  },
-  {
-    header: 'Type',
-    id: 'event.type',
-    size: 175,
-    minSize: 175,
-    maxSize: 175,
-    accessorFn: (row) => {
-      const type = getStackEventType(row);
-      return row.event ? stackEventTypeLabels[type] : '';
-    },
-    filter: {
-      type: {
-        select: {
-          isMultiple: true,
-          options: Object.values(StackEventType).map((value) => ({ label: stackEventTypeLabels[value], value })),
+function getEventColumns(t: TFunction): CustomColumnDef<O5AwsDeployerV1StackEvent>[] {
+  return extendColumnsWithPSMFeatures<O5AwsDeployerV1StackEvent, O5AwsDeployerV1StackQueryServiceListStackEventsRequest['query']>(
+    [
+      getRowExpander(),
+      {
+        header: 'ID',
+        id: 'metadata.eventId',
+        size: 110,
+        minSize: 110,
+        maxSize: 110,
+        accessorFn: (row) => row.metadata?.eventId,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
+          return value ? <UUID canCopy short uuid={value} /> : null;
         },
       },
-    },
-  },
-  {
-    header: 'Timestamp',
-    id: 'metadata.timestamp',
-    align: 'right',
-    accessorFn: (row) => row.metadata?.timestamp,
-    enableSorting: true,
-    cell: ({ getValue }) => {
-      return (
-        <DateFormat
-          day="2-digit"
-          hour="numeric"
-          minute="2-digit"
-          second="numeric"
-          month="2-digit"
-          timeZoneName="short"
-          year="numeric"
-          value={getValue<string>()}
-        />
-      );
-    },
-    filter: {
-      type: {
-        date: {
-          isFlexible: true,
-          exactLabel: 'Pick a date',
-          startLabel: 'Min',
-          endLabel: 'Max',
+      {
+        header: 'Type',
+        id: 'event',
+        size: 175,
+        minSize: 175,
+        maxSize: 175,
+        accessorFn: (row) => {
+          const eventType = getOneOfType(row.event);
+          return eventType ? t(`awsDeployer:oneOf.O5AwsDeployerV1StackEventType.${eventType}`) : '';
         },
       },
-    },
-  },
-];
+      {
+        header: 'Timestamp',
+        id: 'metadata.timestamp',
+        align: 'right',
+        accessorFn: (row) => row.metadata?.timestamp,
+        enableSorting: true,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
 
-function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
+          return value ? (
+            <DateFormat
+              day="2-digit"
+              hour="numeric"
+              minute="2-digit"
+              second="numeric"
+              month="2-digit"
+              timeZoneName="short"
+              year="numeric"
+              value={value}
+            />
+          ) : null;
+        },
+      },
+    ],
+    [],
+    Object.values(O5AwsDeployerV1StackQueryServiceListStackEventsSortableFields),
+  );
+}
+
+function renderSubRow({ row }: TableRowType<O5AwsDeployerV1StackEvent>) {
   return (
     <div className="flex flex-col gap-4">
-      <NutritionFact label="Actor" value="-" />
+      <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+        <CollapsibleTrigger asChild>
+          <button className="w-full flex items-center justify-start gap-1" type="button">
+            <CaretDownIcon />
+            <h4 className="text-lg">Metadata</h4>
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <J5EventMetadata metadata={row.original.metadata} isLoading={false} />
+        </CollapsibleContent>
+      </Collapsible>
 
-      {match(row.original.event?.type)
-        .with({ triggered: P.not(P.nullish) }, (e) => (
-          <>
-            <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.triggered.applicationName} />
-            <NutritionFact
-              label="Environment"
-              renderWhenEmpty="-"
-              value={
-                e.triggered.environmentName ? (
-                  e.triggered.environmentId ? (
-                    <span>
-                      <Link to={`/environment/${e.triggered.environmentId}`}>{e.triggered.environmentName}</Link> (
-                      <UUID canCopy to={`/environment/${e.triggered.environmentId}`} uuid={e.triggered.environmentId} />)
-                    </span>
-                  ) : (
-                    e.triggered.environmentName
-                  )
-                ) : e.triggered.environmentId ? (
-                  <UUID canCopy to={`/environment/${e.triggered.environmentId}`} uuid={e.triggered.environmentId} />
-                ) : undefined
-              }
-            />
-            <NutritionFact
-              label="Deployment"
-              renderWhenEmpty="-"
-              value={
-                e.triggered.deployment?.deploymentId ? (
-                  <UUID canCopy to={`/deployment/${e.triggered.deployment.deploymentId}`} uuid={e.triggered.deployment.deploymentId} />
-                ) : undefined
-              }
-            />
-            <NutritionFact
-              label="Deployment Version"
-              renderWhenEmpty="-"
-              value={e.triggered.deployment?.version ? <UUID canCopy uuid={e.triggered.deployment.version} /> : undefined}
-            />
-          </>
-        ))
+      {match(row.original.event)
         .with({ configured: P.not(P.nullish) }, (e) => (
           <>
             <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.configured.applicationName} />
@@ -146,18 +121,12 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
                 ) : undefined
               }
             />
-
-            <h4>Code Source</h4>
-            <NutritionFact label="Type" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github ? 'GitHub' : ''} />
-            <NutritionFact label="Owner" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.owner} />
-            <NutritionFact label="Repository" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.repo} />
-            <NutritionFact label="Branch" renderWhenEmpty="-" value={e.configured.config?.codeSource?.type?.github?.branch} />
           </>
         ))
         .with({ deploymentCompleted: P.not(P.nullish) }, (e) => (
           <>
             <NutritionFact
-              label="Deployment"
+              label="Deployment ID"
               renderWhenEmpty="-"
               value={
                 e.deploymentCompleted.deployment?.deploymentId ? (
@@ -169,18 +138,14 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
                 ) : undefined
               }
             />
-            <NutritionFact
-              label="Deployment Version"
-              renderWhenEmpty="-"
-              value={e.deploymentCompleted.deployment?.version ? <UUID canCopy uuid={e.deploymentCompleted.deployment.version} /> : undefined}
-            />
+            <NutritionFact label="Deployment Version" renderWhenEmpty="-" value={e.deploymentCompleted.deployment?.version} />
           </>
         ))
         .with({ deploymentFailed: P.not(P.nullish) }, (e) => (
           <>
-            <NutritionFact label="Failure Reason" renderWhenEmpty="-" value={e.deploymentFailed.error} />
+            <NutritionFact label="Error" renderWhenEmpty="-" value={e.deploymentFailed.error} />
             <NutritionFact
-              label="Deployment"
+              label="Deployment ID"
               renderWhenEmpty="-"
               value={
                 e.deploymentFailed.deployment?.deploymentId ? (
@@ -188,12 +153,53 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
                 ) : undefined
               }
             />
-            <NutritionFact
-              label="Deployment Version"
-              renderWhenEmpty="-"
-              value={e.deploymentFailed.deployment?.version ? <UUID canCopy uuid={e.deploymentFailed.deployment.version} /> : undefined}
-            />
+            <NutritionFact label="Deployment Version" renderWhenEmpty="-" value={e.deploymentFailed.deployment?.version} />
           </>
+        ))
+        .with({ deploymentRequested: P.not(P.nullish) }, (e) => (
+          <>
+            <NutritionFact label="Application Name" renderWhenEmpty="-" value={e.deploymentRequested.applicationName} />
+            <NutritionFact
+              label="Environment"
+              renderWhenEmpty="-"
+              value={
+                e.deploymentRequested.environmentName ? (
+                  e.deploymentRequested.environmentId ? (
+                    <span>
+                      <Link to={`/environment/${e.deploymentRequested.environmentId}`}>{e.deploymentRequested.environmentName}</Link> (
+                      <UUID canCopy to={`/environment/${e.deploymentRequested.environmentId}`} uuid={e.deploymentRequested.environmentId} />)
+                    </span>
+                  ) : (
+                    e.deploymentRequested.environmentName
+                  )
+                ) : e.deploymentRequested.environmentId ? (
+                  <UUID canCopy to={`/environment/${e.deploymentRequested.environmentId}`} uuid={e.deploymentRequested.environmentId} />
+                ) : undefined
+              }
+            />
+
+            <NutritionFact
+              label="Deployment ID"
+              renderWhenEmpty="-"
+              value={
+                e.deploymentRequested.deployment?.deploymentId ? (
+                  <UUID to={`/deployment/${e.deploymentRequested.deployment.deploymentId}`} uuid={e.deploymentRequested.deployment.deploymentId} />
+                ) : undefined
+              }
+            />
+            <NutritionFact label="Deployment Version" renderWhenEmpty="-" value={e.deploymentRequested.deployment?.version} />
+          </>
+        ))
+        .with({ runDeployment: P.not(P.nullish) }, (e) => (
+          <NutritionFact
+            label="Deployment ID"
+            renderWhenEmpty="-"
+            value={
+              e.runDeployment.deploymentId ? (
+                <UUID to={`/deployment/${e.runDeployment.deploymentId}`} uuid={e.runDeployment.deploymentId} />
+              ) : undefined
+            }
+          />
         ))
         .otherwise(() => null)}
     </div>
@@ -202,10 +208,16 @@ function renderSubRow({ row }: TableRowType<O5DeployerV1StackEvent>) {
 
 export function Stack() {
   const { stackId } = useParams();
-  const { data, isLoading, error } = useStack({ stackId });
+  const { t } = useTranslation('awsDeployer');
+  const eventColumns = useMemo(() => getEventColumns(t), [t]);
+  const { data, isLoading, error } = useO5AwsDeployerV1StackQueryServiceGetStack(stackId ? { stackId } : undefined);
   useErrorHandler(error, 'Failed to load stack');
 
-  const { sortValues, setSortValues, filterValues, setFilterValues, psmQuery } = useTableState();
+  const { sortValues, filterValues, setFilterValues, setSortValues, psmQuery } = useTableState<
+    O5AwsDeployerV1StackQueryServiceListStackEventsRequest['query']
+  >({
+    initialSort: O5_AWS_DEPLOYER_V1_STACK_QUERY_SERVICE_LIST_STACK_EVENTS_DEFAULT_SORTS,
+  });
   const {
     data: eventsData,
     isLoading: eventsAreLoading,
@@ -213,7 +225,7 @@ export function Stack() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useListStackEvents({ stackId, query: psmQuery });
+  } = useO5AwsDeployerV1StackQueryServiceListStackEvents(stackId ? { stackId, query: psmQuery } : undefined);
   useErrorHandler(eventsError, 'Failed to load stack events');
   const flattenedEvents = useMemo(() => {
     if (!eventsData?.pages) {
@@ -226,7 +238,7 @@ export function Stack() {
       }
 
       return acc;
-    }, [] as O5DeployerV1StackEvent[]);
+    }, [] as O5AwsDeployerV1StackEvent[]);
   }, [eventsData?.pages]);
 
   return (
@@ -239,7 +251,7 @@ export function Stack() {
         <Card className="flex-grow lg:flex-grow-0 w-[325px] h-fit">
           <CardHeader className="text-lg font-semibold">Details</CardHeader>
           <CardContent className="w-full flex flex-col gap-4">
-            <NutritionFact isLoading={isLoading} label="Application Name" renderWhenEmpty="-" value={data?.state?.applicationName} />
+            <NutritionFact isLoading={isLoading} label="Application Name" renderWhenEmpty="-" value={data?.state?.data?.applicationName} />
 
             <NutritionFact
               isLoading={isLoading}
@@ -247,20 +259,20 @@ export function Stack() {
               renderWhenEmpty="-"
               value={
                 data?.state?.environmentId ? (
-                  <Link to={`/environment/${data.state.environmentId}`}>{data?.state?.environmentName || data?.state?.environmentId}</Link>
+                  <Link to={`/environment/${data.state.environmentId}`}>{data?.state?.data?.environmentName || data?.state?.environmentId}</Link>
                 ) : (
-                  data?.state?.environmentName
+                  data?.state?.data?.environmentName
                 )
               }
             />
-
-            {buildCodeSourceFact(data?.state?.config?.codeSource, isLoading)}
 
             <NutritionFact
               isLoading={isLoading}
               label="Status"
               renderWhenEmpty="-"
-              value={data?.state?.status ? stackStatusLabels[data.state.status] : undefined}
+              value={
+                data?.state?.status ? <TranslatedText i18nKey={`awsDeployer:enum.O5AwsDeployerV1StackStatus.${data.state.status}`} /> : undefined
+              }
             />
 
             <NutritionFact
@@ -268,8 +280,12 @@ export function Stack() {
               label="Current Deployment"
               renderWhenEmpty="-"
               value={
-                data?.state?.currentDeployment?.deploymentId ? (
-                  <UUID short to={`/deployment/${data.state.currentDeployment.deploymentId}`} uuid={data.state.currentDeployment.deploymentId} />
+                data?.state?.data?.currentDeployment?.deploymentId ? (
+                  <UUID
+                    short
+                    to={`/deployment/${data.state.data.currentDeployment.deploymentId}`}
+                    uuid={data.state.data.currentDeployment.deploymentId}
+                  />
                 ) : undefined
               }
             />
@@ -278,17 +294,17 @@ export function Stack() {
               isLoading={isLoading}
               label="Current Deployment Version"
               renderWhenEmpty="-"
-              value={data?.state?.currentDeployment?.version ? <UUID short uuid={data.state.currentDeployment.version} /> : undefined}
+              value={data?.state?.data?.currentDeployment?.version ? <UUID short uuid={data.state.data.currentDeployment.version} /> : undefined}
             />
 
             <NutritionFact
               isLoading={isLoading}
               label="Queued Deployments"
               renderWhenEmpty="-"
-              value={data?.state?.queuedDeployments?.map((d, i) => (
+              value={data?.state?.data?.queuedDeployments?.map((d, i) => (
                 <React.Fragment key={d.deploymentId}>
                   <UUID short to={`/deployment/${d.deploymentId}`} uuid={d.deploymentId} />
-                  {i !== (data?.state?.queuedDeployments?.length ?? 0) - 1 && <br />}
+                  {i !== (data?.state?.data?.queuedDeployments?.length ?? 0) - 1 && <br />}
                 </React.Fragment>
               ))}
             />

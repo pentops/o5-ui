@@ -1,253 +1,117 @@
 import React, { useMemo, useState } from 'react';
+import { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { match, P } from 'ts-pattern';
 import { useParams } from 'react-router-dom';
-import { useListMessageEvents, useMessage } from '@/data/api';
 import { useErrorHandler } from '@/lib/error.ts';
 import { UUID } from '@/components/uuid/uuid.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { ActionActivator } from '@/pages/dead-letter-management/action-activator/action-activator.tsx';
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx';
-import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
+import { DataTable } from '@/components/data-table/data-table.tsx';
 import {
-  DeadMessageEventType,
-  deadMessageEventTypeLabels,
-  deadMessageStatusLabels,
-  getDeadMessageEventType,
+  getOneOfType,
   O5DanteV1DeadMessageEvent,
+  O5DanteV1DeadMessageQueryServiceListDeadMessageEventsListDeadMessageEventsRequest,
+  O5DanteV1DeadMessageQueryServiceListDeadMessageEventsSortableFields,
 } from '@/data/types';
 import { DateFormat } from '@/components/format/date/date-format.tsx';
-import { DeadMessageProblem, deadMessageProblemLabels, getDeadMessageProblem } from '@/data/types/ui/dante.ts';
 import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
-import { CodeEditor } from '@/components/code-editor/code-editor.tsx';
-import { formatJSONString, getBase64StringObjectPaths } from '@/lib/json.ts';
 import { useTableState } from '@/components/data-table/state.ts';
-import { buildDeadMessageProblemFacts } from './build-facts';
 import { TableRowType } from '@/components/data-table/body.tsx';
-import { MagicWandIcon } from '@radix-ui/react-icons';
+import {
+  useO5DanteV1DeadMessageQueryServiceGetDeadMessage,
+  useO5DanteV1DeadMessageQueryServiceListDeadMessageEvents,
+} from '@/data/api/hooks/generated';
+import { TranslatedText } from '@/components/translated-text/translated-text.tsx';
+import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
+import { O5_DANTE_V1_DEAD_MESSAGE_QUERY_SERVICE_LIST_DEAD_MESSAGE_EVENTS_DEFAULT_SORTS } from '@/data/table-config/generated';
+import { DeadMessage } from '@/pages/dead-letter/dead-message/dead-message.tsx';
+import { DeadMessageVersion } from '@/pages/dead-letter/dead-message/dead-message-version.tsx';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.tsx';
+import { CaretDownIcon } from '@radix-ui/react-icons';
+import { J5EventMetadata } from '@/components/j5/j5-event-metadata.tsx';
 
-const eventColumns: CustomColumnDef<O5DanteV1DeadMessageEvent, any>[] = [
-  getRowExpander(),
-  {
-    header: 'ID',
-    id: 'metadata.eventId',
-    size: 110,
-    minSize: 110,
-    maxSize: 110,
-    accessorFn: (row) => row.metadata?.eventId,
-    cell: ({ getValue }) => {
-      return <UUID canCopy short uuid={getValue<string>()} />;
-    },
-  },
-  {
-    header: 'Type',
-    id: 'event.type',
-    size: 120,
-    minSize: 100,
-    maxSize: 150,
-    accessorFn: (row) => deadMessageEventTypeLabels[getDeadMessageEventType(row.event)],
-    filter: {
-      type: {
-        select: {
-          isMultiple: true,
-          options: Object.values(DeadMessageEventType).map((value) => ({ label: deadMessageEventTypeLabels[value], value })),
+function getEventColumns(t: TFunction) {
+  return extendColumnsWithPSMFeatures<
+    O5DanteV1DeadMessageEvent,
+    O5DanteV1DeadMessageQueryServiceListDeadMessageEventsListDeadMessageEventsRequest['query']
+  >(
+    [
+      getRowExpander(),
+      {
+        header: 'ID',
+        id: 'metadata.eventId',
+        size: 110,
+        minSize: 110,
+        maxSize: 110,
+        accessorFn: (row) => row.metadata?.eventId,
+        cell: ({ getValue }) => {
+          const eventId = getValue<string>();
+          return eventId ? <UUID canCopy short uuid={eventId} /> : null;
         },
       },
-    },
-  },
-  {
-    header: 'Timestamp',
-    id: 'metadata.timestamp',
-    align: 'right',
-    accessorFn: (row) => row.metadata?.timestamp,
-    enableSorting: true,
-    cell: ({ getValue }) => {
-      return (
-        <DateFormat
-          day="2-digit"
-          hour="numeric"
-          minute="2-digit"
-          second="numeric"
-          month="2-digit"
-          timeZoneName="short"
-          year="numeric"
-          value={getValue<string>()}
-        />
-      );
-    },
-    filter: {
-      type: {
-        date: {
-          isFlexible: true,
-          exactLabel: 'Pick a date',
-          startLabel: 'Min',
-          endLabel: 'Max',
+      {
+        header: 'Type',
+        id: 'event',
+        size: 120,
+        minSize: 100,
+        maxSize: 150,
+        accessorFn: (row) => {
+          const oneOfType = getOneOfType(row.event);
+          return oneOfType ? t(`dante:oneOf.O5DanteV1DeadMessageEventType.${oneOfType}`) : undefined;
         },
       },
-    },
-  },
-];
+      {
+        header: 'Timestamp',
+        id: 'metadata.timestamp',
+        align: 'right',
+        accessorFn: (row) => row.metadata?.timestamp,
+        enableSorting: true,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
 
-function getSubRowRenderer(decodeBase64: boolean, setDecodeBase64: (value: boolean) => void) {
+          return value ? (
+            <DateFormat
+              day="2-digit"
+              hour="numeric"
+              minute="2-digit"
+              second="numeric"
+              month="2-digit"
+              timeZoneName="short"
+              year="numeric"
+              value={value}
+            />
+          ) : null;
+        },
+      },
+    ],
+    [],
+    Object.values(O5DanteV1DeadMessageQueryServiceListDeadMessageEventsSortableFields),
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getSubRowRenderer(_decodeBase64: boolean, _setDecodeBase64: (value: boolean) => void) {
   return function renderSubRow({ row }: TableRowType<O5DanteV1DeadMessageEvent>) {
-    const problemType = getDeadMessageProblem(row.original.event?.type?.created?.spec);
-
     return (
       <div className="flex flex-col gap-4">
-        <NutritionFact vertical label="Actor" value="-" />
+        <Collapsible className="py-2 px-1 border rounded-md border-slate-900/10 lg:px-2 lg:border-1 dark:border-slate-300/10">
+          <CollapsibleTrigger asChild>
+            <button className="w-full flex items-center justify-start gap-1" type="button">
+              <CaretDownIcon />
+              <h4 className="text-lg">Metadata</h4>
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <J5EventMetadata metadata={row.original.metadata} isLoading={false} />
+          </CollapsibleContent>
+        </Collapsible>
 
-        {match(row.original.event?.type)
-          .with({ updated: P.not(P.nullish) }, (e) => {
-            let hasBase64Strings = false;
-
-            try {
-              if (e.updated.spec?.payload?.json) {
-                const parsed = JSON.parse(e.updated.spec.payload.json);
-                hasBase64Strings = getBase64StringObjectPaths(parsed).length > 0;
-              }
-            } catch {}
-
-            return (
-              <>
-                <NutritionFact
-                  vertical
-                  label="Version ID"
-                  renderWhenEmpty="-"
-                  value={e.updated.spec?.versionId ? <UUID canCopy short uuid={e.updated.spec?.versionId} /> : undefined}
-                />
-                <NutritionFact vertical label="Queue Name" renderWhenEmpty="-" value={e.updated.spec?.queueName} />
-                <NutritionFact vertical label="gRPC Name" renderWhenEmpty="-" value={e.updated.spec?.grpcName} />
-                <NutritionFact
-                  vertical
-                  label="Infa Message ID"
-                  renderWhenEmpty="-"
-                  value={e.updated.spec?.infraMessageId ? <UUID canCopy short uuid={e.updated.spec?.infraMessageId} /> : undefined}
-                />
-                <NutritionFact
-                  vertical
-                  label="Created At"
-                  renderWhenEmpty="-"
-                  value={
-                    e.updated.spec?.createdAt ? (
-                      <DateFormat
-                        day="2-digit"
-                        hour="numeric"
-                        minute="2-digit"
-                        second="numeric"
-                        month="2-digit"
-                        timeZoneName="short"
-                        year="numeric"
-                        value={e.updated.spec.createdAt}
-                      />
-                    ) : undefined
-                  }
-                />
-
-                <NutritionFact
-                  label="Problem"
-                  renderWhenEmpty="-"
-                  value={problemType !== DeadMessageProblem.Unspecified ? deadMessageProblemLabels[problemType] : null}
-                />
-
-                {buildDeadMessageProblemFacts(e.updated.spec?.problem)}
-
-                <NutritionFact
-                  vertical
-                  label="JSON"
-                  renderWhenEmpty="-"
-                  value={<CodeEditor disabled value={formatJSONString(e.updated.spec?.payload?.json || '', decodeBase64)} />}
-                />
-
-                {hasBase64Strings && (
-                  <button
-                    className="bg-background border border-r-2 hover:bg-slate-900 text-white font-bold py-1 px-2 rounded flex gap-2 items-center text-sm w-fit"
-                    onClick={() => {
-                      setDecodeBase64(!decodeBase64);
-                    }}
-                    type="button"
-                  >
-                    <MagicWandIcon />
-                    {decodeBase64 ? 'Encode' : 'Decode'}
-                  </button>
-                )}
-              </>
-            );
-          })
-          .with({ created: P.not(P.nullish) }, (e) => {
-            let hasBase64Strings = false;
-
-            try {
-              if (e.created.spec?.payload?.json) {
-                const parsed = JSON.parse(e.created.spec.payload.json);
-                hasBase64Strings = getBase64StringObjectPaths(parsed).length > 0;
-              }
-            } catch {}
-
-            return (
-              <>
-                <NutritionFact
-                  vertical
-                  label="Version ID"
-                  renderWhenEmpty="-"
-                  value={e.created.spec?.versionId ? <UUID canCopy short uuid={e.created.spec.versionId} /> : undefined}
-                />
-                <NutritionFact vertical label="Queue Name" renderWhenEmpty="-" value={e.created.spec?.queueName} />
-                <NutritionFact vertical label="gRPC Name" renderWhenEmpty="-" value={e.created.spec?.grpcName} />
-                <NutritionFact
-                  vertical
-                  label="Infa Message ID"
-                  renderWhenEmpty="-"
-                  value={e.created.spec?.infraMessageId ? <UUID canCopy short uuid={e.created.spec?.infraMessageId} /> : undefined}
-                />
-                <NutritionFact
-                  vertical
-                  label="Created At"
-                  renderWhenEmpty="-"
-                  value={
-                    e.created.spec?.createdAt ? (
-                      <DateFormat
-                        day="2-digit"
-                        hour="numeric"
-                        minute="2-digit"
-                        second="numeric"
-                        month="2-digit"
-                        timeZoneName="short"
-                        year="numeric"
-                        value={e.created.spec.createdAt}
-                      />
-                    ) : undefined
-                  }
-                />
-
-                <NutritionFact
-                  label="Problem"
-                  renderWhenEmpty="-"
-                  value={problemType !== DeadMessageProblem.Unspecified ? deadMessageProblemLabels[problemType] : null}
-                />
-
-                {buildDeadMessageProblemFacts(e.created.spec?.problem)}
-
-                <NutritionFact
-                  vertical
-                  label="JSON"
-                  value={<CodeEditor disabled value={formatJSONString(e.created.spec?.payload?.json || '', decodeBase64)} />}
-                />
-
-                {hasBase64Strings && (
-                  <button
-                    className="bg-background border border-r-2 hover:bg-slate-900 text-white font-bold py-1 px-2 rounded flex gap-2 items-center text-sm w-fit"
-                    onClick={() => {
-                      setDecodeBase64(!decodeBase64);
-                    }}
-                    type="button"
-                  >
-                    <MagicWandIcon />
-                    {decodeBase64 ? 'Encode' : 'Decode'}
-                  </button>
-                )}
-              </>
-            );
-          })
+        {match(row.original.event)
+          .with({ notified: P.not(P.nullish) }, (e) => <DeadMessage vertical deadMessage={e.notified.notification} heading="Notification" />)
+          .with({ updated: P.not(P.nullish) }, (e) => <DeadMessageVersion version={e.updated.spec} heading="Dead Message" />)
           .with({ rejected: P.not(P.nullish) }, (e) => {
             return <NutritionFact vertical label="Reason" value={e.rejected.reason} />;
           })
@@ -259,22 +123,16 @@ function getSubRowRenderer(decodeBase64: boolean, setDecodeBase64: (value: boole
 
 export function DeadLetter() {
   const { messageId } = useParams();
+  const { t } = useTranslation('dante');
+  const eventColumns = useMemo(() => getEventColumns(t), [t]);
   const [decodeBase64, setDecodeBase64] = useState(false);
   const renderSubRow = useMemo(() => getSubRowRenderer(decodeBase64, setDecodeBase64), [decodeBase64]);
-  const { data, error, isLoading } = useMessage({ messageId });
+  const { data, error, isLoading } = useO5DanteV1DeadMessageQueryServiceGetDeadMessage(messageId ? { messageId } : undefined);
   useErrorHandler(error, 'Failed to load dead letter message');
-  const hasBase64Strings = useMemo(() => {
-    try {
-      if (data?.message?.currentSpec?.payload?.json) {
-        const parsed = JSON.parse(data.message.currentSpec.payload.json);
-        return getBase64StringObjectPaths(parsed).length > 0;
-      }
-    } catch {}
 
-    return false;
-  }, [data]);
-
-  const { sortValues, setSortValues, filterValues, setFilterValues, psmQuery } = useTableState();
+  const { sortValues, setSortValues, filterValues, setFilterValues, psmQuery } = useTableState<
+    O5DanteV1DeadMessageQueryServiceListDeadMessageEventsListDeadMessageEventsRequest['query']
+  >({ initialSort: O5_DANTE_V1_DEAD_MESSAGE_QUERY_SERVICE_LIST_DEAD_MESSAGE_EVENTS_DEFAULT_SORTS });
   const {
     data: eventsData,
     isLoading: eventsAreLoading,
@@ -282,7 +140,7 @@ export function DeadLetter() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useListMessageEvents({ messageId, query: psmQuery });
+  } = useO5DanteV1DeadMessageQueryServiceListDeadMessageEvents(messageId ? { messageId, query: psmQuery } : undefined);
   useErrorHandler(eventsError, 'Failed to load message events');
   const flattenedEvents = useMemo(() => {
     if (!eventsData?.pages) {
@@ -298,8 +156,6 @@ export function DeadLetter() {
     }, [] as O5DanteV1DeadMessageEvent[]);
   }, [eventsData?.pages]);
 
-  const problemType = getDeadMessageProblem(data?.message?.currentSpec);
-
   return (
     <div className="w-full">
       <div className="flex items-end place-content-between w-full pb-4">
@@ -312,24 +168,17 @@ export function DeadLetter() {
           <CardContent className="w-full flex flex-col gap-4">
             <NutritionFact
               isLoading={isLoading}
-              label="Infra Message ID"
-              renderWhenEmpty="-"
-              value={data?.message?.currentSpec?.infraMessageId ? <UUID canCopy short uuid={data.message.currentSpec.infraMessageId} /> : null}
-            />
-            <NutritionFact
-              isLoading={isLoading}
               label="Status"
               renderWhenEmpty="-"
-              value={data?.message?.status ? deadMessageStatusLabels[data.message.status] : null}
+              value={data?.message?.status ? <TranslatedText i18nKey={`dante:enum.O5DanteV1MessageStatus.${data.message.status}`} /> : null}
             />
-            <NutritionFact isLoading={isLoading} label="Queue Name" renderWhenEmpty="-" value={data?.message?.currentSpec?.queueName} />
-            <NutritionFact isLoading={isLoading} label="gRPC Name" renderWhenEmpty="-" value={data?.message?.currentSpec?.grpcName} />
+
             <NutritionFact
               isLoading={isLoading}
               label="Created At"
               renderWhenEmpty="-"
               value={
-                data?.message?.currentSpec?.createdAt ? (
+                data?.message?.metadata?.createdAt ? (
                   <DateFormat
                     day="2-digit"
                     hour="numeric"
@@ -338,7 +187,7 @@ export function DeadLetter() {
                     month="2-digit"
                     timeZoneName="short"
                     year="numeric"
-                    value={data.message.currentSpec.createdAt}
+                    value={data.message.metadata.createdAt}
                   />
                 ) : null
               }
@@ -346,31 +195,39 @@ export function DeadLetter() {
 
             <NutritionFact
               isLoading={isLoading}
-              label="Problem"
+              label="Updated At"
               renderWhenEmpty="-"
-              value={problemType !== DeadMessageProblem.Unspecified ? deadMessageProblemLabels[problemType] : null}
+              value={
+                data?.message?.metadata?.updatedAt ? (
+                  <DateFormat
+                    day="2-digit"
+                    hour="numeric"
+                    minute="2-digit"
+                    second="numeric"
+                    month="2-digit"
+                    timeZoneName="short"
+                    year="numeric"
+                    value={data.message.metadata.updatedAt}
+                  />
+                ) : null
+              }
             />
 
-            {buildDeadMessageProblemFacts(data?.message?.currentSpec?.problem)}
+            <NutritionFact isLoading={isLoading} label="Last Sequence" renderWhenEmpty="-" value={data?.message?.metadata?.lastSequence} />
           </CardContent>
         </Card>
         <div className="flex-grow h-fit basis-5/6 flex flex-col gap-4 overflow-auto">
           <Card className="flex-grow h-fit">
-            <CardHeader className="text-lg font-semibold">Payload</CardHeader>
+            <CardHeader className="text-lg font-semibold">Notification</CardHeader>
             <CardContent className="flex flex-col gap-4">
-              <CodeEditor disabled value={formatJSONString(data?.message?.currentSpec?.payload?.json || '', decodeBase64)} />
-              {hasBase64Strings && (
-                <button
-                  className="bg-background border border-r-2 hover:bg-slate-900 text-white font-bold py-1 px-2 rounded flex gap-2 items-center text-sm w-fit"
-                  onClick={() => {
-                    setDecodeBase64((prevState) => !prevState);
-                  }}
-                  type="button"
-                >
-                  <MagicWandIcon />
-                  {decodeBase64 ? 'Encode' : 'Decode'}
-                </button>
-              )}
+              <DeadMessage deadMessage={data?.message?.data?.notification} isLoading={isLoading} />
+            </CardContent>
+          </Card>
+
+          <Card className="flex-grow h-fit">
+            <CardHeader className="text-lg font-semibold">Current Version</CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <DeadMessageVersion version={data?.message?.data?.currentVersion} isLoading={isLoading} />
             </CardContent>
           </Card>
 

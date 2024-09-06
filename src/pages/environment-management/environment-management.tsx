@@ -1,97 +1,109 @@
 import React, { useMemo } from 'react';
-import { useListEnvironments } from '@/data/api';
+import { TFunction } from 'i18next';
 import { useErrorHandler } from '@/lib/error.ts';
-import { EnvironmentProvider, environmentProviderLabels, getEnvironmentProvider, O5DeployerV1EnvironmentState } from '@/data/types';
 import { CustomColumnDef, DataTable } from '@/components/data-table/data-table.tsx';
 import { UUID } from '@/components/uuid/uuid.tsx';
-import { environmentStatusLabels } from '@/data/types/ui/environment.ts';
-import { NutritionFact } from '@/components/nutrition-fact/nutrition-fact.tsx';
-import { buildEnvironmentCustomVariables, buildEnvironmentProvider } from '@/pages/environment/build-facts.tsx';
 import { useTableState } from '@/components/data-table/state.ts';
 import { getRowExpander } from '@/components/data-table/row-expander/row-expander.tsx';
 import { UpsertEnvironmentDialog } from '@/pages/environment/upsert-environment-dialog/upsert-environment-dialog.tsx';
 import { RocketIcon } from '@radix-ui/react-icons';
 import { TableRowType } from '@/components/data-table/body.tsx';
+import {
+  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilterableFields,
+  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest,
+  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSortableFields,
+  O5AwsDeployerV1EnvironmentState,
+} from '@/data/types';
+import { useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments } from '@/data/api/hooks/generated';
+import { useTranslation } from 'react-i18next';
+import {
+  getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilters,
+  getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchFields,
+  O5_AWS_DEPLOYER_V1_ENVIRONMENT_QUERY_SERVICE_LIST_ENVIRONMENTS_DEFAULT_SORTS,
+} from '@/data/table-config/generated';
+import { EnvironmentSpec } from '@/pages/environment/spec/environment-spec.tsx';
+import { J5StateMetadata } from '@/components/j5/j5-state-metadata.tsx';
+import { extendColumnsWithPSMFeatures } from '@/components/data-table/util.ts';
+import { BaseTableFilter } from '@pentops/react-table-state-psm';
 
-const columns: CustomColumnDef<O5DeployerV1EnvironmentState>[] = [
-  getRowExpander(),
-  {
-    header: 'ID',
-    id: 'environmentId',
-    accessorKey: 'environmentId',
-    size: 110,
-    minSize: 110,
-    maxSize: 110,
-    cell: ({ getValue }) => {
-      const value = getValue<string>();
-      return value ? <UUID canCopy short to={`/environment/${value}`} uuid={value} /> : null;
-    },
-  },
-  {
-    header: 'Full Name',
-    id: 'config.fullName',
-    size: 150,
-    minSize: 150,
-    accessorFn: (row) => row.config?.fullName,
-  },
-  {
-    header: 'Provider',
-    id: 'config.provider',
-    size: 80,
-    minSize: 80,
-    maxSize: 80,
-    accessorFn: (row) => {
-      const provider = getEnvironmentProvider(row);
-
-      if (provider === EnvironmentProvider.Unspecified) {
-        return '';
-      }
-
-      return environmentProviderLabels[provider];
-    },
-  },
-  {
-    header: 'Status',
-    align: 'right',
-    id: 'status',
-    size: 120,
-    minSize: 120,
-    maxSize: 150,
-    accessorFn: (row) => environmentStatusLabels[row.status!] || '',
-    filter: {
-      type: {
-        select: {
-          isMultiple: true,
-          options: Object.entries(environmentStatusLabels).map(([value, label]) => ({ value, label })),
+function getColumns(
+  t: TFunction,
+  filters: BaseTableFilter<O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilterableFields>[],
+): CustomColumnDef<O5AwsDeployerV1EnvironmentState>[] {
+  return extendColumnsWithPSMFeatures<O5AwsDeployerV1EnvironmentState, O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest['query']>(
+    [
+      getRowExpander(),
+      {
+        header: 'ID',
+        id: 'environmentId',
+        accessorKey: 'environmentId',
+        size: 110,
+        minSize: 110,
+        maxSize: 110,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
+          return value ? <UUID canCopy short to={`/environment/${value}`} uuid={value} /> : null;
         },
       },
-    },
-  },
-];
+      {
+        header: 'Full Name',
+        id: 'data.config.fullName',
+        size: 150,
+        minSize: 150,
+        accessorFn: (row) => row.data?.config?.fullName,
+      },
+      {
+        header: 'Cluster ID',
+        id: 'clusterId',
+        accessorKey: 'clusterId',
+        size: 110,
+        minSize: 110,
+        maxSize: 110,
+        cell: ({ getValue }) => {
+          const value = getValue<string>();
+          return value ? <UUID canCopy short uuid={value} /> : null;
+        },
+      },
+      {
+        header: 'Status',
+        align: 'right',
+        id: 'status',
+        size: 120,
+        minSize: 120,
+        maxSize: 150,
+        accessorFn: (row) => (row.status ? t(`awsDeployer:enum.O5AwsDeployerV1EnvironmentStatus.${row.status}`) : ''),
+      },
+    ],
+    filters,
+    Object.values(O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSortableFields),
+  );
+}
 
-function renderSubRow({ row }: TableRowType<O5DeployerV1EnvironmentState>) {
+function renderSubRow({ row }: TableRowType<O5AwsDeployerV1EnvironmentState>) {
   return (
     <div className="flex flex-col gap-4">
-      <NutritionFact vertical label="Full Name" renderWhenEmpty="-" value={row.original.config?.fullName} />
-      <NutritionFact label="CORS Origins" renderWhenEmpty="-" value={row.original.config?.corsOrigins?.join('\n')} />
-      <NutritionFact label="Trust JWKS" renderWhenEmpty="-" value={row.original.config?.trustJwks?.join('\n')} />
+      <J5StateMetadata vertical heading="Metadata" metadata={row.original.metadata} />
 
-      <h4>Provider</h4>
-      {buildEnvironmentProvider(row.original.config?.provider)}
-
-      <h4>Variables</h4>
-      {buildEnvironmentCustomVariables(row.original.config?.vars)}
+      <EnvironmentSpec vertical heading="Config" spec={row.original.data?.config} />
     </div>
   );
 }
 
-const searchableFields = [{ value: 'fullName', label: 'Full Name' }];
-const initialSearchFields = searchableFields.map((field) => field.value);
-
 export function EnvironmentManagement() {
+  const { t } = useTranslation('awsDeployer');
+  const filters = useMemo(() => getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsFilters(t), [t]);
+  const columns = useMemo(() => getColumns(t, filters), [t, filters]);
+  const searchableFields = useMemo(() => getO5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsSearchFields(t), [t]);
+  const initialSearchFields = useMemo(() => searchableFields.map((field) => field.id), [searchableFields]);
   const { sortValues, setSortValues, psmQuery, setFilterValues, filterValues, searchValue, setSearchValue, searchFields, setSearchFields } =
-    useTableState({ initialSearchFields });
-  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListEnvironments({ query: psmQuery });
+    useTableState<O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest['query']>({
+      initialSearchFields,
+      initialSort: O5_AWS_DEPLOYER_V1_ENVIRONMENT_QUERY_SERVICE_LIST_ENVIRONMENTS_DEFAULT_SORTS,
+      filterFields: filters,
+    });
+  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useO5AwsDeployerV1EnvironmentQueryServiceListEnvironments({
+    query: psmQuery,
+  });
   useErrorHandler(error, 'Failed to load environments');
 
   const flatData = useMemo(() => {
@@ -105,7 +117,7 @@ export function EnvironmentManagement() {
       }
 
       return acc;
-    }, [] as O5DeployerV1EnvironmentState[]);
+    }, [] as O5AwsDeployerV1EnvironmentState[]);
   }, [data?.pages]);
 
   return (

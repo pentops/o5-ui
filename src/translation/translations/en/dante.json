@@ -1,0 +1,33 @@
+{
+  "enum": {
+    "O5DanteV1DeadMessageQueryServiceListDeadMessageEventsSortableFields": {
+      "metadata": {
+        "timestamp": "Timestamp"
+      }
+    },
+    "O5DanteV1DeadMessageQueryServiceListDeadMessagesFilterableFields": {
+      "status": "Status"
+    },
+    "O5DanteV1DeadMessageQueryServiceListDeadMessagesSortableFields": {
+      "metadata": {
+        "createdAt": "Created At",
+        "updatedAt": "Updated At"
+      }
+    },
+    "O5DanteV1MessageStatus": {
+      "CREATED": "Created",
+      "REJECTED": "Rejected",
+      "REPLAYED": "Replayed",
+      "UNSPECIFIED": "Unspecified",
+      "UPDATED": "Updated"
+    }
+  },
+  "oneOf": {
+    "O5DanteV1DeadMessageEventType": {
+      "notified": "Notified",
+      "rejected": "Rejected",
+      "replayed": "Replayed",
+      "updated": "Updated"
+    }
+  }
+}
