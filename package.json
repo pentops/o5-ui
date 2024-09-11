@@ -14,7 +14,7 @@
     "@hookform/resolvers": "^3.9.0",
     "@pentops/jsonapi-request": "^0.0.4",
     "@pentops/normalized-query-cache": "^0.0.2",
-    "@pentops/react-table-state-psm": "^0.0.9",
+    "@pentops/react-table-state-psm": "^0.0.10",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-collapsible": "^1.1.0",
@@ -36,7 +36,7 @@
     "clsx": "^2.1.1",
     "cmdk": "0.2.1",
     "date-fns": "^3.6.0",
-    "i18next": "^23.15.0",
+    "i18next": "^23.15.1",
     "js-yaml": "^4.1.0",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
@@ -59,9 +59,9 @@
   },
   "devDependencies": {
     "@pentops/j5-ts-generator-i18n-plugin": "^0.0.12",
-    "@pentops/j5-ts-generator-normalized-query-plugin": "^0.0.13",
+    "@pentops/j5-ts-generator-normalized-query-plugin": "^0.0.22",
     "@pentops/j5-ts-generator-psm-table-config-plugin": "^0.0.13",
-    "@pentops/jsonapi-jdef-ts-generator": "^0.0.85",
+    "@pentops/jsonapi-jdef-ts-generator": "^0.0.87",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash.get": "^4.4.9",
     "@types/lodash.set": "^4.3.9",
@@ -84,6 +84,6 @@
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.6.2",
-    "vite": "^5.4.3"
+    "vite": "^5.4.4"
   }
 }

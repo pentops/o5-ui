@@ -18,8 +18,8 @@ importers:
         specifier: ^0.0.2
         version: 0.0.2(@tanstack/react-query@5.55.4(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1)
       '@pentops/react-table-state-psm':
-        specifier: ^0.0.9
-        version: 0.0.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.0.10
+        version: 0.0.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.1
         version: 1.1.1(@types/react-dom@18.3.0)(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -84,8 +84,8 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0
       i18next:
-        specifier: ^23.15.0
-        version: 23.15.0
+        specifier: ^23.15.1
+        version: 23.15.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.0
@@ -118,7 +118,7 @@ importers:
         version: 7.53.0(react@18.3.1)
       react-i18next:
         specifier: ^15.0.1
-        version: 15.0.1(i18next@23.15.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 15.0.1(i18next@23.15.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-router-dom:
         specifier: ^6.26.2
         version: 6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -146,16 +146,16 @@ importers:
     devDependencies:
       '@pentops/j5-ts-generator-i18n-plugin':
         specifier: ^0.0.12
-        version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(i18next@23.15.0)
+        version: 0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(i18next@23.15.1)
       '@pentops/j5-ts-generator-normalized-query-plugin':
-        specifier: ^0.0.13
-        version: 0.0.13(@pentops/jsonapi-jdef-ts-generator@0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/normalized-query-cache@0.0.2(@tanstack/react-query@5.55.4(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1))(normalizr@3.6.2)
+        specifier: ^0.0.22
+        version: 0.0.22(@pentops/jsonapi-jdef-ts-generator@0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/normalized-query-cache@0.0.2(@tanstack/react-query@5.55.4(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1))(normalizr@3.6.2)
       '@pentops/j5-ts-generator-psm-table-config-plugin':
         specifier: ^0.0.13
-        version: 0.0.13(@pentops/jsonapi-jdef-ts-generator@0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/react-table-state-psm@0.0.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+        version: 0.0.13(@pentops/jsonapi-jdef-ts-generator@0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/react-table-state-psm@0.0.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@pentops/jsonapi-jdef-ts-generator':
-        specifier: ^0.0.85
-        version: 0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))
+        specifier: ^0.0.87
+        version: 0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -191,7 +191,7 @@ importers:
         version: 7.11.0(eslint@8.57.0)(typescript@5.6.2)
       '@vitejs/plugin-react':
         specifier: ^4.3.1
-        version: 4.3.1(vite@5.4.3(@types/node@22.5.4))
+        version: 4.3.1(vite@5.4.4(@types/node@22.5.4))
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.45)
@@ -223,8 +223,8 @@ importers:
         specifier: ^5.6.2
         version: 5.6.2
       vite:
-        specifier: ^5.4.3
-        version: 5.4.3(@types/node@22.5.4)
+        specifier: ^5.4.4
+        version: 5.4.4(@types/node@22.5.4)
 
 packages:
 
@@ -562,10 +562,10 @@ packages:
       '@pentops/jsonapi-jdef-ts-generator': '>=0.0.83 < 0.1.0'
       i18next: '>=23.0.0 < 24.0.0'
 
-  '@pentops/j5-ts-generator-normalized-query-plugin@0.0.13':
-    resolution: {integrity: sha512-H2IRQMyisSut+dgFCpe3MxqX+eLUdJmR50MXOcSpuozW7YFb80erB/jIVAOUq/7WQpsiHlgAzX0x0W6vC4SX1Q==}
+  '@pentops/j5-ts-generator-normalized-query-plugin@0.0.22':
+    resolution: {integrity: sha512-exvy6fljDe8LYiH0Codo0B07wuTreRxwbQHpH+hdmPrOCD64UvYLxIyFVXLd8Fd4MHb4aE3D0vG6lwT7ilWfUQ==}
     peerDependencies:
-      '@pentops/jsonapi-jdef-ts-generator': '>=0.0.83 < 0.1.0'
+      '@pentops/jsonapi-jdef-ts-generator': '>=0.0.87 < 0.1.0'
       '@pentops/normalized-query-cache': '>=0.0.1 < 0.1.0'
       normalizr: '>=3.0.0 < 4.0.0'
 
@@ -575,8 +575,8 @@ packages:
       '@pentops/jsonapi-jdef-ts-generator': '>=0.0.85 < 0.1.0'
       '@pentops/react-table-state-psm': '>=0.0.6 < 0.1.0'
 
-  '@pentops/jsonapi-jdef-ts-generator@0.0.85':
-    resolution: {integrity: sha512-xHOx+3iu0VKqbCjLtVQj6pzjs8SXMVLt1iAJrx+BxS6KOlSyemXpmHWqYGDqHdoIw+1sOq+Q7elx18yAyko1Qw==}
+  '@pentops/jsonapi-jdef-ts-generator@0.0.87':
+    resolution: {integrity: sha512-bW7glR9pwtSbk75Lswg5Rqa8rLjOmp9zFn8xVWEdFbJpB0NKrkkItKdVXhStjR5lFFX4KeBj4PHMFb/0BwkSkg==}
     hasBin: true
     peerDependencies:
       '@pentops/jsonapi-request': '>=0.0.4'
@@ -596,8 +596,8 @@ packages:
       normalizr: '>=3.6.0 < 4.0.0'
       react: '>=18.3.0 < 19.0.0'
 
-  '@pentops/react-table-state-psm@0.0.9':
-    resolution: {integrity: sha512-48nkY8DBIpU+njE+4FK3MxwNxhWwbZRsoVELRlxGvQ819KmuYA7pu+EPVLqzBQVHGenpVgrJxUkfiEI2jrhyeA==}
+  '@pentops/react-table-state-psm@0.0.10':
+    resolution: {integrity: sha512-wWiv9sNXd6i/FwjLKsl68JjM1+X08jF4euEWoaKwF7wiQogVykA4xPTuWx+b/rzWiJLFDga3Ek4HY0SRSrYHpQ==}
     peerDependencies:
       react: '>=18.0.0 < 19.0.0'
       react-dom: '>=18.0.0 < 19.0.0'
@@ -1797,8 +1797,8 @@ packages:
   html-parse-stringify@3.0.1:
     resolution: {integrity: sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==}
 
-  i18next@23.15.0:
-    resolution: {integrity: sha512-saeTb1tIQT+W/3xMivWSEVdpjyiEbj0IeK8eI/PB8jyr5gSQF5qxWLlGLEgRa5od3lvMfvW+ituhrf2VCNfTuw==}
+  i18next@23.15.1:
+    resolution: {integrity: sha512-wB4abZ3uK7EWodYisHl/asf8UYEhrI/vj/8aoSsrj/ZDxj4/UXPOa1KvFt1Fq5hkUHquNqwFlDprmjZ8iySgYA==}
 
   ignore@5.3.1:
     resolution: {integrity: sha512-5Fytz/IraMjqpwfd34ke28PTVMjZjJG2MPn5t7OE4eUCUNf8BAa7b5WUS9/Qvr6mwOQS7Mk6vdsMno5he+T8Xw==}
@@ -2496,8 +2496,8 @@ packages:
       react:
         optional: true
 
-  vite@5.4.3:
-    resolution: {integrity: sha512-IH+nl64eq9lJjFqU+/yrRnrHPVTlgy42/+IzbOdaFDVlyLgI/wDlf+FCobXLX1cT0X5+7LMyH1mIy2xJdLfo8Q==}
+  vite@5.4.4:
+    resolution: {integrity: sha512-RHFCkULitycHVTtelJ6jQLd+KSAAzOgEYorV32R2q++M6COBjKJR6BxqClwp5sf0XaBDjVMuJ9wnNfyAJwjMkA==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -2893,33 +2893,33 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@pentops/j5-ts-generator-i18n-plugin@0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(i18next@23.15.0)':
+  '@pentops/j5-ts-generator-i18n-plugin@0.0.12(@pentops/jsonapi-jdef-ts-generator@0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(i18next@23.15.1)':
     dependencies:
-      '@pentops/jsonapi-jdef-ts-generator': 0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))
+      '@pentops/jsonapi-jdef-ts-generator': 0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))
       '@pentops/sort-helpers': 0.0.1
       change-case: 5.4.4
-      i18next: 23.15.0
+      i18next: 23.15.1
       lodash.set: 4.3.2
       ts-pattern: 5.3.1
 
-  '@pentops/j5-ts-generator-normalized-query-plugin@0.0.13(@pentops/jsonapi-jdef-ts-generator@0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/normalized-query-cache@0.0.2(@tanstack/react-query@5.55.4(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1))(normalizr@3.6.2)':
+  '@pentops/j5-ts-generator-normalized-query-plugin@0.0.22(@pentops/jsonapi-jdef-ts-generator@0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/normalized-query-cache@0.0.2(@tanstack/react-query@5.55.4(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1))(normalizr@3.6.2)':
     dependencies:
-      '@pentops/jsonapi-jdef-ts-generator': 0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))
+      '@pentops/jsonapi-jdef-ts-generator': 0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))
       '@pentops/normalized-query-cache': 0.0.2(@tanstack/react-query@5.55.4(react@18.3.1))(@types/react@18.3.5)(normalizr@3.6.2)(react@18.3.1)
       change-case: 5.4.4
       normalizr: 3.6.2
       ts-morph: 23.0.0
       ts-pattern: 5.3.1
 
-  '@pentops/j5-ts-generator-psm-table-config-plugin@0.0.13(@pentops/jsonapi-jdef-ts-generator@0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/react-table-state-psm@0.0.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1))':
+  '@pentops/j5-ts-generator-psm-table-config-plugin@0.0.13(@pentops/jsonapi-jdef-ts-generator@0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0)))(@pentops/react-table-state-psm@0.0.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1))':
     dependencies:
-      '@pentops/jsonapi-jdef-ts-generator': 0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))
-      '@pentops/react-table-state-psm': 0.0.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@pentops/jsonapi-jdef-ts-generator': 0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))
+      '@pentops/react-table-state-psm': 0.0.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       change-case: 5.4.4
       ts-morph: 23.0.0
       ts-pattern: 5.3.1
 
-  '@pentops/jsonapi-jdef-ts-generator@0.0.85(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))':
+  '@pentops/jsonapi-jdef-ts-generator@0.0.87(@pentops/jsonapi-request@0.0.4(uuid@10.0.0))':
     dependencies:
       '@pentops/jsonapi-request': 0.0.4(uuid@10.0.0)
       change-case: 5.4.4
@@ -2944,7 +2944,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
-  '@pentops/react-table-state-psm@0.0.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@pentops/react-table-state-psm@0.0.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -3739,14 +3739,14 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react@4.3.1(vite@5.4.3(@types/node@22.5.4))':
+  '@vitejs/plugin-react@4.3.1(vite@5.4.4(@types/node@22.5.4))':
     dependencies:
       '@babel/core': 7.25.2
       '@babel/plugin-transform-react-jsx-self': 7.24.7(@babel/core@7.25.2)
       '@babel/plugin-transform-react-jsx-source': 7.24.7(@babel/core@7.25.2)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.4.3(@types/node@22.5.4)
+      vite: 5.4.4(@types/node@22.5.4)
     transitivePeerDependencies:
       - supports-color
 
@@ -4219,7 +4219,7 @@ snapshots:
     dependencies:
       void-elements: 3.1.0
 
-  i18next@23.15.0:
+  i18next@23.15.1:
     dependencies:
       '@babel/runtime': 7.25.6
 
@@ -4520,11 +4520,11 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  react-i18next@15.0.1(i18next@23.15.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-i18next@15.0.1(i18next@23.15.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.25.4
       html-parse-stringify: 3.0.1
-      i18next: 23.15.0
+      i18next: 23.15.1
       react: 18.3.1
     optionalDependencies:
       react-dom: 18.3.1(react@18.3.1)
@@ -4843,7 +4843,7 @@ snapshots:
       '@types/react': 18.3.5
       react: 18.3.1
 
-  vite@5.4.3(@types/node@22.5.4):
+  vite@5.4.4(@types/node@22.5.4):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.45
