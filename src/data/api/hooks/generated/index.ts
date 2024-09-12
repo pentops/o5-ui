@@ -4,12 +4,12 @@ export * from './o5-dante-v1-dead-message-query-service-list-dead-message-events
 export * from './o5-dante-v1-dead-message-command-service-update-dead-message';
 export * from './o5-dante-v1-dead-message-command-service-replay-dead-message';
 export * from './o5-dante-v1-dead-message-command-service-reject-dead-message';
-export * from './o5-aws-deployer-v1-environment-query-service-list-environments';
-export * from './o5-aws-deployer-v1-environment-query-service-get-environment';
-export * from './o5-aws-deployer-v1-environment-query-service-list-environment-events';
 export * from './o5-aws-deployer-v1-stack-query-service-get-stack';
 export * from './o5-aws-deployer-v1-stack-query-service-list-stacks';
 export * from './o5-aws-deployer-v1-stack-query-service-list-stack-events';
+export * from './o5-aws-deployer-v1-environment-query-service-list-environments';
+export * from './o5-aws-deployer-v1-environment-query-service-get-environment';
+export * from './o5-aws-deployer-v1-environment-query-service-list-environment-events';
 export * from './o5-aws-deployer-v1-deployment-query-service-get-deployment';
 export * from './o5-aws-deployer-v1-deployment-query-service-list-deployment-events';
 export * from './o5-aws-deployer-v1-deployment-query-service-list-deployments';

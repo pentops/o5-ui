@@ -8,5 +8,5 @@ export const J5_REGISTRY_GITHUB_V1_REPO_STATE_ENTITY_NAME = 'j5.registry.github.
 export const j5RegistryGithubV1RepoStateEntity = new schema.Entity<J5RegistryGithubV1RepoState>(
   J5_REGISTRY_GITHUB_V1_REPO_STATE_ENTITY_NAME,
   {},
-  { idAttribute: (entity: J5RegistryGithubV1RepoState) => `${entity.keys.owner}-${entity.keys.name}` },
+  { idAttribute: (entity: J5RegistryGithubV1RepoState) => `${entity.owner}-${entity.name}` },
 );

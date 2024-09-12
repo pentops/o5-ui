@@ -15,18 +15,18 @@ import type {
   O5DanteV1DeadMessageCommandServiceReplayDeadMessageRequest,
   O5DanteV1DeadMessageCommandServiceRejectDeadMessageResponse,
   O5DanteV1DeadMessageCommandServiceRejectDeadMessageRequest,
-  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsResponse,
-  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest,
-  O5AwsDeployerV1EnvironmentQueryServiceGetEnvironmentResponse,
-  O5AwsDeployerV1EnvironmentQueryServiceGetEnvironmentGetEnvironmentRequest,
-  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEventsResponse,
-  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEventsRequest,
   O5AwsDeployerV1StackQueryServiceGetStackResponse,
   O5AwsDeployerV1StackQueryServiceGetStackGetStackRequest,
   O5AwsDeployerV1StackQueryServiceListStacksResponse,
   O5AwsDeployerV1StackQueryServiceListStacksRequest,
   O5AwsDeployerV1StackQueryServiceListStackEventsResponse,
   O5AwsDeployerV1StackQueryServiceListStackEventsRequest,
+  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsResponse,
+  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest,
+  O5AwsDeployerV1EnvironmentQueryServiceGetEnvironmentResponse,
+  O5AwsDeployerV1EnvironmentQueryServiceGetEnvironmentGetEnvironmentRequest,
+  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEventsResponse,
+  O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEventsRequest,
   O5AwsDeployerV1DeploymentQueryServiceGetDeploymentResponse,
   O5AwsDeployerV1DeploymentQueryServiceGetDeploymentGetDeploymentRequest,
   O5AwsDeployerV1DeploymentQueryServiceListDeploymentEventsResponse,
@@ -123,6 +123,36 @@ export async function o5DanteV1DeadMessageCommandServiceRejectDeadMessage(
   );
 }
 
+export async function o5AwsDeployerV1StackQueryServiceGetStack(
+  baseUrl: string | undefined,
+  request?: O5AwsDeployerV1StackQueryServiceGetStackGetStackRequest,
+  requestInit?: RequestInit,
+): Promise<O5AwsDeployerV1StackQueryServiceGetStackResponse | undefined> {
+  return makeRequest<O5AwsDeployerV1StackQueryServiceGetStackResponse, O5AwsDeployerV1StackQueryServiceGetStackGetStackRequest>(
+    ...buildMergedRequestInit('GET', baseUrl || '', '/deployer/v1/q/stack/:stackId', request, requestInit),
+  );
+}
+
+export async function o5AwsDeployerV1StackQueryServiceListStacks(
+  baseUrl: string | undefined,
+  request?: O5AwsDeployerV1StackQueryServiceListStacksRequest,
+  requestInit?: RequestInit,
+): Promise<O5AwsDeployerV1StackQueryServiceListStacksResponse | undefined> {
+  return makeRequest<O5AwsDeployerV1StackQueryServiceListStacksResponse, O5AwsDeployerV1StackQueryServiceListStacksRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/stacks', request, requestInit),
+  );
+}
+
+export async function o5AwsDeployerV1StackQueryServiceListStackEvents(
+  baseUrl: string | undefined,
+  request?: O5AwsDeployerV1StackQueryServiceListStackEventsRequest,
+  requestInit?: RequestInit,
+): Promise<O5AwsDeployerV1StackQueryServiceListStackEventsResponse | undefined> {
+  return makeRequest<O5AwsDeployerV1StackQueryServiceListStackEventsResponse, O5AwsDeployerV1StackQueryServiceListStackEventsRequest>(
+    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/stack/:stackId/events', request, requestInit),
+  );
+}
+
 export async function o5AwsDeployerV1EnvironmentQueryServiceListEnvironments(
   baseUrl: string | undefined,
   request?: O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentsRequest,
@@ -153,36 +183,6 @@ export async function o5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEvent
     O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEventsResponse,
     O5AwsDeployerV1EnvironmentQueryServiceListEnvironmentEventsRequest
   >(...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/environment/:environmentId/events', request, requestInit));
-}
-
-export async function o5AwsDeployerV1StackQueryServiceGetStack(
-  baseUrl: string | undefined,
-  request?: O5AwsDeployerV1StackQueryServiceGetStackGetStackRequest,
-  requestInit?: RequestInit,
-): Promise<O5AwsDeployerV1StackQueryServiceGetStackResponse | undefined> {
-  return makeRequest<O5AwsDeployerV1StackQueryServiceGetStackResponse, O5AwsDeployerV1StackQueryServiceGetStackGetStackRequest>(
-    ...buildMergedRequestInit('GET', baseUrl || '', '/deployer/v1/q/stack/:stackId', request, requestInit),
-  );
-}
-
-export async function o5AwsDeployerV1StackQueryServiceListStacks(
-  baseUrl: string | undefined,
-  request?: O5AwsDeployerV1StackQueryServiceListStacksRequest,
-  requestInit?: RequestInit,
-): Promise<O5AwsDeployerV1StackQueryServiceListStacksResponse | undefined> {
-  return makeRequest<O5AwsDeployerV1StackQueryServiceListStacksResponse, O5AwsDeployerV1StackQueryServiceListStacksRequest>(
-    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/stacks', request, requestInit),
-  );
-}
-
-export async function o5AwsDeployerV1StackQueryServiceListStackEvents(
-  baseUrl: string | undefined,
-  request?: O5AwsDeployerV1StackQueryServiceListStackEventsRequest,
-  requestInit?: RequestInit,
-): Promise<O5AwsDeployerV1StackQueryServiceListStackEventsResponse | undefined> {
-  return makeRequest<O5AwsDeployerV1StackQueryServiceListStackEventsResponse, O5AwsDeployerV1StackQueryServiceListStackEventsRequest>(
-    ...buildMergedRequestInit('POST', baseUrl || '', '/deployer/v1/q/stack/:stackId/events', request, requestInit),
-  );
 }
 
 export async function o5AwsDeployerV1DeploymentQueryServiceGetDeployment(
